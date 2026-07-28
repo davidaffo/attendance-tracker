@@ -1,7 +1,7 @@
 # Registro presenze — progettazione della PWA
 
 **Stato:** progettazione approvata operativamente, prototipo MVP avviato  
-**Versione:** 0.5  
+**Versione:** 1.5
 **Data:** 28 luglio 2026  
 **Fonte analizzata:** `Registro stagionale.xlsx`
 
@@ -16,9 +16,10 @@ usa Hetzner Storage Share/Nextcloud come archivio condiviso tramite WebDAV:
 - la PWA conserva una copia locale in IndexedDB, funziona offline e sincronizza
   un file JSON di squadra con Nextcloud;
 - ogni squadra e stagione hanno un file separato;
-- il coordinatore sincronizza sul proprio PC la cartella che contiene tutte le
-  squadre e la PWA costruisce localmente la vista aggregata leggendo i JSON in
-  modo ricorsivo.
+- il coordinatore può leggere tutti i file direttamente via WebDAV con il
+  proprio account supervisore oppure dalla cartella sincronizzata sul PC;
+- la PWA costruisce localmente il sommario aggregato e i dettagli delle singole
+  squadre.
 
 Non è previsto un database centrale separato, né Supabase né un cloud server
 dedicato. Nextcloud gestisce autenticazione, autorizzazioni alle cartelle,
@@ -50,6 +51,7 @@ di allenamento, presenze e riepiloghi.
 - pochi passaggi per registrare una seduta;
 - pulsanti grandi e selezione rapida dello stato;
 - salvataggio automatico con stato di sincronizzazione sempre visibile;
+- URL distinti per le sezioni e supporto alla cronologia Indietro/Avanti;
 - nessuna schermata o campo non necessario al registro presenze.
 
 ## 3. Cosa contiene il file Excel
@@ -114,6 +116,19 @@ Per ogni atleta sono calcolati:
 
 - totale mensile per ciascuno stato;
 - percentuale mensile per ciascuno stato.
+
+Come nel file Excel, le percentuali di assenza (`A%`) e ritardo (`R%`) usano
+una scala colore a tre punti con interpolazione:
+
+| Percentuale | Verde | Giallo | Rosso |
+|---|---:|---:|---:|
+| `A%` | 0% | 20% | 33% e oltre |
+| `R%` | 0% | 25% | 40% e oltre |
+
+I colori originali sono verde `#00A933`, giallo `#FFFF00` e rosso `#FF0000`.
+La stessa regola è applicata ai riepiloghi mensili e stagionali accessibili
+all'allenatore e al coordinatore; le altre percentuali non ricevono una scala,
+in coerenza con il foglio di origine.
 
 Sono inoltre calcolati:
 
@@ -307,12 +322,15 @@ sono previsti utenti pubblici o anonimi.
 L'unità di sincronizzazione è un documento JSON per squadra e stagione:
 
 ```text
-Presenze/
-└── 2026-2027/
-    ├── U14/u14__2026-2027.attendance.json
-    ├── U16/u16__2026-2027.attendance.json
-    └── U18/u18__2026-2027.attendance.json
+attendance-tracker/
+├── u14__2026-2027.attendance.json
+├── u16__2026-2027.attendance.json
+└── u18__2026-2027.attendance.json
 ```
+
+`attendance-tracker` si trova direttamente nella root Nextcloud. Tutti i file
+di squadra vengono conservati in questa cartella; squadra e stagione restano
+riconoscibili dal nome del file e dai metadati interni.
 
 Il file contiene:
 
@@ -400,8 +418,9 @@ Allenatore
 PWA ── IndexedDB locale ── WebDAV HTTPS ── file JSON su Nextcloud
 
 Coordinatore
-Nextcloud Desktop ── cartella locale sincronizzata ── PWA coordinatore
-                                                      └─ vista aggregata
+account supervisore ── WebDAV ───────────────┐
+Nextcloud Desktop ── cartella locale ────────┴─ PWA coordinatore
+                                                └─ sommari in sola lettura
 ```
 
 ### 9.1 Stack consigliato
@@ -415,9 +434,12 @@ Scelta proposta, ancora modificabile prima dell'avvio:
 - **sincronizzazione allenatore:** WebDAV Nextcloud;
 - **autenticazione:** account Nextcloud esistenti e password applicative
   revocabili;
-- **accesso coordinatore:** cartella locale aggiornata da Nextcloud Desktop e
-  letta con File System Access API su browser desktop compatibile;
-- **hosting frontend:** servizio statico HTTPS;
+- **protezione credenziali locale:** password solo in memoria; salvataggio e
+  compilazione demandati al password manager del browser quando disponibile;
+- **accesso coordinatore:** WebDAV con credenziali proprie oppure cartella
+  aggiornata da Nextcloud Desktop e letta con File System Access API;
+- **hosting frontend:** GitHub Pages tramite GitHub Actions, con base
+  `/attendance-tracker/`;
 - **export:** generazione locale CSV/Excel;
 - **test:** calcoli, serializzazione, sincronizzazione, conflitti e lettura
   ricorsiva dei file.
@@ -563,6 +585,11 @@ La progettazione tecnica deve includere:
 - permessi minimi applicati dalle cartelle e condivisioni Nextcloud;
 - HTTPS obbligatorio;
 - password applicative revocabili, senza memorizzare la password principale;
+- password applicativa mai persistita dall'app;
+- form compatibili con password manager tramite `username` e
+  `current-password`;
+- richiesta contestuale della password quando una sincronizzazione ne è priva,
+  senza registrare la situazione come errore cloud;
 - origine della PWA esplicitamente autorizzata in WebAppPassword;
 - backup verificati con prova periodica di ripristino;
 - esportazioni accessibili soltanto a ruoli autorizzati;
@@ -745,6 +772,11 @@ realizzati:
 - interfaccia responsive distinta fra allenatore e coordinatore;
 - configurazione iniziale di società, squadra, allenatore, stagione, giorni
   abituali e rosa;
+- configurazione guidata allenatore in passaggi brevi, saltabile e riapribile
+  dalle Impostazioni;
+- criterio di prima apertura basato su versione onboarding in IndexedDB e
+  assenza di un documento squadra, con migrazione silenziosa degli utenti già
+  esistenti;
 - registrazione e modifica di una sessione;
 - scorciatoia `Segna tutte P`;
 - archiviazione delle atlete senza cancellazione dello storico;
@@ -753,12 +785,54 @@ realizzati:
 - documento JSON validato e versionato;
 - persistenza locale tramite IndexedDB;
 - indicazione dello stato di sincronizzazione;
+- esito della configurazione cloud collegato alla sincronizzazione completa del
+  JSON, non al solo test della cartella WebDAV;
+- ultimo errore WebDAV visibile per esteso nelle Impostazioni;
 - client WebDAV con `PROPFIND`, `GET`, `PUT`, ETag e scritture condizionali;
 - ritentativo all'avvio, al ritorno online e quando l'app torna in primo piano;
 - merge delle sessioni create su dispositivi diversi e prevenzione del doppio
   allenamento nella stessa data;
 - vista coordinatore che legge ricorsivamente i file locali
   `*.attendance.json`;
+- caricamento coordinatore diretto di tutti i JSON via WebDAV;
+- credenziali allenatore e coordinatore conservate separatamente;
+- URL Nextcloud, nome utente e cartella remota ricordati in IndexedDB;
+- password applicativa mantenuta soltanto in memoria durante la sessione;
+- password manager del browser abilitato nei form di allenatore, coordinatore e
+  richiesta contestuale;
+- rimozione automatica degli archivi credenziali sperimentali delle versioni
+  precedenti;
+- URL, nome utente e cartella remota salvati automaticamente durante la
+  modifica, senza richiedere il salvataggio dell'intera configurazione;
+- riferimento alla cartella locale del coordinatore ricordato tramite File
+  System Access API, con eventuale nuova conferma del permesso richiesta dal
+  browser;
+- cache IndexedDB dell'ultimo insieme di squadre caricato dal coordinatore, con
+  sorgente e data di aggiornamento;
+- ripristino immediato dei riepiloghi coordinatore alla riapertura, anche
+  offline;
+- rilettura automatica della cartella locale quando era l'ultima sorgente usata
+  e il browser conserva il permesso;
+- sommario aggregato delle squadre con sessioni, atlete e totali per stato;
+- dettaglio coordinatore di ogni squadra con riepilogo stagionale, conteggi,
+  percentuali e matrici mensili;
+- URL a hash compatibili con GitHub Pages per selezione modalità, sezioni
+  allenatore, modifica allenamento e dettaglio squadra coordinatore, con
+  cronologia Indietro/Avanti;
+- navigazione desktop e mobile realizzata con collegamenti, non con sole viste
+  interne prive di indirizzo;
+- workflow GitHub Actions con test, build PWA e deploy automatico su Pages;
+- download del backup JSON completo dalla sezione Portabilità;
+- ripristino allenatore da JSON validato, disponibile anche quando
+  l'installazione non contiene ancora un registro;
+- anteprima e conferma del backup prima della sostituzione del documento in
+  IndexedDB;
+- sospensione persistente della sincronizzazione automatica dopo il ripristino,
+  fino al comando esplicito `Pubblica il ripristino`;
+- ripristino completo con conferma in due passaggi, cancellazione di tutto lo
+  stato IndexedDB e ritorno alla selezione iniziale;
+- reset disponibile sia dalle Impostazioni allenatore sia dalla vista
+  coordinatore, senza cancellare file remoti o password del browser;
 - test automatici del documento, dei calcoli e del merge;
 - build di produzione verificata.
 

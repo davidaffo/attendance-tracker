@@ -1,5 +1,9 @@
 import { describe, expect, it } from 'vitest'
-import { createTeamDocument } from '../domain/defaults'
+import {
+  COACH_ONBOARDING_VERSION,
+  createTeamDocument,
+  isFirstCoachUse
+} from '../domain/defaults'
 import {
   athleteTotals,
   isTeamDocument,
@@ -10,6 +14,12 @@ import {
 } from '../domain/document'
 
 describe('documento squadra', () => {
+  it('mostra la guida solo alla prima apertura senza registro', () => {
+    expect(isFirstCoachUse(undefined, false)).toBe(true)
+    expect(isFirstCoachUse(COACH_ONBOARDING_VERSION, false)).toBe(false)
+    expect(isFirstCoachUse(undefined, true)).toBe(false)
+  })
+
   it('crea un documento valido e serializzabile', () => {
     const document = createTeamDocument({
       teamName: 'Under 14',
@@ -22,6 +32,12 @@ describe('documento squadra', () => {
 
     expect(isTeamDocument(document)).toBe(true)
     expect(parseTeamDocument(serializeTeamDocument(document))).toEqual(document)
+  })
+
+  it('rifiuta un JSON che non è un backup valido della squadra', () => {
+    expect(() =>
+      parseTeamDocument(JSON.stringify({ teamName: 'U14', sessions: [] }))
+    ).toThrow('Il file non rispetta lo schema')
   })
 
   it('calcola i totali partendo dalle sessioni', () => {

@@ -2,11 +2,12 @@ import { useMemo, useState } from 'react'
 import { CalendarDays, CalendarRange, Plus, Users } from 'lucide-react'
 import type { TeamDocument, TrainingSession } from '../domain/types'
 import { athleteTotals, sessionsInMonth } from '../domain/document'
+import { percentageScaleColor } from '../domain/percentageColorScale'
 
 interface MonthlyRegisterProps {
   document: TeamDocument
-  onEditSession: (session: TrainingSession) => void
-  onNewSession: () => void
+  onEditSession?: (session: TrainingSession) => void
+  onNewSession?: () => void
 }
 
 interface SeasonMonth {
@@ -67,10 +68,12 @@ export function MonthlyRegister({
             Stagione {document.season.startYear}–{document.season.endYear}
           </h1>
         </div>
-        <button className="button primary" onClick={onNewSession}>
-          <Plus size={17} />
-          Nuovo allenamento
-        </button>
+        {onNewSession && (
+          <button className="button primary" onClick={onNewSession}>
+            <Plus size={17} />
+            Nuovo allenamento
+          </button>
+        )}
       </div>
 
       <nav className="season-navigation" aria-label="Periodo del registro">
@@ -153,7 +156,7 @@ interface MatrixProps {
   document: TeamDocument
   sessions: TrainingSession[]
   athletes: TeamDocument['athletes']
-  onEditSession: (session: TrainingSession) => void
+  onEditSession?: (session: TrainingSession) => void
 }
 
 function MonthMatrix({ document, sessions, athletes, onEditSession }: MatrixProps) {
@@ -175,26 +178,26 @@ function MonthMatrix({ document, sessions, athletes, onEditSession }: MatrixProp
             <th className="sticky-name">Atleta</th>
             {sessions.map((session) => (
               <th key={session.id}>
-                <button onClick={() => onEditSession(session)} title="Modifica sessione">
-                  {session.date.slice(-2)}
-                </button>
+                {onEditSession ? (
+                  <button onClick={() => onEditSession(session)} title="Modifica sessione">
+                    {session.date.slice(-2)}
+                  </button>
+                ) : (
+                  <span>{session.date.slice(-2)}</span>
+                )}
               </th>
             ))}
             {document.statuses.map((status) => (
               <th className="total-head" key={status.id}>
-                {status.code}
+                <span>{status.code}</span>
+                <small>n · %</small>
               </th>
             ))}
-            <th className="total-head">P%</th>
           </tr>
         </thead>
         <tbody>
           {athletes.map((athlete) => {
             const totals = athleteTotals(document, athlete.id, sessions)
-            const presentId = document.statuses.find((status) => status.code === 'P')?.id
-            const percentage = sessions.length
-              ? Math.round(((presentId ? totals[presentId] : 0) / sessions.length) * 100)
-              : 0
             return (
               <tr key={athlete.id}>
                 <th className="sticky-name">{athlete.name}</th>
@@ -218,12 +221,22 @@ function MonthMatrix({ document, sessions, athletes, onEditSession }: MatrixProp
                     </td>
                   )
                 })}
-                {document.statuses.map((status) => (
-                  <td className="total-cell" key={status.id}>
-                    {totals[status.id]}
-                  </td>
-                ))}
-                <td className="percentage-cell">{percentage}%</td>
+                {document.statuses.map((status) => {
+                  const percentage = sessions.length
+                    ? (totals[status.id] / sessions.length) * 100
+                    : 0
+                  const scaleColor = percentageScaleColor(status, percentage)
+                  return (
+                    <td
+                      className={`total-cell${scaleColor ? ' color-scale-cell' : ''}`}
+                      key={status.id}
+                      style={scaleColor ? { backgroundColor: scaleColor } : undefined}
+                    >
+                      <strong>{totals[status.id]}</strong>
+                      <span>{Math.round(percentage)}%</span>
+                    </td>
+                  )
+                })}
               </tr>
             )
           })}
@@ -283,12 +296,17 @@ function SeasonOverview({
                   {document.statuses.map((status) => {
                     const count = totals[status.id]
                     const percentage = document.sessions.length
-                      ? Math.round((count / document.sessions.length) * 100)
+                      ? (count / document.sessions.length) * 100
                       : 0
+                    const scaleColor = percentageScaleColor(status, percentage)
                     return (
-                      <td className="season-total-cell" key={status.id}>
+                      <td
+                        className={`season-total-cell${scaleColor ? ' color-scale-cell' : ''}`}
+                        key={status.id}
+                        style={scaleColor ? { backgroundColor: scaleColor } : undefined}
+                      >
                         <strong>{count}</strong>
-                        <span>{percentage}%</span>
+                        <span>{Math.round(percentage)}%</span>
                       </td>
                     )
                   })}

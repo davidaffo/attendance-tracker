@@ -23,14 +23,23 @@ async function scanHandle(
   }
 }
 
-export async function pickAndScanDirectory(): Promise<TeamSummary[]> {
+export async function scanDirectoryHandle(
+  handle: FileSystemDirectoryHandle
+): Promise<TeamSummary[]> {
+  const output: TeamSummary[] = []
+  await scanHandle(handle, '', output)
+  return output.sort((a, b) => a.document.teamName.localeCompare(b.document.teamName))
+}
+
+export async function pickAndScanDirectory(): Promise<{
+  handle: FileSystemDirectoryHandle
+  teams: TeamSummary[]
+}> {
   if (!window.showDirectoryPicker) {
     throw new Error('Questo browser non consente di scegliere una cartella locale.')
   }
   const handle = await window.showDirectoryPicker()
-  const output: TeamSummary[] = []
-  await scanHandle(handle, '', output)
-  return output.sort((a, b) => a.document.teamName.localeCompare(b.document.teamName))
+  return { handle, teams: await scanDirectoryHandle(handle) }
 }
 
 export async function parseSelectedFiles(files: FileList): Promise<TeamSummary[]> {

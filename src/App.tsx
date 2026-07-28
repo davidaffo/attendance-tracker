@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react'
 import {
   CalendarRange,
   Check,
@@ -11,13 +11,23 @@ import {
   Users
 } from 'lucide-react'
 import { AttendanceEditor } from './components/AttendanceEditor'
+import { CoachOnboarding } from './components/CoachOnboarding'
 import { CoordinatorDashboard } from './components/CoordinatorDashboard'
 import { Dashboard } from './components/Dashboard'
 import { MonthlyRegister } from './components/MonthlyRegister'
+import { PasswordPrompt } from './components/PasswordPrompt'
 import { SetupCoach } from './components/SetupCoach'
 import { SyncSettings } from './components/SyncSettings'
 import { TeamSettings } from './components/TeamSettings'
+import {
+  COACH_ONBOARDING_VERSION,
+  isFirstCoachUse
+} from './domain/defaults'
 import { deleteSession, saveSession } from './domain/document'
+import {
+  metaForManualSync,
+  metaForRestoredBackup
+} from './domain/syncConfig'
 import type {
   AppMode,
   LocalSyncMeta,
@@ -28,24 +38,70 @@ import type {
 } from './domain/types'
 import { synchronizeDocument } from './services/webdav'
 import {
+  clearLocalData,
   loadAppMode,
+  loadCoachOnboardingVersion,
+  loadCoordinatorSyncConfig,
   loadDocument,
   loadSyncConfig,
   loadSyncMeta,
+  removeLegacyEncryptedCredentials,
   storeAppMode,
+  storeCoachOnboardingVersion,
+  storeCoordinatorSyncConfig,
   storeDocument,
   storeSyncConfig,
   storeSyncMeta
 } from './storage/database'
 
 type CoachView = 'home' | 'register' | 'team' | 'settings'
+type SyncOutcome =
+  | { status: 'synced' | 'skipped' | 'cancelled' }
+  | { status: 'error'; message: string }
 
 const navigation = [
-  { id: 'home' as const, label: 'Oggi', icon: ClipboardCheck },
-  { id: 'register' as const, label: 'Registro', icon: CalendarRange },
-  { id: 'team' as const, label: 'Squadra', icon: Users },
-  { id: 'settings' as const, label: 'Impostazioni', icon: Settings }
+  { id: 'home' as const, path: '/allenatore', label: 'Oggi', icon: ClipboardCheck },
+  {
+    id: 'register' as const,
+    path: '/allenatore/registro',
+    label: 'Registro',
+    icon: CalendarRange
+  },
+  { id: 'team' as const, path: '/allenatore/squadra', label: 'Squadra', icon: Users },
+  {
+    id: 'settings' as const,
+    path: '/allenatore/impostazioni',
+    label: 'Impostazioni',
+    icon: Settings
+  }
 ]
+
+function normalizePath(path: string): string {
+  if (path === '/') return path
+  return path.replace(/\/+$/, '')
+}
+
+function currentRoutePath(): string {
+  const hashPath = window.location.hash.startsWith('#/')
+    ? window.location.hash.slice(1)
+    : '/'
+  return normalizePath(hashPath)
+}
+
+function routeHref(path: string): string {
+  return `${import.meta.env.BASE_URL}#${normalizePath(path)}`
+}
+
+function isCoachSyncRoute(path: string): boolean {
+  return (
+    path.startsWith('/allenatore') &&
+    path !== '/allenatore/configurazione-guidata'
+  )
+}
+
+function coachViewForPath(path: string): CoachView {
+  return navigation.find((item) => item.path === path)?.id ?? 'home'
+}
 
 function syncLabel(indicator: SyncIndicator): string {
   switch (indicator) {
@@ -96,17 +152,80 @@ function Welcome({ onSelect }: { onSelect: (mode: AppMode) => void }) {
 
 export default function App() {
   const [loading, setLoading] = useState(true)
-  const [mode, setMode] = useState<AppMode>()
+  const [pathname, setPathname] = useState(currentRoutePath)
   const [document, setDocument] = useState<TeamDocument>()
   const [syncConfig, setSyncConfig] = useState<SyncConfig>()
+  const [coordinatorSyncConfig, setCoordinatorSyncConfig] = useState<SyncConfig>()
   const [syncMeta, setSyncMeta] = useState<LocalSyncMeta>({ dirty: false })
   const [syncIndicator, setSyncIndicator] = useState<SyncIndicator>('local')
-  const [view, setView] = useState<CoachView>('home')
-  const [editingSession, setEditingSession] = useState<TrainingSession | 'new'>()
+  const [coachOnboardingVersion, setCoachOnboardingVersion] = useState<number>()
+  const [passwordPrompt, setPasswordPrompt] = useState<{
+    owner: 'coach' | 'coordinator'
+    username: string
+  }>()
   const documentRef = useRef<TeamDocument | undefined>(undefined)
   const configRef = useRef<SyncConfig | undefined>(undefined)
   const metaRef = useRef<LocalSyncMeta>({ dirty: false })
-  const syncingRef = useRef(false)
+  const syncPromiseRef = useRef<Promise<SyncOutcome> | undefined>(undefined)
+  const resettingRef = useRef(false)
+  const passwordRequestRef = useRef<{
+    owner: 'coach' | 'coordinator'
+    promise: Promise<string | undefined>
+    resolve: (password: string | undefined) => void
+  } | undefined>(undefined)
+
+  const navigate = useCallback(
+    (path: string, options?: { replace?: boolean; from?: string }) => {
+      const nextPath = normalizePath(path)
+      const state = options?.from ? { from: options.from } : null
+      if (options?.replace) {
+        window.history.replaceState(state, '', routeHref(nextPath))
+      } else {
+        window.history.pushState(state, '', routeHref(nextPath))
+      }
+      setPathname(nextPath)
+      window.scrollTo({ top: 0 })
+    },
+    []
+  )
+
+  useEffect(() => {
+    const handleNavigation = () => setPathname(currentRoutePath())
+    window.addEventListener('popstate', handleNavigation)
+    window.addEventListener('hashchange', handleNavigation)
+    return () => {
+      window.removeEventListener('popstate', handleNavigation)
+      window.removeEventListener('hashchange', handleNavigation)
+    }
+  }, [])
+
+  const requestPassword = useCallback(
+    (owner: 'coach' | 'coordinator', username: string): Promise<string | undefined> => {
+      const currentRequest = passwordRequestRef.current
+      if (currentRequest) return currentRequest.promise
+
+      let resolveRequest!: (password: string | undefined) => void
+      const promise = new Promise<string | undefined>((resolve) => {
+        resolveRequest = resolve
+      })
+      passwordRequestRef.current = {
+        owner,
+        promise,
+        resolve: resolveRequest
+      }
+      setPasswordPrompt({ owner, username })
+      return promise
+    },
+    []
+  )
+
+  const finishPasswordRequest = (password?: string) => {
+    const request = passwordRequestRef.current
+    if (!request) return
+    passwordRequestRef.current = undefined
+    setPasswordPrompt(undefined)
+    request.resolve(password)
+  }
 
   const applyDocument = (next: TeamDocument | undefined) => {
     documentRef.current = next
@@ -124,50 +243,126 @@ export default function App() {
   }
 
   const performSync = useCallback(
-    async (
+    (
       currentDocument = documentRef.current,
       currentMeta = metaRef.current,
       currentConfig = configRef.current
-    ) => {
-      if (!currentDocument || !currentConfig || syncingRef.current) return
+    ): Promise<SyncOutcome> => {
+      if (!currentDocument || !currentConfig) {
+        return Promise.resolve({ status: 'skipped' })
+      }
+      if (currentMeta.restorePending) {
+        setSyncIndicator('pending')
+        return Promise.resolve({ status: 'skipped' })
+      }
       if (!navigator.onLine) {
         setSyncIndicator(currentMeta.dirty ? 'pending' : 'local')
-        return
+        return Promise.resolve({ status: 'skipped' })
       }
+      if (syncPromiseRef.current) return syncPromiseRef.current
 
-      syncingRef.current = true
-      setSyncIndicator('syncing')
-      try {
-        const result = await synchronizeDocument(currentDocument, currentMeta, currentConfig)
-        await Promise.all([storeDocument(result.document), storeSyncMeta(result.meta)])
-        applyDocument(result.document)
-        applyMeta(result.meta)
-        setSyncIndicator('synced')
-      } catch (error) {
-        const message = error instanceof Error ? error.message : 'Sincronizzazione non riuscita.'
-        const nextMeta = { ...currentMeta, dirty: true, lastError: message }
-        await storeSyncMeta(nextMeta)
-        applyMeta(nextMeta)
-        setSyncIndicator(message.includes('conflitto') ? 'conflict' : 'error')
-      } finally {
-        syncingRef.current = false
-      }
+      const operation = (async (): Promise<SyncOutcome> => {
+        try {
+          let readyConfig = currentConfig
+          if (!readyConfig.appPassword) {
+            setSyncIndicator(currentMeta.dirty ? 'pending' : 'local')
+            const password = await requestPassword('coach', readyConfig.username)
+            if (!password) return { status: 'cancelled' }
+            readyConfig = { ...readyConfig, appPassword: password }
+            applyConfig(readyConfig)
+          }
+
+          setSyncIndicator('syncing')
+          const result = await synchronizeDocument(
+            currentDocument,
+            currentMeta,
+            readyConfig
+          )
+          if (resettingRef.current) return { status: 'skipped' }
+          await Promise.all([storeDocument(result.document), storeSyncMeta(result.meta)])
+          applyDocument(result.document)
+          applyMeta(result.meta)
+          setSyncIndicator('synced')
+          return { status: 'synced' }
+        } catch (error) {
+          if (resettingRef.current) return { status: 'skipped' }
+          const message =
+            error instanceof Error ? error.message : 'Sincronizzazione non riuscita.'
+          if (
+            message.includes('Credenziali non valide') ||
+            message.includes('account non può leggere')
+          ) {
+            const current = configRef.current
+            if (current) applyConfig({ ...current, appPassword: '' })
+          }
+          const nextMeta = { ...currentMeta, dirty: true, lastError: message }
+          await storeSyncMeta(nextMeta)
+          applyMeta(nextMeta)
+          setSyncIndicator(message.includes('conflitto') ? 'conflict' : 'error')
+          return { status: 'error', message }
+        }
+      })()
+
+      syncPromiseRef.current = operation
+      void operation.finally(() => {
+        if (syncPromiseRef.current === operation) {
+          syncPromiseRef.current = undefined
+        }
+      })
+      return operation
     },
-    []
+    [requestPassword]
   )
 
   useEffect(() => {
     let active = true
-    Promise.all([loadAppMode(), loadDocument(), loadSyncConfig(), loadSyncMeta()]).then(
-      ([storedMode, storedDocument, storedConfig, storedMeta]) => {
+    Promise.all([
+      loadAppMode(),
+      loadDocument(),
+      loadSyncConfig(),
+      loadCoordinatorSyncConfig(),
+      loadSyncMeta(),
+      loadCoachOnboardingVersion(),
+      removeLegacyEncryptedCredentials()
+    ]).then(
+      ([
+        storedMode,
+        storedDocument,
+        storedConfig,
+        storedCoordinatorConfig,
+        storedMeta,
+        storedOnboardingVersion
+      ]) => {
         if (!active) return
-        setMode(storedMode)
         applyDocument(storedDocument)
         applyConfig(storedConfig)
+        setCoordinatorSyncConfig(storedCoordinatorConfig)
+        if (!storedOnboardingVersion && storedDocument) {
+          void storeCoachOnboardingVersion(COACH_ONBOARDING_VERSION)
+          setCoachOnboardingVersion(COACH_ONBOARDING_VERSION)
+        } else {
+          setCoachOnboardingVersion(storedOnboardingVersion)
+        }
         applyMeta(storedMeta)
-        setSyncIndicator(storedMeta.dirty ? 'pending' : storedMeta.lastSyncedAt ? 'synced' : 'local')
+        setSyncIndicator(
+          !storedConfig
+            ? 'local'
+            : storedMeta.dirty
+              ? 'pending'
+              : storedMeta.lastSyncedAt
+                ? 'synced'
+                : 'local'
+        )
+        if (currentRoutePath() === '/' && storedMode) {
+          const initialPath = storedMode === 'coach' ? '/allenatore' : '/coordinatore'
+          window.history.replaceState(null, '', routeHref(initialPath))
+          setPathname(initialPath)
+        }
         setLoading(false)
-        if (storedDocument && storedConfig && navigator.onLine) {
+        const shouldSyncCoach =
+          isCoachSyncRoute(currentRoutePath()) ||
+          (currentRoutePath() === '/' && storedMode === 'coach')
+        if (storedDocument && storedConfig && navigator.onLine && shouldSyncCoach) {
           void performSync(storedDocument, storedMeta, storedConfig)
         }
       }
@@ -178,9 +373,16 @@ export default function App() {
   }, [performSync])
 
   useEffect(() => {
-    const syncWhenAvailable = () => void performSync()
+    const syncWhenAvailable = () => {
+      if (isCoachSyncRoute(currentRoutePath())) void performSync()
+    }
     const syncWhenVisible = () => {
-      if (window.document.visibilityState === 'visible') void performSync()
+      if (
+        window.document.visibilityState === 'visible' &&
+        isCoachSyncRoute(currentRoutePath())
+      ) {
+        void performSync()
+      }
     }
     window.addEventListener('online', syncWhenAvailable)
     window.document.addEventListener('visibilitychange', syncWhenVisible)
@@ -192,7 +394,7 @@ export default function App() {
 
   const chooseMode = async (nextMode: AppMode) => {
     await storeAppMode(nextMode)
-    setMode(nextMode)
+    navigate(nextMode === 'coach' ? '/allenatore' : '/coordinatore')
   }
 
   const commitDocument = async (next: TeamDocument, syncNow = true) => {
@@ -207,8 +409,73 @@ export default function App() {
   }
 
   const completeSetup = async (next: TeamDocument) => {
+    await storeCoachOnboardingVersion(COACH_ONBOARDING_VERSION)
+    setCoachOnboardingVersion(COACH_ONBOARDING_VERSION)
     await commitDocument(next, false)
-    setView('home')
+    navigate('/allenatore', { replace: true })
+  }
+
+  const completeCoachOnboarding = async (
+    next: TeamDocument,
+    nextSyncConfig?: SyncConfig
+  ) => {
+    const reopening = Boolean(document)
+    await commitDocument(next, false)
+    if (nextSyncConfig) {
+      await storeSyncConfig(nextSyncConfig)
+      applyConfig(nextSyncConfig)
+      if (navigator.onLine) {
+        void performSync(next, metaRef.current, nextSyncConfig)
+      }
+    } else if (configRef.current && navigator.onLine) {
+      void performSync(next, metaRef.current, configRef.current)
+    }
+    await storeCoachOnboardingVersion(COACH_ONBOARDING_VERSION)
+    setCoachOnboardingVersion(COACH_ONBOARDING_VERSION)
+    navigate(reopening ? '/allenatore/impostazioni' : '/allenatore', {
+      replace: true
+    })
+  }
+
+  const skipCoachOnboarding = async () => {
+    await storeCoachOnboardingVersion(COACH_ONBOARDING_VERSION)
+    setCoachOnboardingVersion(COACH_ONBOARDING_VERSION)
+    navigate(document ? '/allenatore/impostazioni' : '/allenatore', {
+      replace: true
+    })
+  }
+
+  const resetAllLocalData = async () => {
+    resettingRef.current = true
+    await clearLocalData()
+    window.history.replaceState(null, '', routeHref('/'))
+    window.location.reload()
+  }
+
+  const restoreCoachBackup = async (restoredDocument: TeamDocument) => {
+    if (syncPromiseRef.current) await syncPromiseRef.current
+    const wasEmpty = !documentRef.current
+    const restoredMeta = metaForRestoredBackup()
+    await Promise.all([
+      storeDocument(restoredDocument),
+      storeSyncMeta(restoredMeta),
+      storeCoachOnboardingVersion(COACH_ONBOARDING_VERSION)
+    ])
+    applyDocument(restoredDocument)
+    applyMeta(restoredMeta)
+    setCoachOnboardingVersion(COACH_ONBOARDING_VERSION)
+    setSyncIndicator(configRef.current ? 'pending' : 'local')
+    if (wasEmpty) navigate('/allenatore', { replace: true })
+  }
+
+  const syncCoachManually = async () => {
+    let currentMeta = metaRef.current
+    if (currentMeta.restorePending) {
+      currentMeta = metaForManualSync(currentMeta)
+      await storeSyncMeta(currentMeta)
+      applyMeta(currentMeta)
+    }
+    await performSync(documentRef.current, currentMeta, configRef.current)
   }
 
   const handleSessionSave = async (
@@ -231,9 +498,46 @@ export default function App() {
     await storeSyncConfig(config)
     applyConfig(config)
     if (documentRef.current) {
-      void performSync(documentRef.current, metaRef.current, config)
+      if (syncPromiseRef.current) await syncPromiseRef.current
+      applyConfig(config)
+      let currentMeta = metaRef.current
+      if (currentMeta.restorePending) {
+        currentMeta = metaForManualSync(currentMeta)
+        await storeSyncMeta(currentMeta)
+        applyMeta(currentMeta)
+      }
+      const outcome = await performSync(
+        documentRef.current,
+        currentMeta,
+        config
+      )
+      if (outcome.status === 'error') throw new Error(outcome.message)
     }
   }
+
+  const persistCoachConnectionDetails = async (config: SyncConfig) => {
+    await storeSyncConfig(config)
+    applyConfig({ ...config, appPassword: '' })
+  }
+
+  const persistCoordinatorConnectionDetails = async (config: SyncConfig) => {
+    await storeCoordinatorSyncConfig(config)
+    setCoordinatorSyncConfig({ ...config, appPassword: '' })
+  }
+
+  const renderPage = (page: ReactNode) => (
+    <>
+      {page}
+      {passwordPrompt && (
+        <PasswordPrompt
+          key={`${passwordPrompt.owner}-${passwordPrompt.username}`}
+          username={passwordPrompt.username}
+          onSubmit={(password) => finishPasswordRequest(password)}
+          onCancel={() => finishPasswordRequest()}
+        />
+      )}
+    </>
+  )
 
   if (loading) {
     return (
@@ -244,37 +548,120 @@ export default function App() {
     )
   }
 
-  if (!mode) return <Welcome onSelect={chooseMode} />
+  if (pathname === '/') return renderPage(<Welcome onSelect={chooseMode} />)
 
-  if (mode === 'coordinator') {
-    return <CoordinatorDashboard onCoachMode={() => void chooseMode('coach')} />
+  const coordinatorTeamMatch = pathname.match(/^\/coordinatore\/squadra\/([^/]+)$/)
+  if (pathname === '/coordinatore' || coordinatorTeamMatch) {
+    return renderPage(
+      <CoordinatorDashboard
+        onChooseMode={() => navigate('/')}
+        selectedTeamId={
+          coordinatorTeamMatch ? decodeURIComponent(coordinatorTeamMatch[1]) : undefined
+        }
+        onNavigate={navigate}
+        config={coordinatorSyncConfig}
+        onSaveConfig={async (config) => {
+          await storeCoordinatorSyncConfig(config)
+          setCoordinatorSyncConfig(config)
+        }}
+        onPersistConnectionDetails={persistCoordinatorConnectionDetails}
+        onRequestPassword={(username) => requestPassword('coordinator', username)}
+        onResetAllData={resetAllLocalData}
+      />
+    )
+  }
+
+  if (!pathname.startsWith('/allenatore')) {
+    return renderPage(
+      <main className="welcome-page">
+        <div className="welcome-content">
+          <div className="eyebrow">Pagina non trovata</div>
+          <h1>Questo indirizzo non esiste.</h1>
+          <button className="button primary" onClick={() => navigate('/', { replace: true })}>
+            Torna all’inizio
+          </button>
+        </div>
+      </main>
+    )
+  }
+
+  const showCoachOnboarding =
+    pathname === '/allenatore/configurazione-guidata' ||
+    isFirstCoachUse(coachOnboardingVersion, Boolean(document))
+
+  if (showCoachOnboarding) {
+    return renderPage(
+      <CoachOnboarding
+        document={document}
+        syncConfig={syncConfig}
+        onComplete={completeCoachOnboarding}
+        onSkip={skipCoachOnboarding}
+        onRestoreBackup={restoreCoachBackup}
+      />
+    )
   }
 
   if (!document) {
-    return (
+    return renderPage(
       <SetupCoach
         onComplete={completeSetup}
         onSwitchMode={() => void chooseMode('coordinator')}
+        onRestoreBackup={restoreCoachBackup}
       />
     )
   }
 
-  if (editingSession) {
-    return (
+  const editorMatch = pathname.match(/^\/allenatore\/sessione\/([^/]+)$/)
+  if (editorMatch) {
+    const sessionSegment = decodeURIComponent(editorMatch[1])
+    const initialSession =
+      sessionSegment === 'nuova'
+        ? undefined
+        : document.sessions.find((session) => session.id === sessionSegment)
+
+    if (sessionSegment !== 'nuova' && !initialSession) {
+      return renderPage(
+        <main className="welcome-page">
+          <div className="welcome-content">
+            <div className="eyebrow">Allenamento non trovato</div>
+            <h1>Il registro richiesto non è disponibile.</h1>
+            <button
+              className="button primary"
+              onClick={() => navigate('/allenatore/registro', { replace: true })}
+            >
+              Apri il registro
+            </button>
+          </div>
+        </main>
+      )
+    }
+
+    const closeEditor = () => {
+      const from = window.history.state?.from
+      if (typeof from === 'string' && from.startsWith('/allenatore')) {
+        window.history.back()
+      } else {
+        navigate('/allenatore/registro', { replace: true })
+      }
+    }
+
+    return renderPage(
       <AttendanceEditor
         document={document}
-        initialSession={editingSession === 'new' ? undefined : editingSession}
+        initialSession={initialSession}
         onSave={handleSessionSave}
         onDelete={handleSessionDelete}
-        onClose={() => setEditingSession(undefined)}
+        onClose={closeEditor}
       />
     )
   }
+
+  const view = coachViewForPath(pathname)
 
   const SyncIcon =
     syncIndicator === 'syncing' ? LoaderCircle : syncIndicator === 'pending' ? CloudOff : Cloud
 
-  return (
+  return renderPage(
     <div className="app-shell">
       <aside className="sidebar">
         <div className="brand-lockup">
@@ -288,14 +675,18 @@ export default function App() {
         </div>
         <nav>
           {navigation.map((item) => (
-            <button
+            <a
               key={item.id}
+              href={routeHref(item.path)}
               className={view === item.id ? 'active' : ''}
-              onClick={() => setView(item.id)}
+              onClick={(event) => {
+                event.preventDefault()
+                navigate(item.path)
+              }}
             >
               <item.icon size={19} />
               {item.label}
-            </button>
+            </a>
           ))}
         </nav>
         <div className="sidebar-team">
@@ -315,7 +706,7 @@ export default function App() {
           </div>
           <button
             className={`sync-chip ${syncIndicator}`}
-            onClick={() => setView('settings')}
+            onClick={() => navigate('/allenatore/impostazioni')}
             title={syncMeta.lastError}
           >
             <SyncIcon className={syncIndicator === 'syncing' ? 'spin' : ''} size={15} />
@@ -327,15 +718,27 @@ export default function App() {
           {view === 'home' && (
             <Dashboard
               document={document}
-              onNewSession={() => setEditingSession('new')}
-              onEditSession={setEditingSession}
+              onNewSession={() =>
+                navigate('/allenatore/sessione/nuova', { from: pathname })
+              }
+              onEditSession={(session) =>
+                navigate(`/allenatore/sessione/${encodeURIComponent(session.id)}`, {
+                  from: pathname
+                })
+              }
             />
           )}
           {view === 'register' && (
             <MonthlyRegister
               document={document}
-              onEditSession={setEditingSession}
-              onNewSession={() => setEditingSession('new')}
+              onEditSession={(session) =>
+                navigate(`/allenatore/sessione/${encodeURIComponent(session.id)}`, {
+                  from: pathname
+                })
+              }
+              onNewSession={() =>
+                navigate('/allenatore/sessione/nuova', { from: pathname })
+              }
             />
           )}
           {view === 'team' && <TeamSettings document={document} onUpdate={commitDocument} />}
@@ -346,22 +749,32 @@ export default function App() {
               meta={syncMeta}
               indicator={syncIndicator}
               onSaveConfig={saveConfig}
-              onSync={() => performSync()}
-              onCoordinatorMode={() => void chooseMode('coordinator')}
+              onPersistConnectionDetails={persistCoachConnectionDetails}
+              onSync={syncCoachManually}
+              onRestoreBackup={restoreCoachBackup}
+              onChooseMode={() => navigate('/')}
+              onOpenOnboarding={() =>
+                navigate('/allenatore/configurazione-guidata')
+              }
+              onResetAllData={resetAllLocalData}
             />
           )}
         </main>
 
         <nav className="bottom-nav">
           {navigation.map((item) => (
-            <button
+            <a
               key={item.id}
+              href={routeHref(item.path)}
               className={view === item.id ? 'active' : ''}
-              onClick={() => setView(item.id)}
+              onClick={(event) => {
+                event.preventDefault()
+                navigate(item.path)
+              }}
             >
               <item.icon size={20} />
               <span>{item.label}</span>
-            </button>
+            </a>
           ))}
         </nav>
       </div>

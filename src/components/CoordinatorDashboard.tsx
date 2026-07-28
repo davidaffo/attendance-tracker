@@ -1,28 +1,224 @@
-import { useRef, useState, type ChangeEvent } from 'react'
-import { ArrowLeft, Check, FolderOpen, RefreshCw, ShieldCheck, Users } from 'lucide-react'
+import { useEffect, useRef, useState, type ChangeEvent, type FormEvent } from 'react'
+import {
+  ArrowLeft,
+  Check,
+  ChevronRight,
+  Cloud,
+  FolderOpen,
+  RefreshCw,
+  ShieldCheck,
+  Users
+} from 'lucide-react'
 import { totalsForDocument } from '../domain/document'
-import type { TeamSummary } from '../domain/types'
-import { parseSelectedFiles, pickAndScanDirectory } from '../services/localFiles'
+import type {
+  CoordinatorTeamCache,
+  SyncConfig,
+  TeamSummary
+} from '../domain/types'
+import {
+  parseSelectedFiles,
+  pickAndScanDirectory,
+  scanDirectoryHandle
+} from '../services/localFiles'
+import { listRemoteTeamDocuments } from '../services/webdav'
+import {
+  loadCoordinatorDirectoryHandle,
+  loadCoordinatorTeamCache,
+  storeCoordinatorTeamCache,
+  storeCoordinatorDirectoryHandle
+} from '../storage/database'
+import { percentageScaleColor } from '../domain/percentageColorScale'
+import { MonthlyRegister } from './MonthlyRegister'
+import { ResetAppDataButton } from './ResetAppDataButton'
 
 interface CoordinatorDashboardProps {
-  onCoachMode: () => void
+  onChooseMode: () => void
+  selectedTeamId?: string
+  onNavigate: (path: string) => void
+  config?: SyncConfig
+  onSaveConfig: (config: SyncConfig) => Promise<void>
+  onPersistConnectionDetails: (config: SyncConfig) => Promise<void>
+  onRequestPassword: (username: string) => Promise<string | undefined>
+  onResetAllData: () => Promise<void>
 }
 
-export function CoordinatorDashboard({ onCoachMode }: CoordinatorDashboardProps) {
+const defaultConfig: SyncConfig = {
+  baseUrl: '',
+  username: '',
+  appPassword: '',
+  remoteFolder: 'attendance-tracker'
+}
+
+function cachedDataMessage(cache: CoordinatorTeamCache): string {
+  const loadedAt = new Intl.DateTimeFormat('it-IT', {
+    dateStyle: 'short',
+    timeStyle: 'short'
+  }).format(new Date(cache.loadedAt))
+  return `${cache.teams.length} squadre ripristinate da ${cache.sourceLabel} · aggiornate ${loadedAt}.`
+}
+
+export function CoordinatorDashboard({
+  onChooseMode,
+  selectedTeamId,
+  onNavigate,
+  config,
+  onSaveConfig,
+  onPersistConnectionDetails,
+  onRequestPassword,
+  onResetAllData
+}: CoordinatorDashboardProps) {
   const [teams, setTeams] = useState<TeamSummary[]>([])
   const [message, setMessage] = useState('')
   const [loading, setLoading] = useState(false)
+  const [draft, setDraft] = useState<SyncConfig>(config ?? defaultConfig)
+  const [rememberedHandle, setRememberedHandle] = useState<FileSystemDirectoryHandle>()
   const inputRef = useRef<HTMLInputElement>(null)
+  const loadedOnce = useRef(false)
+  const freshTeamsLoaded = useRef(false)
+
+  const rememberTeams = async (
+    found: TeamSummary[],
+    source: CoordinatorTeamCache['source'],
+    sourceLabel: string
+  ) => {
+    freshTeamsLoaded.current = true
+    setTeams(found)
+    await storeCoordinatorTeamCache({
+      teams: found,
+      loadedAt: new Date().toISOString(),
+      source,
+      sourceLabel
+    })
+  }
+
+  const updateConnectionDetails = (
+    patch: Partial<Pick<SyncConfig, 'baseUrl' | 'username' | 'remoteFolder'>>
+  ) => {
+    const next = { ...draft, ...patch }
+    setDraft(next)
+    void onPersistConnectionDetails({ ...next, appPassword: '' })
+  }
+
+  const loadCloud = async (connection = draft) => {
+    setLoading(true)
+    setMessage('')
+    try {
+      let readyConnection = connection
+      if (!readyConnection.appPassword) {
+        const password = await onRequestPassword(readyConnection.username)
+        if (!password) {
+          setMessage('Caricamento da Nextcloud non eseguito.')
+          return
+        }
+        readyConnection = { ...readyConnection, appPassword: password }
+        setDraft(readyConnection)
+        await onSaveConfig(readyConnection)
+      }
+      const found = await listRemoteTeamDocuments(readyConnection)
+      await rememberTeams(found, 'nextcloud', 'Nextcloud')
+      setMessage(
+        found.length
+          ? `${found.length} squadre caricate da Nextcloud.`
+          : 'Nessun file .attendance.json trovato in attendance-tracker.'
+      )
+    } catch (error) {
+      setMessage(error instanceof Error ? error.message : 'Nextcloud non è raggiungibile.')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  useEffect(() => {
+    let active = true
+    loadCoordinatorTeamCache().then((cache) => {
+      if (!active || !cache || freshTeamsLoaded.current) return
+      setTeams(cache.teams)
+      setMessage(cachedDataMessage(cache))
+    })
+    return () => {
+      active = false
+    }
+  }, [])
+
+  useEffect(() => {
+    if (!config) return
+    setDraft((current) =>
+      current.baseUrl === config.baseUrl &&
+      current.username === config.username &&
+      current.remoteFolder === config.remoteFolder
+        ? { ...current, appPassword: config.appPassword || current.appPassword }
+        : config
+    )
+    if (config.appPassword && !loadedOnce.current) {
+      loadedOnce.current = true
+      void loadCloud(config)
+    }
+  }, [config])
+
+  useEffect(() => {
+    let active = true
+    Promise.all([
+      loadCoordinatorDirectoryHandle(),
+      loadCoordinatorTeamCache()
+    ]).then(async ([handle, cache]) => {
+      if (!active || !handle) return
+      setRememberedHandle(handle)
+      if (cache && cache.source !== 'directory') return
+      const permission = await handle.queryPermission({ mode: 'read' })
+      if (permission === 'granted' && !config?.appPassword) {
+        const found = await scanDirectoryHandle(handle)
+        if (!active) return
+        await rememberTeams(found, 'directory', `cartella ${handle.name}`)
+        setMessage(`${found.length} squadre caricate dalla cartella ${handle.name}.`)
+      } else if (!config?.appPassword) {
+        setMessage(`Cartella ${handle.name} ricordata: conferma l’accesso per aggiornarla.`)
+      }
+    })
+    return () => {
+      active = false
+    }
+  }, [])
+
+  const connectCloud = async (event: FormEvent) => {
+    event.preventDefault()
+    setMessage('')
+    try {
+      loadedOnce.current = true
+      await onSaveConfig(draft)
+      await loadCloud(draft)
+    } catch (error) {
+      setMessage(error instanceof Error ? error.message : 'Connessione non riuscita.')
+    }
+  }
 
   const loadFolder = async () => {
     setLoading(true)
     setMessage('')
     try {
-      const found = await pickAndScanDirectory()
-      setTeams(found)
+      if (rememberedHandle) {
+        const permission = await rememberedHandle.requestPermission({ mode: 'read' })
+        if (permission !== 'granted') {
+          setMessage('Accesso alla cartella locale non consentito.')
+          return
+        }
+        const found = await scanDirectoryHandle(rememberedHandle)
+        await rememberTeams(
+          found,
+          'directory',
+          `cartella ${rememberedHandle.name}`
+        )
+        setMessage(`${found.length} squadre caricate dalla cartella ${rememberedHandle.name}.`)
+        return
+      }
+
+      const result = await pickAndScanDirectory()
+      const found = result.teams
+      setRememberedHandle(result.handle)
+      await storeCoordinatorDirectoryHandle(result.handle)
+      await rememberTeams(found, 'directory', `cartella ${result.handle.name}`)
       setMessage(
         found.length
-          ? `${found.length} file squadra caricati.`
+          ? `${found.length} squadre caricate dalla cartella ${result.handle.name}.`
           : 'Nessun file .attendance.json trovato nella cartella.'
       )
     } catch (error) {
@@ -38,23 +234,24 @@ export function CoordinatorDashboard({ onCoachMode }: CoordinatorDashboardProps)
     if (!event.target.files) return
     setLoading(true)
     const found = await parseSelectedFiles(event.target.files)
-    setTeams(found)
+    await rememberTeams(found, 'files', 'selezione manuale')
     setMessage(
       found.length
-        ? `${found.length} file squadra caricati.`
+        ? `${found.length} squadre caricate dalla cartella locale.`
         : 'Nessun file .attendance.json valido trovato.'
     )
     setLoading(false)
   }
 
-  const totalSessions = teams.reduce(
-    (sum, team) => sum + team.document.sessions.length,
-    0
-  )
+  const selectedTeam = teams.find((team) => team.document.teamId === selectedTeamId)
+  const totalSessions = teams.reduce((sum, team) => sum + team.document.sessions.length, 0)
   const totalAthletes = teams.reduce(
     (sum, team) => sum + team.document.athletes.filter((athlete) => athlete.active).length,
     0
   )
+  const statusCodes = [
+    ...new Set(teams.flatMap((team) => team.document.statuses.map((status) => status.code)))
+  ]
 
   return (
     <div className="coordinator-page">
@@ -68,117 +265,313 @@ export function CoordinatorDashboard({ onCoachMode }: CoordinatorDashboardProps)
             <span>Coordinamento tecnico</span>
           </div>
         </div>
-        <button className="button ghost dark-ghost" onClick={onCoachMode}>
-          <ArrowLeft size={17} />
-          Vista allenatore
-        </button>
+        <div className="coordinator-header-actions">
+          <ResetAppDataButton
+            onReset={onResetAllData}
+            className="button ghost dark-ghost reset-dark"
+          />
+          <button className="button ghost dark-ghost" onClick={onChooseMode}>
+            <ArrowLeft size={17} />
+            Cambia modalità
+          </button>
+        </div>
       </header>
 
-      <main className="coordinator-main">
-        <section className="coordinator-hero">
-          <div>
-            <div className="eyebrow">Dati locali sincronizzati</div>
-            <h1>Tutte le squadre,<br />in un solo posto.</h1>
-            <p>
-              Seleziona la cartella Presenze scaricata da Nextcloud Desktop. La lettura resta su
-              questo computer.
-            </p>
-          </div>
-          <button className="button light folder-button" onClick={loadFolder} disabled={loading}>
-            {loading ? <RefreshCw className="spin" size={19} /> : <FolderOpen size={20} />}
-            {teams.length ? 'Aggiorna cartella' : 'Scegli cartella'}
+      {selectedTeam ? (
+        <main className="coordinator-main coordinator-detail">
+          <button className="button ghost report-back" onClick={() => onNavigate('/coordinatore')}>
+            <ArrowLeft size={17} />
+            Tutte le squadre
           </button>
-          <input
-            ref={inputRef}
-            className="visually-hidden"
-            type="file"
-            multiple
-            onChange={loadFallback}
-            {...({ webkitdirectory: '', directory: '' } as React.InputHTMLAttributes<HTMLInputElement>)}
-          />
-        </section>
-
-        {message && <div className="coordinator-message">{message}</div>}
-
-        <section className="coordinator-metrics">
-          <article>
-            <span>Squadre</span>
-            <strong>{teams.length}</strong>
-          </article>
-          <article>
-            <span>Atlete attive</span>
-            <strong>{totalAthletes}</strong>
-          </article>
-          <article>
-            <span>Allenamenti</span>
-            <strong>{totalSessions}</strong>
-          </article>
-          <article className="privacy-metric">
-            <ShieldCheck size={22} />
-            <span>Sola lettura locale</span>
-          </article>
-        </section>
-
-        <section className="coordinator-section">
-          <div className="section-heading">
+          <section className="coordinator-report-shell">
+            <MonthlyRegister document={selectedTeam.document} />
+          </section>
+        </main>
+      ) : (
+        <main className="coordinator-main">
+          <section className="coordinator-hero">
             <div>
-              <div className="eyebrow">Riepilogo</div>
-              <h2>Squadre</h2>
+              <div className="eyebrow">Riepilogo società</div>
+              <h1>
+                Tutte le squadre,
+                <br />
+                fino all’ultima presenza.
+              </h1>
+              <p>
+                Carica automaticamente i JSON da Nextcloud con l’account supervisore oppure
+                seleziona la cartella sincronizzata sul computer.
+              </p>
             </div>
-          </div>
+            <div className="coordinator-load-actions">
+              <button
+                className="button light folder-button"
+                onClick={() => void loadCloud()}
+                disabled={loading || !draft.baseUrl || !draft.username}
+              >
+                {loading ? <RefreshCw className="spin" size={19} /> : <Cloud size={20} />}
+                {teams.length ? 'Aggiorna da Nextcloud' : 'Carica da Nextcloud'}
+              </button>
+              <button className="button dark-secondary" onClick={loadFolder} disabled={loading}>
+                <FolderOpen size={19} />
+                {rememberedHandle ? rememberedHandle.name : 'Cartella locale'}
+              </button>
+            </div>
+            <input
+              ref={inputRef}
+              className="visually-hidden"
+              type="file"
+              multiple
+              onChange={loadFallback}
+              {...({
+                webkitdirectory: '',
+                directory: ''
+              } as React.InputHTMLAttributes<HTMLInputElement>)}
+            />
+          </section>
 
-          {teams.length === 0 ? (
-            <div className="empty-coordinator">
-              <FolderOpen size={38} />
-              <h2>Nessuna cartella selezionata</h2>
-              <p>I file delle squadre compariranno qui dopo la scansione.</p>
+          <details className="coordinator-cloud-config" open={!config}>
+            <summary>Collegamento Nextcloud del supervisore</summary>
+            <form className="form-grid" onSubmit={connectCloud} autoComplete="on">
+              <div className="form-grid coordinator-config-grid">
+                <label className="field">
+                  <span>Indirizzo Nextcloud</span>
+                  <input
+                    type="url"
+                    value={draft.baseUrl}
+                    placeholder="https://nxXXXXX.your-storageshare.de"
+                    onChange={(event) =>
+                      updateConnectionDetails({ baseUrl: event.target.value })
+                    }
+                    required
+                  />
+                </label>
+                <label className="field">
+                  <span>Nome utente supervisore</span>
+                  <input
+                    name="username"
+                    autoComplete="username"
+                    value={draft.username}
+                    onChange={(event) =>
+                      updateConnectionDetails({ username: event.target.value })
+                    }
+                    required
+                  />
+                </label>
+                <label className="field">
+                  <span>Password applicativa</span>
+                  <input
+                    type="password"
+                    name="password"
+                    autoComplete="current-password"
+                    value={draft.appPassword}
+                    onChange={(event) => setDraft({ ...draft, appPassword: event.target.value })}
+                    required
+                  />
+                  <small>
+                    L’app non la salva. Il browser può proporti di ricordarla e compilarla.
+                  </small>
+                </label>
+                <label className="field">
+                  <span>Cartella remota</span>
+                  <input
+                    value={draft.remoteFolder}
+                    onChange={(event) =>
+                      updateConnectionDetails({ remoteFolder: event.target.value })
+                    }
+                    required
+                  />
+                </label>
+              </div>
+              <button className="button primary" type="submit" disabled={loading}>
+                <Cloud size={17} />
+                Salva e carica i riepiloghi
+              </button>
+            </form>
+          </details>
+
+          {message && <div className="coordinator-message">{message}</div>}
+
+          <section className="coordinator-metrics">
+            <article>
+              <span>Squadre</span>
+              <strong>{teams.length}</strong>
+            </article>
+            <article>
+              <span>Atlete attive</span>
+              <strong>{totalAthletes}</strong>
+            </article>
+            <article>
+              <span>Allenamenti</span>
+              <strong>{totalSessions}</strong>
+            </article>
+            <article className="privacy-metric">
+              <ShieldCheck size={22} />
+              <span>Riepiloghi in sola lettura</span>
+            </article>
+          </section>
+
+          <section className="coordinator-section">
+            <div className="section-heading">
+              <div>
+                <div className="eyebrow">Sommario stagionale</div>
+                <h2>Riepilogo squadre</h2>
+              </div>
             </div>
-          ) : (
-            <div className="team-summary-grid">
-              {teams.map(({ source, document }) => {
-                const totals = totalsForDocument(document)
-                const athletes = document.athletes.filter((athlete) => athlete.active).length
-                return (
-                  <article className="team-summary-card" key={source}>
-                    <div className="team-card-heading">
-                      <div>
-                        <span>{document.organizationName}</span>
-                        <h3>{document.teamName}</h3>
-                      </div>
-                      <span className="season-pill">
-                        {document.season.startYear}–{String(document.season.endYear).slice(-2)}
-                      </span>
-                    </div>
-                    <div className="team-card-metrics">
-                      <span>
-                        <Users size={16} /> {athletes} atlete
-                      </span>
-                      <span>{totals.sessions} allenamenti</span>
-                    </div>
-                    <div className="team-status-totals">
-                      {document.statuses.map((status) => (
-                        <span key={status.id} title={status.label}>
-                          <i style={{ background: status.color }}>{status.code}</i>
-                          {totals.byStatus[status.id] ?? 0}
-                        </span>
-                      ))}
-                    </div>
-                    <div className="team-card-footer">
-                      <span>{document.coachName}</span>
-                      <span>
-                        Aggiornato{' '}
-                        {new Intl.DateTimeFormat('it-IT', { dateStyle: 'short' }).format(
-                          new Date(document.updatedAt)
-                        )}
-                      </span>
-                    </div>
-                  </article>
-                )
-              })}
-            </div>
-          )}
-        </section>
-      </main>
+
+            {teams.length === 0 ? (
+              <div className="empty-coordinator">
+                <Cloud size={38} />
+                <h2>Nessun dato caricato</h2>
+                <p>
+                  Configura l’account supervisore e carica da Nextcloud, oppure scegli la cartella
+                  locale attendance-tracker.
+                </p>
+              </div>
+            ) : (
+              <>
+                <div className="coordinator-table-wrap">
+                  <table className="coordinator-summary-table">
+                    <thead>
+                      <tr>
+                        <th>Squadra</th>
+                        <th>Stagione</th>
+                        <th>Atlete</th>
+                        <th>Allenamenti</th>
+                        {statusCodes.map((code) => (
+                          <th key={code}>{code}</th>
+                        ))}
+                        <th />
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {teams.map(({ source, document }) => {
+                        const totals = totalsForDocument(document)
+                        const possibleAttendances =
+                          totals.sessions * document.athletes.length
+                        return (
+                          <tr key={source}>
+                            <th>
+                              <strong>{document.teamName}</strong>
+                              <span>{document.coachName}</span>
+                            </th>
+                            <td>
+                              {document.season.startYear}–{String(document.season.endYear).slice(-2)}
+                            </td>
+                            <td>{document.athletes.filter((athlete) => athlete.active).length}</td>
+                            <td>{totals.sessions}</td>
+                            {statusCodes.map((code) => {
+                              const status = document.statuses.find(
+                                (candidate) => candidate.code === code
+                              )
+                              const count = status ? totals.byStatus[status.id] ?? 0 : 0
+                              const percentage =
+                                status && possibleAttendances
+                                  ? (count / possibleAttendances) * 100
+                                  : 0
+                              const scaleColor = status
+                                ? percentageScaleColor(status, percentage)
+                                : undefined
+                              return (
+                                <td
+                                  className={scaleColor ? 'color-scale-cell' : undefined}
+                                  key={code}
+                                  style={scaleColor ? { backgroundColor: scaleColor } : undefined}
+                                >
+                                  {status ? (
+                                    <>
+                                      <strong>{count}</strong>
+                                      <small>{Math.round(percentage)}%</small>
+                                    </>
+                                  ) : (
+                                    '—'
+                                  )}
+                                </td>
+                              )
+                            })}
+                            <td>
+                              <button
+                                className="icon-button quiet"
+                                onClick={() =>
+                                  onNavigate(
+                                    `/coordinatore/squadra/${encodeURIComponent(document.teamId)}`
+                                  )
+                                }
+                                aria-label={`Apri riepilogo ${document.teamName}`}
+                              >
+                                <ChevronRight size={18} />
+                              </button>
+                            </td>
+                          </tr>
+                        )
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+
+                <div className="team-summary-grid">
+                  {teams.map(({ source, document }) => {
+                    const totals = totalsForDocument(document)
+                    const athletes = document.athletes.filter((athlete) => athlete.active).length
+                    const possibleAttendances =
+                      totals.sessions * document.athletes.length
+                    return (
+                      <article className="team-summary-card" key={source}>
+                        <div className="team-card-heading">
+                          <div>
+                            <span>{document.organizationName}</span>
+                            <h3>{document.teamName}</h3>
+                          </div>
+                          <span className="season-pill">
+                            {document.season.startYear}–{String(document.season.endYear).slice(-2)}
+                          </span>
+                        </div>
+                        <div className="team-card-metrics">
+                          <span>
+                            <Users size={16} /> {athletes} atlete
+                          </span>
+                          <span>{totals.sessions} allenamenti</span>
+                        </div>
+                        <div className="team-status-totals">
+                          {document.statuses.map((status) => {
+                            const count = totals.byStatus[status.id] ?? 0
+                            const percentage = possibleAttendances
+                              ? (count / possibleAttendances) * 100
+                              : 0
+                            const scaleColor = percentageScaleColor(status, percentage)
+                            return (
+                              <span
+                                className={scaleColor ? 'color-scale-cell' : undefined}
+                                key={status.id}
+                                title={`${status.label}: ${count} · ${Math.round(percentage)}%`}
+                                style={scaleColor ? { backgroundColor: scaleColor } : undefined}
+                              >
+                                <i style={{ background: status.color }}>{status.code}</i>
+                                <b>{count}</b>
+                                <small>{Math.round(percentage)}%</small>
+                              </span>
+                            )
+                          })}
+                        </div>
+                        <button
+                          className="button team-report-button"
+                          onClick={() =>
+                            onNavigate(
+                              `/coordinatore/squadra/${encodeURIComponent(document.teamId)}`
+                            )
+                          }
+                        >
+                          Apri riepilogo completo
+                          <ChevronRight size={17} />
+                        </button>
+                      </article>
+                    )
+                  })}
+                </div>
+              </>
+            )}
+          </section>
+        </main>
+      )}
     </div>
   )
 }

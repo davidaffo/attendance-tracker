@@ -1,6 +1,11 @@
 import { mergeDocuments, parseTeamDocument, serializeTeamDocument } from '../domain/document'
 import { remoteFileName } from '../domain/defaults'
-import type { LocalSyncMeta, SyncConfig, TeamDocument } from '../domain/types'
+import type {
+  LocalSyncMeta,
+  SyncConfig,
+  TeamDocument,
+  TeamSummary
+} from '../domain/types'
 
 interface RemoteFile {
   document?: TeamDocument
@@ -98,6 +103,55 @@ export async function testWebDavConnection(config: SyncConfig): Promise<void> {
   if (response.status !== 207 && !response.ok) {
     throw new Error(`Nextcloud ha risposto con errore ${response.status}.`)
   }
+}
+
+export async function listRemoteTeamDocuments(config: SyncConfig): Promise<TeamSummary[]> {
+  await testWebDavConnection(config)
+  const response = await davFetch(config, folderUrl(config), {
+    method: 'PROPFIND',
+    headers: { Depth: '1', 'Content-Type': 'application/xml; charset=utf-8' },
+    body:
+      '<?xml version="1.0"?><d:propfind xmlns:d="DAV:"><d:prop><d:getcontenttype/><d:getetag/></d:prop></d:propfind>'
+  })
+
+  if (response.status !== 207 && !response.ok) {
+    throw new Error(`Impossibile leggere la cartella remota (${response.status}).`)
+  }
+
+  const xml = new DOMParser().parseFromString(await response.text(), 'application/xml')
+  const entries = [...xml.getElementsByTagNameNS('DAV:', 'response')]
+  const fileUrls = entries
+    .map((entry) => entry.getElementsByTagNameNS('DAV:', 'href')[0]?.textContent?.trim())
+    .filter((href): href is string => Boolean(href))
+    .filter((href) => {
+      try {
+        return decodeURIComponent(new URL(href, config.baseUrl).pathname).endsWith(
+          '.attendance.json'
+        )
+      } catch {
+        return false
+      }
+    })
+    .map((href) => new URL(href, config.baseUrl).toString())
+
+  const documents = await Promise.all(
+    fileUrls.map(async (url): Promise<TeamSummary | undefined> => {
+      const file = await davFetch(config, url, { method: 'GET' })
+      if (!file.ok) return undefined
+      try {
+        return {
+          source: decodeURIComponent(new URL(url).pathname.split('/').pop() ?? url),
+          document: parseTeamDocument(await file.text())
+        }
+      } catch {
+        return undefined
+      }
+    })
+  )
+
+  return documents
+    .filter((entry): entry is TeamSummary => Boolean(entry))
+    .sort((a, b) => a.document.teamName.localeCompare(b.document.teamName))
 }
 
 async function readRemote(config: SyncConfig, local: TeamDocument): Promise<RemoteFile> {

@@ -3,13 +3,19 @@ import { ArrowRight, Check, Plus, Trash2 } from 'lucide-react'
 import { getCurrentSeason, WEEKDAYS } from '../domain/defaults'
 import type { TeamDocument } from '../domain/types'
 import { createTeamDocument } from '../domain/defaults'
+import { RestoreBackupButton } from './RestoreBackupButton'
 
 interface SetupCoachProps {
   onComplete: (document: TeamDocument) => Promise<void>
   onSwitchMode: () => void
+  onRestoreBackup: (document: TeamDocument) => Promise<void>
 }
 
-export function SetupCoach({ onComplete, onSwitchMode }: SetupCoachProps) {
+export function SetupCoach({
+  onComplete,
+  onSwitchMode,
+  onRestoreBackup
+}: SetupCoachProps) {
   const currentSeason = useMemo(() => getCurrentSeason(), [])
   const [teamName, setTeamName] = useState('')
   const [organizationName, setOrganizationName] = useState('')
@@ -71,8 +77,8 @@ export function SetupCoach({ onComplete, onSwitchMode }: SetupCoachProps) {
       </div>
 
       <form className="setup-card" onSubmit={submit}>
-        <div className="eyebrow">Prima configurazione</div>
-        <h1>Prepariamo la squadra</h1>
+        <div className="eyebrow">Configurazione manuale</div>
+        <h1>Prepara la squadra</h1>
         <p className="lead">
           Solo le informazioni già presenti nel registro. Potrai modificarle anche in seguito.
         </p>
@@ -200,6 +206,13 @@ export function SetupCoach({ onComplete, onSwitchMode }: SetupCoachProps) {
           <button className="button ghost" type="button" onClick={onSwitchMode}>
             Sono il coordinatore
           </button>
+        </div>
+        <div className="setup-restore">
+          <span>Hai già un backup del Registro Presenze?</span>
+          <RestoreBackupButton
+            onRestore={onRestoreBackup}
+            label="Ripristina da JSON"
+          />
         </div>
       </form>
     </main>

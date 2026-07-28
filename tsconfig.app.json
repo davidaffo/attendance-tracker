@@ -11,6 +11,7 @@
     "forceConsistentCasingInFileNames": true,
     "module": "ESNext",
     "moduleResolution": "Bundler",
+    "tsBuildInfoFile": "./node_modules/.vite/tsconfig.app.tsbuildinfo",
     "resolveJsonModule": true,
     "isolatedModules": true,
     "noEmit": true,

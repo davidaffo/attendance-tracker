@@ -1,6 +1,15 @@
 import type { AttendanceStatus, TeamDocument } from './types'
 import { ATTENDANCE_SCHEMA_VERSION } from './types'
 
+export const COACH_ONBOARDING_VERSION = 1
+
+export function isFirstCoachUse(
+  storedVersion: number | undefined,
+  hasDocument: boolean
+): boolean {
+  return !hasDocument && storedVersion !== COACH_ONBOARDING_VERSION
+}
+
 export const DEFAULT_STATUSES: AttendanceStatus[] = [
   { id: 'present', code: 'P', label: 'Presente', color: '#2f7d68' },
   { id: 'absent', code: 'A', label: 'Assente', color: '#c94f46' },

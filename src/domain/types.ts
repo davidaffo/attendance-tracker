@@ -68,11 +68,19 @@ export interface LocalSyncMeta {
   etag?: string
   lastSyncedAt?: string
   lastError?: string
+  restorePending?: boolean
 }
 
 export interface TeamSummary {
   source: string
   document: TeamDocument
+}
+
+export interface CoordinatorTeamCache {
+  teams: TeamSummary[]
+  loadedAt: string
+  source: 'nextcloud' | 'directory' | 'files'
+  sourceLabel: string
 }
 
 export interface TeamTotals {
