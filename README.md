@@ -59,6 +59,11 @@ cartella e sincronizzato effettivamente il JSON. Se il collegamento funziona ma
 la lettura o scrittura del file fallisce, l'errore WebDAV viene mostrato nelle
 Impostazioni e lo stato resta `Errore cloud`.
 
+Se Storage Share rifiuta ripetutamente le scritture `If-Match`, l'app passa
+automaticamente alla protezione `Confronto e verifica Nextcloud`: rilegge e
+unisce il JSON prima del caricamento e controlla nuovamente il contenuto dopo
+il `PUT`. La modalità utilizzata è indicata nelle Impostazioni.
+
 La cartella si trova direttamente nella root Nextcloud:
 
 ```text

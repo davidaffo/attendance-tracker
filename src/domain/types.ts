@@ -69,6 +69,7 @@ export interface LocalSyncMeta {
   lastSyncedAt?: string
   lastError?: string
   restorePending?: boolean
+  conditionalWrites?: boolean
 }
 
 export interface TeamSummary {

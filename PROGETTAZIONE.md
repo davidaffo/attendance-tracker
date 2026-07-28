@@ -1,7 +1,7 @@
 # Registro presenze — progettazione della PWA
 
 **Stato:** progettazione approvata operativamente, prototipo MVP avviato  
-**Versione:** 1.5
+**Versione:** 1.6
 **Data:** 28 luglio 2026  
 **Fonte analizzata:** `Registro stagionale.xlsx`
 
@@ -534,6 +534,14 @@ e l'indicazione di modifiche locali non ancora caricate. Un conflitto esiste
 quando il file remoto e la copia locale sono cambiati entrambi dalla precedente
 sincronizzazione.
 
+Alcune configurazioni Storage Share/WebAppPassword possono rifiutare
+sistematicamente il `PUT` con `If-Match`, restituendo `412` anche dopo una
+rilettura immediata. Dopo due rifiuti consecutivi la PWA passa, per quel
+dispositivo, a una modalità compatibile: confronta ETag e JSON, unisce la
+versione remota appena letta, esegue il `PUT` e rilegge il file per verificare
+che il contenuto salvato coincida. La modalità attiva resta visibile nelle
+Impostazioni.
+
 Regola proposta:
 
 1. nessuna modifica locale e remoto più recente: sostituire la copia locale;
@@ -789,6 +797,8 @@ realizzati:
   JSON, non al solo test della cartella WebDAV;
 - ultimo errore WebDAV visibile per esteso nelle Impostazioni;
 - client WebDAV con `PROPFIND`, `GET`, `PUT`, ETag e scritture condizionali;
+- fallback persistente per istanze che rifiutano `If-Match`, con merge prima
+  della scrittura e verifica del JSON dopo il `PUT`;
 - ritentativo all'avvio, al ritorno online e quando l'app torna in primo piano;
 - merge delle sessioni create su dispositivi diversi e prevenzione del doppio
   allenamento nella stessa data;

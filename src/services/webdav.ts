@@ -81,9 +81,40 @@ async function davFetch(
   }
 }
 
+export function normalizeEtag(value: string | null | undefined): string | undefined {
+  if (!value) return undefined
+  const normalized = value
+    .trim()
+    .replace(/&quot;|&#34;|&#x22;/gi, '"')
+    .replace(/&apos;|&#39;|&#x27;/gi, "'")
+    .replace(/&lt;/gi, '<')
+    .replace(/&gt;/gi, '>')
+    .replace(/&amp;/gi, '&')
+    .trim()
+  return normalized || undefined
+}
+
 function extractEtag(xml: string): string | undefined {
-  const match = xml.match(/<(?:d:)?getetag[^>]*>([^<]+)<\/(?:d:)?getetag>/i)
-  return match?.[1]?.trim()
+  const match = xml.match(
+    /<(?:[\w-]+:)?getetag[^>]*>([^<]+)<\/(?:[\w-]+:)?getetag>/i
+  )
+  return normalizeEtag(match?.[1])
+}
+
+function documentsAreEqual(first: TeamDocument, second: TeamDocument): boolean {
+  return serializeTeamDocument(first) === serializeTeamDocument(second)
+}
+
+function syncedMeta(
+  etag: string | undefined,
+  conditionalWrites: boolean | undefined
+): LocalSyncMeta {
+  return {
+    dirty: false,
+    etag,
+    lastSyncedAt: new Date().toISOString(),
+    ...(conditionalWrites === false ? { conditionalWrites: false } : {})
+  }
 }
 
 export async function testWebDavConnection(config: SyncConfig): Promise<void> {
@@ -178,7 +209,7 @@ async function readRemote(config: SyncConfig, local: TeamDocument): Promise<Remo
   }
   return {
     exists: true,
-    etag: response.headers.get('etag') ?? etag,
+    etag: normalizeEtag(response.headers.get('etag')) ?? etag,
     document: parseTeamDocument(await response.text())
   }
 }
@@ -192,7 +223,8 @@ async function writeRemote(
   const conditionalHeaders: Record<string, string> = {
     'Content-Type': 'application/json; charset=utf-8'
   }
-  if (expectedEtag) conditionalHeaders['If-Match'] = expectedEtag
+  const normalizedExpectedEtag = normalizeEtag(expectedEtag)
+  if (normalizedExpectedEtag) conditionalHeaders['If-Match'] = normalizedExpectedEtag
   if (createOnly) conditionalHeaders['If-None-Match'] = '*'
 
   const response = await davFetch(config, documentUrl(config, document), {
@@ -207,11 +239,25 @@ async function writeRemote(
   if (!response.ok) {
     throw new Error(`Impossibile caricare il file remoto (${response.status}).`)
   }
-  const responseEtag = response.headers.get('etag')
+  const responseEtag = normalizeEtag(response.headers.get('etag'))
   if (responseEtag) return responseEtag
 
   const confirmed = await readRemote(config, document)
   return confirmed.etag
+}
+
+async function writeAndVerifyWithoutCondition(
+  config: SyncConfig,
+  document: TeamDocument
+): Promise<RemoteFile> {
+  await writeRemote(config, document)
+  const confirmed = await readRemote(config, document)
+  if (!confirmed.document || !documentsAreEqual(confirmed.document, document)) {
+    throw new Error(
+      'Conflitto remoto reale: il file è cambiato durante la verifica finale.'
+    )
+  }
+  return confirmed
 }
 
 export async function synchronizeDocument(
@@ -227,7 +273,7 @@ export async function synchronizeDocument(
     return {
       document: local,
       merged: false,
-      meta: { dirty: false, etag, lastSyncedAt: new Date().toISOString() }
+      meta: syncedMeta(etag, meta.conditionalWrites)
     }
   }
 
@@ -237,15 +283,25 @@ export async function synchronizeDocument(
     return {
       document: remote.document,
       merged: false,
-      meta: { dirty: false, etag: remote.etag, lastSyncedAt: new Date().toISOString() }
+      meta: syncedMeta(remote.etag, meta.conditionalWrites)
     }
   }
 
   let document = local
   let merged = false
-  if (meta.etag && remote.etag && meta.etag !== remote.etag) {
+  const localEtag = normalizeEtag(meta.etag)
+  if (localEtag && remote.etag && localEtag !== remote.etag) {
     document = mergeDocuments(local, remote.document)
     merged = true
+  }
+
+  if (meta.conditionalWrites === false) {
+    const confirmed = await writeAndVerifyWithoutCondition(config, document)
+    return {
+      document,
+      merged,
+      meta: syncedMeta(confirmed.etag, false)
+    }
   }
 
   try {
@@ -253,22 +309,49 @@ export async function synchronizeDocument(
     return {
       document,
       merged,
-      meta: {
-        dirty: false,
-        etag,
-        lastSyncedAt: new Date().toISOString()
-      }
+      meta: syncedMeta(etag, meta.conditionalWrites)
     }
   } catch (error) {
     if (error instanceof Error && error.message === 'CONFLICT') {
       remote = await readRemote(config, local)
       if (!remote.document) throw new Error('Conflitto remoto non risolvibile.')
+      if (documentsAreEqual(remote.document, document)) {
+        return {
+          document,
+          merged,
+          meta: syncedMeta(remote.etag, meta.conditionalWrites)
+        }
+      }
       document = mergeDocuments(document, remote.document)
-      const etag = await writeRemote(config, document, remote.etag)
-      return {
-        document,
-        merged: true,
-        meta: { dirty: false, etag, lastSyncedAt: new Date().toISOString() }
+      try {
+        const etag = await writeRemote(config, document, remote.etag)
+        return {
+          document,
+          merged: true,
+          meta: syncedMeta(etag, meta.conditionalWrites)
+        }
+      } catch (retryError) {
+        if (!(retryError instanceof Error) || retryError.message !== 'CONFLICT') {
+          throw retryError
+        }
+        const latest = await readRemote(config, local)
+        if (latest.document && documentsAreEqual(latest.document, document)) {
+          return {
+            document,
+            merged: true,
+            meta: syncedMeta(latest.etag, meta.conditionalWrites)
+          }
+        }
+        if (!latest.document) {
+          throw new Error('Il file remoto è vuoto dopo il conflitto.')
+        }
+        document = mergeDocuments(document, latest.document)
+        const confirmed = await writeAndVerifyWithoutCondition(config, document)
+        return {
+          document,
+          merged: true,
+          meta: syncedMeta(confirmed.etag, false)
+        }
       }
     }
     throw error

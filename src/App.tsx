@@ -298,7 +298,9 @@ export default function App() {
           const nextMeta = { ...currentMeta, dirty: true, lastError: message }
           await storeSyncMeta(nextMeta)
           applyMeta(nextMeta)
-          setSyncIndicator(message.includes('conflitto') ? 'conflict' : 'error')
+          setSyncIndicator(
+            message.toLocaleLowerCase().includes('conflitto') ? 'conflict' : 'error'
+          )
           return { status: 'error', message }
         }
       })()

@@ -214,6 +214,14 @@ export function SyncSettings({
                     timeStyle: 'short'
                   }).format(new Date(meta.lastSyncedAt))
                 : 'Mai'}
+              </dd>
+          </div>
+          <div>
+            <dt>Protezione conflitti</dt>
+            <dd>
+              {meta.conditionalWrites === false
+                ? 'Confronto e verifica Nextcloud'
+                : 'ETag WebDAV'}
             </dd>
           </div>
         </dl>
