@@ -63,7 +63,6 @@ export function MonthlyRegister({
     <div className="page-content register-page">
       <div className="page-title-row">
         <div>
-          <div className="eyebrow">Registro</div>
           <h1>
             Stagione {document.season.startYear}–{document.season.endYear}
           </h1>
@@ -102,9 +101,6 @@ export function MonthlyRegister({
 
       <section className="register-period-heading">
         <div>
-          <div className="eyebrow">
-            {selectedMonth ? 'Dettaglio mensile' : 'Riepilogo completo'}
-          </div>
           <h2 className="capitalize">
             {selectedMonth ? selectedMonth.label : 'Intera stagione'}
           </h2>

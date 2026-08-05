@@ -49,8 +49,7 @@ export function PasswordPrompt({
           <KeyRound size={24} />
         </div>
         <div>
-          <div className="eyebrow">Nextcloud</div>
-          <h2 id="password-dialog-title">Serve la password per sincronizzare</h2>
+          <h2 id="password-dialog-title">Password Nextcloud</h2>
           <p>
             Inserisci la password applicativa di <strong>{username}</strong>. Puoi lasciare che
             sia il browser a salvarla e compilarla in futuro.

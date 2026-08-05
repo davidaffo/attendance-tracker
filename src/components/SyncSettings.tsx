@@ -103,16 +103,14 @@ export function SyncSettings({
     <div className="page-content">
       <div className="page-title-row">
         <div>
-          <div className="eyebrow">Impostazioni</div>
-          <h1>Cloud e dati</h1>
+          <h1>Impostazioni</h1>
         </div>
       </div>
 
       <section className="panel settings-panel">
         <div className="panel-heading">
           <div>
-            <div className="eyebrow">Nextcloud</div>
-            <h2>Sincronizzazione WebDAV</h2>
+            <h2>Nextcloud</h2>
           </div>
           <Cloud size={24} />
         </div>
@@ -236,7 +234,6 @@ export function SyncSettings({
       <section className="panel settings-panel">
         <div className="panel-heading">
           <div>
-            <div className="eyebrow">Portabilità</div>
             <h2>Backup e ripristino</h2>
           </div>
         </div>
@@ -258,7 +255,6 @@ export function SyncSettings({
 
       <section className="panel settings-panel coordinator-switch">
         <div>
-          <div className="eyebrow">Aiuto</div>
           <h2>Configurazione guidata</h2>
           <p>
             Rivedi passo per passo squadra, giorni, rosa e collegamento Nextcloud.
@@ -272,7 +268,6 @@ export function SyncSettings({
 
       <section className="panel settings-panel coordinator-switch">
         <div>
-          <div className="eyebrow">Questo computer</div>
           <h2>Cambia modalità</h2>
           <p>Torna alla scelta fra allenatore e coordinatore senza cancellare i dati locali.</p>
         </div>
@@ -284,7 +279,6 @@ export function SyncSettings({
 
       <section className="panel settings-panel coordinator-switch reset-panel">
         <div>
-          <div className="eyebrow">Ripristino</div>
           <h2>Ricomincia da zero</h2>
           <p>
             Cancella tutti i dati conservati localmente e torna alla prima schermata dell’app.

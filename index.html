@@ -10,14 +10,40 @@
     />
     <meta
       name="description"
-      content="Registro presenze essenziale per squadre sportive"
+      content="Registro presenze per squadre sportive"
     />
-    <link rel="icon" href="/app-icon.svg" />
-    <link rel="apple-touch-icon" href="/app-icon-192.png" />
+    <link rel="icon" href="%BASE_URL%app-icon.svg" />
+    <link rel="apple-touch-icon" href="%BASE_URL%app-icon-192.png" />
+    <style>
+      .boot-fallback {
+        display: grid;
+        min-height: 100vh;
+        margin: 0;
+        place-content: center;
+        gap: 0.5rem;
+        padding: 1rem;
+        color: #18332c;
+        background: #f5f2ea;
+        font-family: system-ui, sans-serif;
+        text-align: center;
+      }
+      .boot-fallback strong { font-size: 1.25rem; }
+      .boot-fallback span { color: #6d7873; }
+      .boot-fallback-error {
+        visibility: hidden;
+        animation: show-boot-error 0s 8s forwards;
+      }
+      @keyframes show-boot-error { to { visibility: visible; } }
+    </style>
     <title>Registro Presenze</title>
   </head>
   <body>
-    <div id="root"></div>
+    <div id="root">
+      <main class="boot-fallback">
+        <strong>Apertura del registro…</strong>
+        <span class="boot-fallback-error">Se il caricamento non termina, ricarica la pagina.</span>
+      </main>
+    </div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

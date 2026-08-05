@@ -15,7 +15,7 @@ export default defineConfig(({ mode }) => {
         manifest: {
           name: 'Registro Presenze',
           short_name: 'Presenze',
-          description: 'Registro presenze semplice per squadre sportive',
+          description: 'Registro presenze per squadre sportive',
           theme_color: '#173f35',
           background_color: '#f5f2ea',
           display: 'standalone',

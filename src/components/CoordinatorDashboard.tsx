@@ -262,7 +262,7 @@ export function CoordinatorDashboard({
           </div>
           <div>
             <strong>Registro Presenze</strong>
-            <span>Coordinamento tecnico</span>
+            <span>Coordinatore</span>
           </div>
         </div>
         <div className="coordinator-header-actions">
@@ -291,15 +291,9 @@ export function CoordinatorDashboard({
         <main className="coordinator-main">
           <section className="coordinator-hero">
             <div>
-              <div className="eyebrow">Riepilogo società</div>
-              <h1>
-                Tutte le squadre,
-                <br />
-                fino all’ultima presenza.
-              </h1>
+              <h1>Squadre</h1>
               <p>
-                Carica automaticamente i JSON da Nextcloud con l’account supervisore oppure
-                seleziona la cartella sincronizzata sul computer.
+                Carica i registri da Nextcloud oppure da una cartella locale.
               </p>
             </div>
             <div className="coordinator-load-actions">
@@ -413,7 +407,6 @@ export function CoordinatorDashboard({
           <section className="coordinator-section">
             <div className="section-heading">
               <div>
-                <div className="eyebrow">Sommario stagionale</div>
                 <h2>Riepilogo squadre</h2>
               </div>
             </div>

@@ -36,6 +36,9 @@ jobs:
       - name: Crea la build per GitHub Pages
         run: npm run build:pages
 
+      - name: Verifica i percorsi della build
+        run: npm run verify:pages
+
       - name: Configura GitHub Pages
         uses: actions/configure-pages@v6
 

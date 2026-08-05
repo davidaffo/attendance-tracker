@@ -34,9 +34,7 @@ export function Dashboard({ document, onNewSession, onEditSession }: DashboardPr
     <div className="page-content dashboard">
       <section className="hero-card">
         <div>
-          <div className="eyebrow">Oggi</div>
-          <h1>Registra l’allenamento</h1>
-          <p>Apri la rosa, segna le eccezioni e salva.</p>
+          <h1>Oggi</h1>
         </div>
         <button className="button light" onClick={onNewSession}>
           <Plus size={19} />
@@ -46,7 +44,6 @@ export function Dashboard({ document, onNewSession, onEditSession }: DashboardPr
 
       <div className="section-heading">
         <div>
-          <div className="eyebrow">In sintesi</div>
           <h2>{monthFormatter.format(now)}</h2>
         </div>
       </div>
@@ -72,7 +69,6 @@ export function Dashboard({ document, onNewSession, onEditSession }: DashboardPr
       <section className="panel">
         <div className="panel-heading">
           <div>
-            <div className="eyebrow">Ultime attività</div>
             <h2>Allenamenti recenti</h2>
           </div>
         </div>
@@ -80,7 +76,7 @@ export function Dashboard({ document, onNewSession, onEditSession }: DashboardPr
           <div className="empty-state">
             <CalendarDays size={30} />
             <h3>Nessun allenamento</h3>
-            <p>Il primo apparirà qui appena avrai registrato le presenze.</p>
+            <p>Non sono ancora state registrate sessioni.</p>
           </div>
         ) : (
           <div className="session-list">

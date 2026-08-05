@@ -83,7 +83,6 @@ export function TeamSettings({ document, onUpdate }: TeamSettingsProps) {
     <div className="page-content">
       <div className="page-title-row">
         <div>
-          <div className="eyebrow">Configurazione</div>
           <h1>Squadra e rosa</h1>
         </div>
         <button className="button primary" onClick={save} disabled={saving}>
@@ -95,7 +94,6 @@ export function TeamSettings({ document, onUpdate }: TeamSettingsProps) {
       <section className="panel settings-panel">
         <div className="panel-heading">
           <div>
-            <div className="eyebrow">Dati essenziali</div>
             <h2>Squadra</h2>
           </div>
         </div>
@@ -172,8 +170,7 @@ export function TeamSettings({ document, onUpdate }: TeamSettingsProps) {
       <section className="panel settings-panel">
         <div className="panel-heading">
           <div>
-            <div className="eyebrow">{activeAthletes.length} attive</div>
-            <h2>Rosa</h2>
+            <h2>Rosa ({activeAthletes.length})</h2>
           </div>
         </div>
         <div className="roster-list">
@@ -246,7 +243,6 @@ export function TeamSettings({ document, onUpdate }: TeamSettingsProps) {
       <section className="panel settings-panel">
         <div className="panel-heading">
           <div>
-            <div className="eyebrow">Legenda</div>
             <h2>Stati di presenza</h2>
           </div>
         </div>

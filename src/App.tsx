@@ -127,22 +127,18 @@ function Welcome({ onSelect }: { onSelect: (mode: AppMode) => void }) {
         <div className="brand-mark welcome-mark">
           <Check size={34} strokeWidth={3} />
         </div>
-        <div className="eyebrow">Registro Presenze</div>
-        <h1>Un registro semplice.<br />Niente di più.</h1>
-        <p>
-          Scegli come vuoi usare questa installazione. Potrai cambiare modalità in qualsiasi
-          momento.
-        </p>
+        <h1>Registro presenze</h1>
+        <p>Seleziona la modalità per questo dispositivo.</p>
         <div className="mode-grid">
           <button className="mode-card" onClick={() => onSelect('coach')}>
             <ClipboardCheck size={26} />
-            <strong>Sono un allenatore</strong>
-            <span>Registro le presenze della mia squadra.</span>
+            <strong>Allenatore</strong>
+            <span>Inserimento e modifica delle presenze.</span>
           </button>
           <button className="mode-card" onClick={() => onSelect('coordinator')}>
             <ShieldCheck size={26} />
-            <strong>Sono il coordinatore</strong>
-            <span>Leggo i file di tutte le squadre dal PC.</span>
+            <strong>Coordinatore</strong>
+            <span>Consultazione dei registri delle squadre.</span>
           </button>
         </div>
       </div>
@@ -152,6 +148,7 @@ function Welcome({ onSelect }: { onSelect: (mode: AppMode) => void }) {
 
 export default function App() {
   const [loading, setLoading] = useState(true)
+  const [loadingError, setLoadingError] = useState(false)
   const [pathname, setPathname] = useState(currentRoutePath)
   const [document, setDocument] = useState<TeamDocument>()
   const [syncConfig, setSyncConfig] = useState<SyncConfig>()
@@ -367,6 +364,12 @@ export default function App() {
         if (storedDocument && storedConfig && navigator.onLine && shouldSyncCoach) {
           void performSync(storedDocument, storedMeta, storedConfig)
         }
+      },
+      (error) => {
+        console.error('Impossibile leggere i dati locali.', error)
+        if (!active) return
+        setLoadingError(true)
+        setLoading(false)
       }
     )
     return () => {
@@ -550,6 +553,20 @@ export default function App() {
     )
   }
 
+  if (loadingError) {
+    return (
+      <main className="error-page" role="alert">
+        <div className="error-card">
+          <h1>Impossibile leggere i dati locali</h1>
+          <p>Ricarica la pagina. I dati presenti sul dispositivo non verranno cancellati.</p>
+          <button className="button primary" onClick={() => window.location.reload()}>
+            Ricarica
+          </button>
+        </div>
+      </main>
+    )
+  }
+
   if (pathname === '/') return renderPage(<Welcome onSelect={chooseMode} />)
 
   const coordinatorTeamMatch = pathname.match(/^\/coordinatore\/squadra\/([^/]+)$/)
@@ -577,8 +594,7 @@ export default function App() {
     return renderPage(
       <main className="welcome-page">
         <div className="welcome-content">
-          <div className="eyebrow">Pagina non trovata</div>
-          <h1>Questo indirizzo non esiste.</h1>
+          <h1>Pagina non trovata</h1>
           <button className="button primary" onClick={() => navigate('/', { replace: true })}>
             Torna all’inizio
           </button>
@@ -625,8 +641,7 @@ export default function App() {
       return renderPage(
         <main className="welcome-page">
           <div className="welcome-content">
-            <div className="eyebrow">Allenamento non trovato</div>
-            <h1>Il registro richiesto non è disponibile.</h1>
+            <h1>Allenamento non trovato</h1>
             <button
               className="button primary"
               onClick={() => navigate('/allenatore/registro', { replace: true })}

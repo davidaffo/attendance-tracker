@@ -227,17 +227,11 @@ export function CoachOnboarding({
               <div className="onboarding-icon">
                 <ListChecks size={30} />
               </div>
-              <div className="eyebrow">Configurazione guidata</div>
-              <h1>Prepariamo il registro insieme</h1>
+              <h1>Configurazione allenatore</h1>
               <p className="lead">
-                Ti chiederemo soltanto squadra, giorni di allenamento, rosa e collegamento
-                Nextcloud. Potrai cambiare tutto anche in seguito.
+                Inserisci squadra, giorni di allenamento e rosa. Il collegamento a Nextcloud è
+                facoltativo.
               </p>
-              <ul className="onboarding-checklist">
-                <li><Check size={17} /> Un passaggio alla volta</li>
-                <li><Check size={17} /> Nessun termine tecnico non necessario</li>
-                <li><Check size={17} /> Collegamento cloud facoltativo</li>
-              </ul>
               <div className="onboarding-restore">
                 <span>Hai già una copia di sicurezza?</span>
                 <RestoreBackupButton
@@ -252,8 +246,7 @@ export function CoachOnboarding({
           {step === 1 && (
             <section>
               <div className="eyebrow">Passaggio 1 di 4</div>
-              <h1>Qual è la tua squadra?</h1>
-              <p className="lead">Questi nomi compariranno nel registro e nei riepiloghi.</p>
+              <h1>Squadra e stagione</h1>
               <div className="form-grid two-columns">
                 <label className="field">
                   <span>Società</span>
@@ -306,10 +299,7 @@ export function CoachOnboarding({
           {step === 2 && (
             <section>
               <div className="eyebrow">Passaggio 2 di 4</div>
-              <h1>Quando vi allenate?</h1>
-              <p className="lead">
-                Seleziona i giorni abituali. Servono solo per rendere il calendario più chiaro.
-              </p>
+              <h1>Giorni di allenamento</h1>
               <div className="weekday-grid onboarding-weekdays">
                 {WEEKDAYS.map((day) => {
                   const selected = weekdays.includes(day.value)
@@ -339,10 +329,7 @@ export function CoachOnboarding({
           {step === 3 && (
             <section>
               <div className="eyebrow">Passaggio 3 di 4</div>
-              <h1>Inserisci la rosa</h1>
-              <p className="lead">
-                Puoi aggiungere anche solo alcune giocatrici e completare la rosa più tardi.
-              </p>
+              <h1>Rosa</h1>
               <div className="athlete-inputs onboarding-athletes">
                 {athletes.map((athlete, index) => (
                   <div className="athlete-input-row" key={athlete.key}>
@@ -394,7 +381,7 @@ export function CoachOnboarding({
           {step === 4 && (
             <section>
               <div className="eyebrow">Passaggio 4 di 4</div>
-              <h1>Collega Nextcloud</h1>
+              <h1>Nextcloud</h1>
               <p className="lead">
                 Serve per salvare il registro nella cartella della squadra. Puoi farlo anche
                 dopo dalle Impostazioni.

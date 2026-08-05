@@ -149,7 +149,9 @@ Il repository è predisposto per pubblicare automaticamente
 
 1. Fare commit e push delle modifiche sul branch `main`.
 2. Su GitHub aprire `Settings → Pages`.
-3. In `Build and deployment → Source` selezionare `GitHub Actions`.
+3. In `Build and deployment → Source` selezionare `GitHub Actions`. Non lasciare
+   `Deploy from a branch`: quella modalità pubblica i sorgenti Vite e produce una
+   pagina vuota sui dispositivi che non hanno già una build in cache.
 4. Aprire la scheda `Actions` e attendere il completamento del workflow
    `Verifica e pubblica la PWA`.
 5. In Nextcloud/WebAppPassword autorizzare l'origine

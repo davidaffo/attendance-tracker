@@ -72,8 +72,7 @@ export function AttendanceEditor({
           <ArrowLeft size={22} />
         </button>
         <div>
-          <div className="eyebrow">{initialSession ? 'Modifica' : 'Nuovo allenamento'}</div>
-          <h1>Presenze</h1>
+          <h1>{initialSession ? 'Modifica allenamento' : 'Nuovo allenamento'}</h1>
         </div>
         <button className="button primary compact" onClick={save} disabled={saving}>
           <Save size={17} />

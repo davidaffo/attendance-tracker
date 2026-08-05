@@ -77,11 +77,7 @@ export function SetupCoach({
       </div>
 
       <form className="setup-card" onSubmit={submit}>
-        <div className="eyebrow">Configurazione manuale</div>
-        <h1>Prepara la squadra</h1>
-        <p className="lead">
-          Solo le informazioni già presenti nel registro. Potrai modificarle anche in seguito.
-        </p>
+        <h1>Configurazione squadra</h1>
 
         <div className="form-grid two-columns">
           <label className="field">
