@@ -22,6 +22,7 @@ import {
 import type { SyncConfig, TeamDocument } from '../domain/types'
 import { testWebDavConnection } from '../services/webdav'
 import { RestoreBackupButton } from './RestoreBackupButton'
+import { AthleteListPaste } from './AthleteListPaste'
 
 interface AthleteDraft {
   key: string
@@ -375,6 +376,15 @@ export function CoachOnboarding({
                 <Plus size={17} />
                 Aggiungi giocatrice
               </button>
+              <AthleteListPaste
+                existingNames={athletes.map((athlete) => athlete.name)}
+                onAdd={(names) =>
+                  setAthletes((current) => [
+                    ...current.filter((athlete) => athlete.name.trim()),
+                    ...names.map((name) => ({ key: crypto.randomUUID(), name }))
+                  ])
+                }
+              />
             </section>
           )}
 

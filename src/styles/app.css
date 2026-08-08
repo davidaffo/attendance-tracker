@@ -1627,6 +1627,64 @@ h2 {
   gap: 0.45rem;
 }
 
+.athlete-list-paste {
+  margin-top: 1rem;
+  border: 1px solid #e3e3dc;
+  border-radius: 12px;
+  background: #fafaf7;
+}
+
+.athlete-list-paste summary {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.8rem 0.9rem;
+  color: var(--text);
+  font-size: 0.82rem;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.athlete-list-paste summary::marker {
+  color: var(--muted);
+}
+
+.athlete-list-paste-content {
+  padding: 0 0.9rem 0.9rem;
+}
+
+.athlete-list-paste textarea {
+  width: 100%;
+  min-height: 8rem;
+  padding: 0.68rem 0.8rem;
+  color: var(--ink);
+  border: 1px solid #d8d8d0;
+  border-radius: 10px;
+  outline: none;
+  background: #fff;
+  font: inherit;
+  resize: vertical;
+  line-height: 1.5;
+}
+
+.athlete-list-paste textarea:focus {
+  border-color: var(--green-2);
+  box-shadow: 0 0 0 3px rgba(47, 125, 104, 0.12);
+}
+
+.athlete-list-paste-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.8rem;
+  margin-top: 0.65rem;
+}
+
+.athlete-list-paste-actions small {
+  color: var(--muted);
+  line-height: 1.35;
+}
+
 .roster-row {
   padding: 0.15rem 0;
 }

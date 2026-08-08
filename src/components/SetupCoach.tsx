@@ -4,6 +4,7 @@ import { getCurrentSeason, WEEKDAYS } from '../domain/defaults'
 import type { TeamDocument } from '../domain/types'
 import { createTeamDocument } from '../domain/defaults'
 import { RestoreBackupButton } from './RestoreBackupButton'
+import { AthleteListPaste } from './AthleteListPaste'
 
 interface SetupCoachProps {
   onComplete: (document: TeamDocument) => Promise<void>
@@ -192,6 +193,12 @@ export function SetupCoach({
             <Plus size={17} />
             Aggiungi atleta
           </button>
+          <AthleteListPaste
+            existingNames={athletes}
+            onAdd={(names) =>
+              setAthletes((current) => [...current.filter((name) => name.trim()), ...names])
+            }
+          />
         </fieldset>
 
         <div className="setup-actions">

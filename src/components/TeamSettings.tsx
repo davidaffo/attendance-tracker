@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react'
 import { Archive, Plus, RotateCcw, Save } from 'lucide-react'
 import { WEEKDAYS } from '../domain/defaults'
 import type { TeamDocument } from '../domain/types'
+import { AthleteListPaste } from './AthleteListPaste'
 
 interface TeamSettingsProps {
   document: TeamDocument
@@ -39,6 +40,23 @@ export function TeamSettings({ document, onUpdate }: TeamSettingsProps) {
       ]
     }))
     setNewAthlete('')
+  }
+
+  const addAthletes = (names: string[]) => {
+    const now = new Date().toISOString()
+    setDraft((current) => ({
+      ...current,
+      athletes: [
+        ...current.athletes,
+        ...names.map((name, index) => ({
+          id: crypto.randomUUID(),
+          name,
+          order: current.athletes.length + index,
+          active: true,
+          createdAt: now
+        }))
+      ]
+    }))
   }
 
   const archiveAthlete = (athleteId: string) => {
@@ -219,6 +237,11 @@ export function TeamSettings({ document, onUpdate }: TeamSettingsProps) {
             </button>
           </div>
         </div>
+
+        <AthleteListPaste
+          existingNames={draft.athletes.map((athlete) => athlete.name)}
+          onAdd={addAthletes}
+        />
 
         {archivedAthletes.length > 0 && (
           <details className="archived">
