@@ -2110,15 +2110,8 @@ h2 {
   font-weight: 500;
 }
 
-.coordinator-summary-table td > strong,
-.coordinator-summary-table td > small {
+.coordinator-summary-table td > strong {
   display: block;
-}
-
-.coordinator-summary-table td > small {
-  margin-top: 0.15rem;
-  font-size: 0.59rem;
-  font-weight: 700;
 }
 
 .coordinator-summary-table tbody tr:last-child th,
@@ -2200,11 +2193,6 @@ h2 {
 
 .team-status-totals b {
   font-weight: 850;
-}
-
-.team-status-totals small {
-  font-size: 0.59rem;
-  font-weight: 750;
 }
 
 .team-status-totals i {

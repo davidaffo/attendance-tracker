@@ -71,6 +71,7 @@ export function CoordinatorDashboard({
   const [teams, setTeams] = useState<TeamSummary[]>([])
   const [message, setMessage] = useState('')
   const [loading, setLoading] = useState(false)
+  const [cloudConfigOpen, setCloudConfigOpen] = useState(!config)
   const [draft, setDraft] = useState<SyncConfig>(config ?? defaultConfig)
   const [folderLink, setFolderLink] = useState(config?.folderLink ?? '')
   const [rememberedHandle, setRememberedHandle] = useState<FileSystemDirectoryHandle>()
@@ -334,7 +335,11 @@ export function CoordinatorDashboard({
             />
           </section>
 
-          <details className="coordinator-cloud-config" open={!config}>
+          <details
+            className="coordinator-cloud-config"
+            open={cloudConfigOpen}
+            onToggle={(event) => setCloudConfigOpen(event.currentTarget.open)}
+          >
             <summary>Collegamento Nextcloud del supervisore</summary>
             <form className="form-grid" onSubmit={connectCloud} autoComplete="on">
               <div className="form-grid coordinator-config-grid">
@@ -471,10 +476,7 @@ export function CoordinatorDashboard({
                                   style={scaleColor ? { backgroundColor: scaleColor } : undefined}
                                 >
                                   {status ? (
-                                    <>
-                                      <strong>{count}</strong>
-                                      <small>{Math.round(percentage)}%</small>
-                                    </>
+                                    <strong>{Math.round(percentage)}%</strong>
                                   ) : (
                                     '—'
                                   )}
@@ -535,12 +537,11 @@ export function CoordinatorDashboard({
                               <span
                                 className={scaleColor ? 'color-scale-cell' : undefined}
                                 key={status.id}
-                                title={`${status.label}: ${count} · ${Math.round(percentage)}%`}
+                                title={`${status.label}: ${Math.round(percentage)}%`}
                                 style={scaleColor ? { backgroundColor: scaleColor } : undefined}
                               >
                                 <i style={{ background: status.color }}>{status.code}</i>
-                                <b>{count}</b>
-                                <small>{Math.round(percentage)}%</small>
+                                <b>{Math.round(percentage)}%</b>
                               </span>
                             )
                           })}
