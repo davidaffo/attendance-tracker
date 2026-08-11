@@ -61,6 +61,7 @@ export interface SyncConfig {
   username: string
   appPassword: string
   remoteFolder: string
+  folderLink?: string
 }
 
 export interface LocalSyncMeta {

@@ -10,7 +10,9 @@ const config = {
   baseUrl: 'https://cloud.example.it',
   username: 'allenatore',
   appPassword: 'segreto',
-  remoteFolder: 'attendance-tracker'
+  remoteFolder: 'attendance-tracker',
+  folderLink:
+    'https://cloud.example.it/apps/files/files/42?dir=/attendance-tracker'
 }
 
 describe('persistenza configurazione cloud', () => {
@@ -25,7 +27,8 @@ describe('persistenza configurazione cloud', () => {
     expect(configForLocalStorage(config)).toMatchObject({
       baseUrl: config.baseUrl,
       username: config.username,
-      remoteFolder: config.remoteFolder
+      remoteFolder: config.remoteFolder,
+      folderLink: config.folderLink
     })
   })
 })

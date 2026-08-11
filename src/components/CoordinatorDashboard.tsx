@@ -72,7 +72,7 @@ export function CoordinatorDashboard({
   const [message, setMessage] = useState('')
   const [loading, setLoading] = useState(false)
   const [draft, setDraft] = useState<SyncConfig>(config ?? defaultConfig)
-  const [folderLink, setFolderLink] = useState('')
+  const [folderLink, setFolderLink] = useState(config?.folderLink ?? '')
   const [rememberedHandle, setRememberedHandle] = useState<FileSystemDirectoryHandle>()
   const inputRef = useRef<HTMLInputElement>(null)
   const loadedOnce = useRef(false)
@@ -93,29 +93,18 @@ export function CoordinatorDashboard({
     })
   }
 
-  const updateConnectionDetails = (
-    patch: Partial<Pick<SyncConfig, 'baseUrl' | 'username' | 'remoteFolder'>>
-  ) => {
-    const next = { ...draft, ...patch }
+  const updateUsername = (username: string) => {
+    const next = { ...draft, username }
     setDraft(next)
     void onPersistConnectionDetails({ ...next, appPassword: '' })
   }
 
   const connectionFromFolderLink = (connection: SyncConfig): SyncConfig => {
-    if (!folderLink.trim()) return connection
-    return { ...connection, ...detailsFromNextcloudFolderLink(folderLink) }
-  }
-
-  const applyFolderLink = async () => {
-    setMessage('')
-    try {
-      const next = connectionFromFolderLink(draft)
-      setDraft(next)
-      setFolderLink('')
-      await onPersistConnectionDetails({ ...next, appPassword: '' })
-      setMessage(`Cartella impostata: ${next.remoteFolder}`)
-    } catch (error) {
-      setMessage(error instanceof Error ? error.message : 'Link Nextcloud non valido.')
+    const normalizedLink = folderLink.trim()
+    return {
+      ...connection,
+      ...detailsFromNextcloudFolderLink(normalizedLink),
+      folderLink: normalizedLink
     }
   }
 
@@ -205,7 +194,6 @@ export function CoordinatorDashboard({
     try {
       const connection = connectionFromFolderLink(draft)
       setDraft(connection)
-      setFolderLink('')
       loadedOnce.current = true
       await onSaveConfig(connection)
       await loadCloud(connection)
@@ -349,42 +337,19 @@ export function CoordinatorDashboard({
           <details className="coordinator-cloud-config" open={!config}>
             <summary>Collegamento Nextcloud del supervisore</summary>
             <form className="form-grid" onSubmit={connectCloud} autoComplete="on">
-              <div className="coordinator-folder-link">
+              <div className="form-grid coordinator-config-grid">
                 <label className="field">
                   <span>Link della cartella Nextcloud</span>
-                  <div className="coordinator-folder-link-row">
-                    <input
-                      type="url"
-                      value={folderLink}
-                      placeholder="https://…/apps/files/files/…?dir=/Volley/Stagioni/…"
-                      onChange={(event) => setFolderLink(event.target.value)}
-                    />
-                    <button
-                      className="button dark-secondary compact"
-                      type="button"
-                      disabled={!folderLink.trim()}
-                      onClick={() => void applyFolderLink()}
-                    >
-                      Usa questo link
-                    </button>
-                  </div>
+                  <input
+                    type="url"
+                    value={folderLink}
+                    placeholder="https://…/apps/files/files/…?dir=/Volley/Stagioni/…"
+                    onChange={(event) => setFolderLink(event.target.value)}
+                    required
+                  />
                   <small>
                     Apri la cartella nell’app File di Nextcloud e copia l’indirizzo completo.
                   </small>
-                </label>
-              </div>
-              <div className="form-grid coordinator-config-grid">
-                <label className="field">
-                  <span>Indirizzo Nextcloud</span>
-                  <input
-                    type="url"
-                    value={draft.baseUrl}
-                    placeholder="https://nxXXXXX.your-storageshare.de"
-                    onChange={(event) =>
-                      updateConnectionDetails({ baseUrl: event.target.value })
-                    }
-                    required
-                  />
                 </label>
                 <label className="field">
                   <span>Nome utente supervisore</span>
@@ -392,9 +357,7 @@ export function CoordinatorDashboard({
                     name="username"
                     autoComplete="username"
                     value={draft.username}
-                    onChange={(event) =>
-                      updateConnectionDetails({ username: event.target.value })
-                    }
+                    onChange={(event) => updateUsername(event.target.value)}
                     required
                   />
                 </label>
@@ -411,16 +374,6 @@ export function CoordinatorDashboard({
                   <small>
                     L’app non la salva. Il browser può proporti di ricordarla e compilarla.
                   </small>
-                </label>
-                <label className="field">
-                  <span>Cartella remota</span>
-                  <input
-                    value={draft.remoteFolder}
-                    onChange={(event) =>
-                      updateConnectionDetails({ remoteFolder: event.target.value })
-                    }
-                    required
-                  />
                 </label>
               </div>
               <button className="button primary" type="submit" disabled={loading}>
