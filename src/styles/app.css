@@ -378,6 +378,59 @@ h2 {
   }
 }
 
+.app-update-control,
+.app-update-banner {
+  position: fixed;
+  z-index: 90;
+  right: max(1rem, env(safe-area-inset-right));
+  bottom: max(1rem, env(safe-area-inset-bottom));
+}
+
+.app-update-control {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.app-update-control > span {
+  max-width: min(360px, calc(100vw - 2rem));
+  padding: 0.65rem 0.85rem;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--paper);
+  box-shadow: 0 8px 28px rgba(17, 45, 37, 0.14);
+  color: var(--muted);
+  font-size: 0.78rem;
+}
+
+.app-update-control .button {
+  min-height: 40px;
+  box-shadow: 0 8px 28px rgba(17, 45, 37, 0.14);
+}
+
+.app-update-banner {
+  display: flex;
+  width: min(520px, calc(100vw - 2rem));
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1rem;
+  border-radius: 16px;
+  background: var(--green);
+  box-shadow: 0 18px 50px rgba(7, 23, 18, 0.3);
+  color: #fff;
+}
+
+.app-update-banner > div {
+  display: grid;
+  gap: 0.2rem;
+}
+
+.app-update-banner span {
+  color: #d7e4df;
+  font-size: 0.8rem;
+}
+
 /* Welcome and setup */
 
 .welcome-page,
@@ -2212,6 +2265,36 @@ h2 {
 }
 
 @media (max-width: 820px) {
+  .app-update-control,
+  .app-update-banner {
+    bottom: calc(5rem + env(safe-area-inset-bottom));
+  }
+
+  .app-update-control {
+    left: max(0.7rem, env(safe-area-inset-left));
+    justify-content: flex-end;
+  }
+
+  .app-update-control > span {
+    position: absolute;
+    right: 0;
+    bottom: 3rem;
+  }
+
+  .app-update-control .button {
+    padding-right: 0.75rem;
+    padding-left: 0.75rem;
+    font-size: 0.72rem;
+  }
+
+  .app-update-banner {
+    right: max(0.7rem, env(safe-area-inset-right));
+    left: max(0.7rem, env(safe-area-inset-left));
+    width: auto;
+    align-items: stretch;
+    flex-direction: column;
+  }
+
   .app-shell {
     display: block;
   }

@@ -183,6 +183,12 @@ npm run verify:pages
 Il codice pubblicato non contiene credenziali o JSON delle squadre: questi
 restano nell'archivio locale del browser e su Nextcloud.
 
+La PWA controlla automaticamente la presenza di nuove versioni all’avvio,
+quando torna online, quando viene riaperta e ogni trenta minuti. Se trova un
+aggiornamento mostra `Nuova versione disponibile` con il pulsante
+`Aggiorna ora`. Il comando `Controlla aggiornamenti`, sempre visibile, permette
+anche di forzare manualmente il controllo.
+
 ## Backup e ripristino della squadra
 
 L'allenatore può scaricare una copia completa da

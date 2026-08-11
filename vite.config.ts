@@ -14,7 +14,7 @@ export default defineConfig(({ mode }) => {
     plugins: [
       react(),
       VitePWA({
-        registerType: 'autoUpdate',
+        registerType: 'prompt',
         includeAssets: ['app-icon.svg', 'app-icon-192.png', 'app-icon-512.png'],
         manifest: {
           name: 'Registro Presenze',
