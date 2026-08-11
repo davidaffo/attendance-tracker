@@ -1,6 +1,12 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { Download, RefreshCw } from 'lucide-react'
 import { useRegisterSW } from 'virtual:pwa-register/react'
+import {
+  activateWaitingServiceWorker,
+  clearCachesForScope,
+  removeUpdateReloadToken,
+  updateReloadUrl
+} from '../services/appUpdate'
 
 const UPDATE_INTERVAL_MS = 30 * 60 * 1000
 
@@ -10,10 +16,7 @@ export function AppUpdatePrompt() {
   const [updating, setUpdating] = useState(false)
   const [feedback, setFeedback] = useState('')
   const feedbackTimer = useRef<number | undefined>(undefined)
-  const {
-    needRefresh: [needRefresh, setNeedRefresh],
-    updateServiceWorker
-  } = useRegisterSW({
+  const { needRefresh: [needRefresh, setNeedRefresh] } = useRegisterSW({
     immediate: true,
     onRegisteredSW: (_workerUrl, nextRegistration) => {
       setRegistration(nextRegistration)
@@ -87,10 +90,37 @@ export function AppUpdatePrompt() {
     []
   )
 
+  useEffect(() => {
+    const cleanUrl = removeUpdateReloadToken(window.location.href)
+    if (cleanUrl) window.history.replaceState(window.history.state, '', cleanUrl)
+  }, [])
+
   const installUpdate = async () => {
+    if (!navigator.onLine) {
+      showFeedback('Sei offline: impossibile scaricare la nuova versione.')
+      return
+    }
+
     setUpdating(true)
     try {
-      await updateServiceWorker(true)
+      const currentRegistration =
+        registration ?? await navigator.serviceWorker.getRegistration(import.meta.env.BASE_URL)
+      const activated = currentRegistration
+        ? await activateWaitingServiceWorker(currentRegistration, navigator.serviceWorker)
+        : false
+
+      if (activated) {
+        window.location.reload()
+        return
+      }
+
+      // Fallback per browser che non notificano controllerchange: rimuove solo
+      // registrazione e cache di questa PWA. IndexedDB e registro restano intatti.
+      const appScope =
+        currentRegistration?.scope ?? new URL(import.meta.env.BASE_URL, window.location.origin).href
+      if ('caches' in window) await clearCachesForScope(appScope, window.caches)
+      await currentRegistration?.unregister()
+      window.location.replace(updateReloadUrl(window.location.href))
     } catch (error) {
       console.error('Aggiornamento PWA non riuscito.', error)
       setUpdating(false)
