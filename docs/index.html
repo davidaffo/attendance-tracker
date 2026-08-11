@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="it">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="theme-color" content="#173f35" />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; connect-src 'self' https: http: ws: wss:; worker-src 'self' blob:; object-src 'none'; base-uri 'self'; form-action 'self'"
+    />
+    <meta
+      name="description"
+      content="Registro presenze per squadre sportive"
+    />
+    <link rel="icon" href="/attendance-tracker/app-icon.svg" />
+    <link rel="apple-touch-icon" href="/attendance-tracker/app-icon-192.png" />
+    <style>
+      .boot-fallback {
+        display: grid;
+        min-height: 100vh;
+        margin: 0;
+        place-content: center;
+        gap: 0.5rem;
+        padding: 1rem;
+        color: #18332c;
+        background: #f5f2ea;
+        font-family: system-ui, sans-serif;
+        text-align: center;
+      }
+      .boot-fallback strong { font-size: 1.25rem; }
+      .boot-fallback span { color: #6d7873; }
+      .boot-fallback-error {
+        visibility: hidden;
+        animation: show-boot-error 0s 8s forwards;
+      }
+      @keyframes show-boot-error { to { visibility: visible; } }
+    </style>
+    <title>Registro Presenze</title>
+    <script type="module" crossorigin src="/attendance-tracker/assets/index-45l8FWJx.js"></script>
+    <link rel="stylesheet" crossorigin href="/attendance-tracker/assets/index-Bv-e5XOL.css">
+  <link rel="manifest" href="/attendance-tracker/manifest.webmanifest"><script id="vite-plugin-pwa:register-sw" src="/attendance-tracker/registerSW.js"></script></head>
+  <body>
+    <div id="root">
+      <main class="boot-fallback">
+        <strong>Apertura del registro…</strong>
+        <span class="boot-fallback-error">Se il caricamento non termina, ricarica la pagina.</span>
+      </main>
+    </div>
+  </body>
+</html>

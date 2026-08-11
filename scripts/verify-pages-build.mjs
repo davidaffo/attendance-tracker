@@ -1,6 +1,6 @@
 import { readFile } from 'node:fs/promises'
 
-const html = await readFile(new URL('../dist/index.html', import.meta.url), 'utf8')
+const html = await readFile(new URL('../docs/index.html', import.meta.url), 'utf8')
 
 if (html.includes('/src/main.tsx')) {
   throw new Error('La build Pages contiene ancora il sorgente TSX.')

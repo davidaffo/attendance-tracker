@@ -163,23 +163,21 @@ Il repository è predisposto per pubblicare automaticamente
 
 1. Fare commit e push delle modifiche sul branch `main`.
 2. Su GitHub aprire `Settings → Pages`.
-3. In `Build and deployment → Source` selezionare `GitHub Actions`. Non lasciare
-   `Deploy from a branch`: quella modalità pubblica i sorgenti Vite e produce una
-   pagina vuota sui dispositivi che non hanno già una build in cache.
-4. Aprire la scheda `Actions` e attendere il completamento del workflow
-   `Verifica e pubblica la PWA`.
+3. In `Build and deployment → Source` selezionare `Deploy from a branch`.
+4. Selezionare il branch `main`, la cartella `/docs` e premere `Save`.
 5. In Nextcloud/WebAppPassword autorizzare l'origine
    `https://davidaffo.github.io`.
 
-Il workflow [deploy-pages.yml](.github/workflows/deploy-pages.yml) installa le
-dipendenze, esegue i test, crea la build con base
-`/attendance-tracker/` e pubblica `dist/`. Ogni successivo push su `main`
-aggiorna automaticamente la PWA.
+La directory `docs/` contiene la build pubblicata con base
+`/attendance-tracker/`. Il workflow [deploy-pages.yml](.github/workflows/deploy-pages.yml)
+esegue test e build e controlla che la copia versionata in `docs/` sia
+aggiornata. Non avvia un secondo deployment concorrente.
 
-Per controllare localmente la stessa build:
+Prima di ogni commit che modifica l'app, rigenerare la build:
 
 ```bash
 npm run build:pages
+npm run verify:pages
 ```
 
 Il codice pubblicato non contiene credenziali o JSON delle squadre: questi

@@ -1,18 +1,9 @@
-name: Verifica e pubblica la PWA
+name: Verifica la build PWA
 
 on:
   push:
     branches: [main]
   workflow_dispatch:
-
-permissions:
-  contents: read
-  pages: write
-  id-token: write
-
-concurrency:
-  group: pages
-  cancel-in-progress: true
 
 jobs:
   build:
@@ -39,21 +30,10 @@ jobs:
       - name: Verifica i percorsi della build
         run: npm run verify:pages
 
-      - name: Configura GitHub Pages
-        uses: actions/configure-pages@v6
-
-      - name: Carica la build
-        uses: actions/upload-pages-artifact@v5
-        with:
-          path: dist
-
-  deploy:
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    runs-on: ubuntu-latest
-    needs: build
-    steps:
-      - name: Pubblica
-        id: deployment
-        uses: actions/deploy-pages@v5
+      - name: Verifica che docs sia aggiornato
+        run: |
+          if [ -n "$(git status --porcelain -- docs)" ]; then
+            echo "La build versionata in docs non è aggiornata."
+            git status --short -- docs
+            exit 1
+          fi

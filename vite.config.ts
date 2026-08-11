@@ -3,10 +3,14 @@ import react from '@vitejs/plugin-react'
 import { VitePWA } from 'vite-plugin-pwa'
 
 export default defineConfig(({ mode }) => {
-  const base = mode === 'github-pages' ? '/attendance-tracker/' : '/'
+  const isGitHubPages = mode === 'github-pages'
+  const base = isGitHubPages ? '/attendance-tracker/' : '/'
 
   return {
     base,
+    build: {
+      outDir: isGitHubPages ? 'docs' : 'dist'
+    },
     plugins: [
       react(),
       VitePWA({
