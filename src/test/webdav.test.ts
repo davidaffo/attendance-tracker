@@ -1,7 +1,8 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { createTeamDocument } from '../domain/defaults'
 import { serializeTeamDocument } from '../domain/document'
-import { normalizeEtag, synchronizeDocument } from '../services/webdav'
+import { detailsFromNextcloudFolderLink } from '../domain/syncConfig'
+import { documentUrl, normalizeEtag, synchronizeDocument } from '../services/webdav'
 
 afterEach(() => {
   vi.unstubAllGlobals()
@@ -23,6 +24,35 @@ describe('ETag WebDAV Nextcloud', () => {
     expect(normalizeEtag('  &quot;a&amp;b&quot;  ')).toBe('"a&b"')
     expect(normalizeEtag(undefined)).toBeUndefined()
     expect(normalizeEtag('   ')).toBeUndefined()
+  })
+})
+
+describe('percorso WebDAV del supervisore', () => {
+  it('usa la cartella annidata estratta dal link Nextcloud', () => {
+    const document = createTeamDocument({
+      teamName: 'U14',
+      organizationName: 'Volley Club',
+      coachName: 'Mario',
+      startYear: 2026,
+      weekdays: [],
+      athleteNames: ['Anna']
+    })
+    const details = detailsFromNextcloudFolderLink(
+      'https://nx100087.your-storageshare.de/apps/files/files/131125?dir=/Volley/Stagioni/2026-2027/attendance-tracker'
+    )
+
+    expect(
+      documentUrl(
+        {
+          ...details,
+          username: 'supervisore',
+          appPassword: 'password-app'
+        },
+        document
+      )
+    ).toBe(
+      'https://nx100087.your-storageshare.de/remote.php/dav/files/supervisore/Volley/Stagioni/2026-2027/attendance-tracker/u14__2026-2027.attendance.json'
+    )
   })
 })
 

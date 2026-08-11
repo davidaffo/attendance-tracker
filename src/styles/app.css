@@ -1984,6 +1984,21 @@ h2 {
   grid-template-columns: 1.35fr 0.8fr 0.9fr 0.8fr;
 }
 
+.coordinator-folder-link {
+  padding-bottom: 1rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.coordinator-folder-link-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 0.6rem;
+}
+
+.coordinator-folder-link-row .button {
+  white-space: nowrap;
+}
+
 .coordinator-cloud-config .field > span {
   color: #b8c8c2;
 }
@@ -2629,6 +2644,10 @@ h2 {
   }
 
   .coordinator-config-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .coordinator-folder-link-row {
     grid-template-columns: 1fr;
   }
 

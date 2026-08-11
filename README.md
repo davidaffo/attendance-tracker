@@ -116,6 +116,12 @@ La modalità coordinatore offre due modalità di caricamento:
    i file `*.attendance.json` presenti in `attendance-tracker`;
 2. selezione della cartella locale già sincronizzata da Nextcloud Desktop.
 
+Nel collegamento WebDAV il supervisore può incollare direttamente il link della
+cartella aperta nell’app File di Nextcloud, per esempio un indirizzo che termina
+con `?dir=/Volley/Stagioni/2026-2027/attendance-tracker`. L’app ricava dal link
+il server e il percorso WebDAV; il numero presente in `/files/12345` è soltanto
+un identificatore dell’interfaccia Nextcloud e non viene usato per l’accesso.
+
 I dati di collegamento del supervisore sono conservati separatamente da quelli
 dell'allenatore; la password resta esclusa. Dopo il caricamento vengono mostrati
 il sommario di tutte le squadre e, per ciascuna squadra, riepilogo stagionale,

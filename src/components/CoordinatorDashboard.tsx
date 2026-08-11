@@ -28,6 +28,7 @@ import {
   storeCoordinatorDirectoryHandle
 } from '../storage/database'
 import { percentageScaleColor } from '../domain/percentageColorScale'
+import { detailsFromNextcloudFolderLink } from '../domain/syncConfig'
 import { MonthlyRegister } from './MonthlyRegister'
 import { ResetAppDataButton } from './ResetAppDataButton'
 
@@ -71,6 +72,7 @@ export function CoordinatorDashboard({
   const [message, setMessage] = useState('')
   const [loading, setLoading] = useState(false)
   const [draft, setDraft] = useState<SyncConfig>(config ?? defaultConfig)
+  const [folderLink, setFolderLink] = useState('')
   const [rememberedHandle, setRememberedHandle] = useState<FileSystemDirectoryHandle>()
   const inputRef = useRef<HTMLInputElement>(null)
   const loadedOnce = useRef(false)
@@ -99,6 +101,24 @@ export function CoordinatorDashboard({
     void onPersistConnectionDetails({ ...next, appPassword: '' })
   }
 
+  const connectionFromFolderLink = (connection: SyncConfig): SyncConfig => {
+    if (!folderLink.trim()) return connection
+    return { ...connection, ...detailsFromNextcloudFolderLink(folderLink) }
+  }
+
+  const applyFolderLink = async () => {
+    setMessage('')
+    try {
+      const next = connectionFromFolderLink(draft)
+      setDraft(next)
+      setFolderLink('')
+      await onPersistConnectionDetails({ ...next, appPassword: '' })
+      setMessage(`Cartella impostata: ${next.remoteFolder}`)
+    } catch (error) {
+      setMessage(error instanceof Error ? error.message : 'Link Nextcloud non valido.')
+    }
+  }
+
   const loadCloud = async (connection = draft) => {
     setLoading(true)
     setMessage('')
@@ -119,7 +139,7 @@ export function CoordinatorDashboard({
       setMessage(
         found.length
           ? `${found.length} squadre caricate da Nextcloud.`
-          : 'Nessun file .attendance.json trovato in attendance-tracker.'
+          : `Nessun file .attendance.json trovato in ${readyConnection.remoteFolder}.`
       )
     } catch (error) {
       setMessage(error instanceof Error ? error.message : 'Nextcloud non è raggiungibile.')
@@ -183,9 +203,12 @@ export function CoordinatorDashboard({
     event.preventDefault()
     setMessage('')
     try {
+      const connection = connectionFromFolderLink(draft)
+      setDraft(connection)
+      setFolderLink('')
       loadedOnce.current = true
-      await onSaveConfig(draft)
-      await loadCloud(draft)
+      await onSaveConfig(connection)
+      await loadCloud(connection)
     } catch (error) {
       setMessage(error instanceof Error ? error.message : 'Connessione non riuscita.')
     }
@@ -326,6 +349,30 @@ export function CoordinatorDashboard({
           <details className="coordinator-cloud-config" open={!config}>
             <summary>Collegamento Nextcloud del supervisore</summary>
             <form className="form-grid" onSubmit={connectCloud} autoComplete="on">
+              <div className="coordinator-folder-link">
+                <label className="field">
+                  <span>Link della cartella Nextcloud</span>
+                  <div className="coordinator-folder-link-row">
+                    <input
+                      type="url"
+                      value={folderLink}
+                      placeholder="https://…/apps/files/files/…?dir=/Volley/Stagioni/…"
+                      onChange={(event) => setFolderLink(event.target.value)}
+                    />
+                    <button
+                      className="button dark-secondary compact"
+                      type="button"
+                      disabled={!folderLink.trim()}
+                      onClick={() => void applyFolderLink()}
+                    >
+                      Usa questo link
+                    </button>
+                  </div>
+                  <small>
+                    Apri la cartella nell’app File di Nextcloud e copia l’indirizzo completo.
+                  </small>
+                </label>
+              </div>
               <div className="form-grid coordinator-config-grid">
                 <label className="field">
                   <span>Indirizzo Nextcloud</span>
