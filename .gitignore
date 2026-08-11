@@ -1,6 +1,10 @@
 node_modules/
 dist/
 resources/
+!resources/
+resources/*
+!resources/nextcloud-demo-2026-2027/
+!resources/nextcloud-demo-2026-2027/**
 .vite/
 *.tsbuildinfo
 vite.config.js

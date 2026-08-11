@@ -29,7 +29,8 @@ function isAthlete(value: unknown): value is Athlete {
     isString(value.name) &&
     typeof value.order === 'number' &&
     typeof value.active === 'boolean' &&
-    isString(value.createdAt)
+    isString(value.createdAt) &&
+    (value.archivedAt === undefined || isString(value.archivedAt))
   )
 }
 
@@ -41,7 +42,8 @@ function isSession(value: unknown): value is TrainingSession {
     isRecord(value.attendances) &&
     Object.values(value.attendances).every(isString) &&
     isString(value.createdAt) &&
-    isString(value.updatedAt)
+    isString(value.updatedAt) &&
+    (value.updatedBy === undefined || isString(value.updatedBy))
   )
 }
 
@@ -49,7 +51,7 @@ export function isTeamDocument(value: unknown): value is TeamDocument {
   if (!isRecord(value) || value.schemaVersion !== ATTENDANCE_SCHEMA_VERSION) return false
   if (!isRecord(value.season)) return false
 
-  return (
+  const hasValidShape =
     isString(value.teamId) &&
     isString(value.teamName) &&
     isString(value.organizationName) &&
@@ -67,6 +69,28 @@ export function isTeamDocument(value: unknown): value is TeamDocument {
     value.athletes.every(isAthlete) &&
     Array.isArray(value.sessions) &&
     value.sessions.every(isSession)
+
+  if (!hasValidShape) return false
+
+  const document = value as unknown as TeamDocument
+  const statusIds = new Set(document.statuses.map((status) => status.id))
+  const statusCodes = new Set(document.statuses.map((status) => status.code))
+  const athleteIds = new Set(document.athletes.map((athlete) => athlete.id))
+  const sessionIds = new Set(document.sessions.map((session) => session.id))
+  const sessionDates = new Set(document.sessions.map((session) => session.date))
+
+  if (
+    statusIds.size !== document.statuses.length ||
+    statusCodes.size !== document.statuses.length ||
+    athleteIds.size !== document.athletes.length ||
+    sessionIds.size !== document.sessions.length ||
+    sessionDates.size !== document.sessions.length
+  ) return false
+
+  return document.sessions.every((session) =>
+    Object.entries(session.attendances).every(
+      ([athleteId, statusId]) => athleteIds.has(athleteId) && statusIds.has(statusId)
+    )
   )
 }
 
@@ -185,4 +209,16 @@ export function sessionsInMonth(
 ): TrainingSession[] {
   const prefix = `${year}-${String(monthIndex + 1).padStart(2, '0')}-`
   return document.sessions.filter((session) => session.date.startsWith(prefix))
+}
+
+export function athletesForReport(document: TeamDocument): Athlete[] {
+  return [...document.athletes].sort((a, b) => a.order - b.order)
+}
+
+export function completedAttendancesForAthletes(
+  session: TrainingSession,
+  athletes: Athlete[]
+): number {
+  const athleteIds = new Set(athletes.map((athlete) => athlete.id))
+  return Object.keys(session.attendances).filter((athleteId) => athleteIds.has(athleteId)).length
 }

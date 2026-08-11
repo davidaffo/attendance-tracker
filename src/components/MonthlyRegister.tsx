@@ -1,7 +1,12 @@
 import { useMemo, useState } from 'react'
 import { CalendarDays, CalendarRange, Plus, Users } from 'lucide-react'
 import type { TeamDocument, TrainingSession } from '../domain/types'
-import { athleteTotals, sessionsInMonth } from '../domain/document'
+import {
+  athleteTotals,
+  athletesForReport,
+  completedAttendancesForAthletes,
+  sessionsInMonth
+} from '../domain/document'
 import { percentageScaleColor } from '../domain/percentageColorScale'
 
 interface MonthlyRegisterProps {
@@ -47,11 +52,9 @@ export function MonthlyRegister({
         a.date.localeCompare(b.date)
       )
     : [...document.sessions].sort((a, b) => a.date.localeCompare(b.date))
-  const athletes = document.athletes
-    .filter((athlete) => athlete.active)
-    .sort((a, b) => a.order - b.order)
+  const athletes = athletesForReport(document)
   const completedAttendances = sessions.reduce(
-    (sum, session) => sum + Object.keys(session.attendances).length,
+    (sum, session) => sum + completedAttendancesForAthletes(session, athletes),
     0
   )
   const possibleAttendances = sessions.length * athletes.length
@@ -196,7 +199,9 @@ function MonthMatrix({ document, sessions, athletes, onEditSession }: MatrixProp
             const totals = athleteTotals(document, athlete.id, sessions)
             return (
               <tr key={athlete.id}>
-                <th className="sticky-name">{athlete.name}</th>
+                <th className="sticky-name">
+                  {athlete.name}{athlete.active ? '' : ' (archiviata)'}
+                </th>
                 {sessions.map((session) => {
                   const status = document.statuses.find(
                     (candidate) => candidate.id === session.attendances[athlete.id]
@@ -288,7 +293,9 @@ function SeasonOverview({
               const totals = athleteTotals(document, athlete.id)
               return (
                 <tr key={athlete.id}>
-                  <th className="sticky-name">{athlete.name}</th>
+                  <th className="sticky-name">
+                    {athlete.name}{athlete.active ? '' : ' (archiviata)'}
+                  </th>
                   {document.statuses.map((status) => {
                     const count = totals[status.id]
                     const percentage = document.sessions.length

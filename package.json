@@ -10,6 +10,7 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "build:pages": "tsc -b && vite build --mode github-pages",
+    "generate:demo": "node scripts/generate-demo-season.mjs",
     "verify:pages": "node scripts/verify-pages-build.mjs",
     "preview": "vite preview",
     "test": "vitest run",

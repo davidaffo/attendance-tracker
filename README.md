@@ -135,6 +135,20 @@ La selezione diretta di una cartella richiede un browser desktop compatibile
 con File System Access API, come Chrome o Edge. Negli altri browser viene usato
 il selettore di directory disponibile.
 
+### Dataset dimostrativo
+
+La cartella
+[`resources/nextcloud-demo-2026-2027`](resources/nextcloud-demo-2026-2027)
+simula una cartella Nextcloud completa: contiene cinque squadre, dati sintetici
+e allenamenti distribuiti da agosto 2026 a luglio 2027. Può essere selezionata
+direttamente con `Coordinatore → Cartella locale`.
+
+Per rigenerare gli stessi file in modo deterministico:
+
+```bash
+npm run generate:demo
+```
+
 ## Navigazione
 
 Le sezioni hanno indirizzi distinti (`#/allenatore/registro`,

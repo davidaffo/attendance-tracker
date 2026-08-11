@@ -1,6 +1,10 @@
 import { CalendarDays, ChevronRight, Plus, Users } from 'lucide-react'
 import type { TeamDocument, TrainingSession } from '../domain/types'
-import { athleteTotals, sessionsInMonth } from '../domain/document'
+import {
+  athleteTotals,
+  completedAttendancesForAthletes,
+  sessionsInMonth
+} from '../domain/document'
 
 interface DashboardProps {
   document: TeamDocument
@@ -81,7 +85,7 @@ export function Dashboard({ document, onNewSession, onEditSession }: DashboardPr
         ) : (
           <div className="session-list">
             {recent.map((session) => {
-              const completed = Object.keys(session.attendances).length
+              const completed = completedAttendancesForAthletes(session, activeAthletes)
               return (
                 <button
                   className="session-item"

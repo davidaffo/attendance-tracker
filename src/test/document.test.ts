@@ -6,6 +6,8 @@ import {
 } from '../domain/defaults'
 import {
   athleteTotals,
+  athletesForReport,
+  completedAttendancesForAthletes,
   isTeamDocument,
   mergeDocuments,
   parseTeamDocument,
@@ -38,6 +40,55 @@ describe('documento squadra', () => {
     expect(() =>
       parseTeamDocument(JSON.stringify({ teamName: 'U14', sessions: [] }))
     ).toThrow('Il file non rispetta lo schema')
+  })
+
+  it('rifiuta presenze che fanno riferimento ad atlete o stati inesistenti', () => {
+    const document = createTeamDocument({
+      teamName: 'U14',
+      organizationName: 'Volley Club',
+      coachName: 'Mario',
+      startYear: 2026,
+      weekdays: [],
+      athleteNames: ['Anna']
+    })
+    document.sessions.push({
+      id: 'session-1',
+      date: '2026-09-01',
+      attendances: { 'atleta-inesistente': 'stato-inesistente' },
+      createdAt: document.updatedAt,
+      updatedAt: document.updatedAt
+    })
+
+    expect(isTeamDocument(document)).toBe(false)
+  })
+
+  it('mantiene le atlete archiviate nei riepiloghi ma non nei conteggi operativi', () => {
+    const document = createTeamDocument({
+      teamName: 'U18',
+      organizationName: 'Volley Club',
+      coachName: 'Mario',
+      startYear: 2026,
+      weekdays: [],
+      athleteNames: ['Anna', 'Bea']
+    })
+    document.athletes[1] = {
+      ...document.athletes[1],
+      active: false,
+      archivedAt: '2027-03-01T18:00:00.000Z'
+    }
+    const session = {
+      id: 'session-1',
+      date: '2027-02-28',
+      attendances: {
+        [document.athletes[0].id]: 'present',
+        [document.athletes[1].id]: 'present'
+      },
+      createdAt: document.updatedAt,
+      updatedAt: document.updatedAt
+    }
+
+    expect(athletesForReport(document)).toHaveLength(2)
+    expect(completedAttendancesForAthletes(session, document.athletes.filter((a) => a.active))).toBe(1)
   })
 
   it('calcola i totali partendo dalle sessioni', () => {
