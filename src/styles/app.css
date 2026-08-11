@@ -1570,10 +1570,31 @@ h2 {
 }
 
 .attendance-matrix thead button {
+  display: grid;
   width: 100%;
+  gap: 0.1rem;
+  justify-items: center;
   padding: 0.3rem;
   border: 0;
   background: transparent;
+  font-weight: 800;
+}
+
+.attendance-matrix thead button small,
+.attendance-matrix .session-day-heading small {
+  color: #929b97;
+  font-size: 0.56rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.attendance-matrix .session-day-heading {
+  display: grid;
+  gap: 0.1rem;
+  justify-items: center;
+}
+
+.attendance-matrix .session-day-heading strong {
   font-weight: 800;
 }
 

@@ -25,6 +25,14 @@ interface SeasonMonth {
 
 const monthLong = new Intl.DateTimeFormat('it-IT', { month: 'long' })
 const monthShort = new Intl.DateTimeFormat('it-IT', { month: 'short' })
+const weekdayShort = new Intl.DateTimeFormat('it-IT', {
+  weekday: 'short',
+  timeZone: 'UTC'
+})
+
+function weekdayForSession(date: string): string {
+  return weekdayShort.format(new Date(`${date}T00:00:00.000Z`)).replace('.', '')
+}
 
 function getSeasonMonths(startYear: number): SeasonMonth[] {
   return Array.from({ length: 12 }, (_, index) => {
@@ -179,10 +187,14 @@ function MonthMatrix({ document, sessions, athletes, onEditSession }: MatrixProp
               <th key={session.id}>
                 {onEditSession ? (
                   <button onClick={() => onEditSession(session)} title="Modifica sessione">
-                    {session.date.slice(-2)}
+                    <small>{weekdayForSession(session.date)}</small>
+                    <strong>{session.date.slice(-2)}</strong>
                   </button>
                 ) : (
-                  <span>{session.date.slice(-2)}</span>
+                  <span className="session-day-heading">
+                    <small>{weekdayForSession(session.date)}</small>
+                    <strong>{session.date.slice(-2)}</strong>
+                  </span>
                 )}
               </th>
             ))}
