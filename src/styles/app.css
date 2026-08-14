@@ -2320,6 +2320,16 @@ h2 {
   gap: 0.6rem;
 }
 
+.quick-access-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+}
+
+.coordinator-quick-access-actions {
+  display: grid;
+}
+
 .team-management-message {
   margin: 1rem 0;
   padding: 0.8rem 1rem;
@@ -3605,6 +3615,11 @@ h2 {
 
   .team-management-actions {
     flex-direction: column;
+  }
+
+  .team-management-actions .quick-access-buttons,
+  .nextcloud-quick-access .quick-access-buttons {
+    width: 100%;
   }
 
   .team-management-actions .button {

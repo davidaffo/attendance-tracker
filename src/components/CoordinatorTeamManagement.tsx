@@ -9,9 +9,9 @@ import {
   Users
 } from 'lucide-react'
 import { useState, type ReactNode } from 'react'
-import type { TeamDocument, TeamSummary } from '../domain/types'
+import type { AppMode, TeamDocument, TeamSummary } from '../domain/types'
 import { CoordinatorTeamCreator } from './CoordinatorTeamCreator'
-import { NextcloudQuickAccessButton } from './NextcloudQuickAccessButton'
+import { NextcloudQuickAccessButtons } from './NextcloudQuickAccessButton'
 
 interface CoordinatorTeamManagementProps {
   teams: TeamSummary[]
@@ -21,8 +21,8 @@ interface CoordinatorTeamManagementProps {
   onCreate: (document: TeamDocument) => Promise<void>
   onDelete: (team: TeamSummary) => Promise<void>
   onRefresh: () => void
-  quickAccessLink?: string
-  onQuickAccessCopied: () => void
+  quickAccessLinks: Partial<Record<AppMode, string>>
+  onQuickAccessCopied: (mode: AppMode) => void
   renderTeamControls: (team: TeamSummary) => ReactNode
 }
 
@@ -34,7 +34,7 @@ export function CoordinatorTeamManagement({
   onCreate,
   onDelete,
   onRefresh,
-  quickAccessLink,
+  quickAccessLinks,
   onQuickAccessCopied,
   renderTeamControls
 }: CoordinatorTeamManagementProps) {
@@ -55,8 +55,8 @@ export function CoordinatorTeamManagement({
           <p>Crea, espandi e amministra qui tutti i registri gestiti su Nextcloud.</p>
         </div>
         <div className="team-management-actions">
-          <NextcloudQuickAccessButton
-            link={quickAccessLink}
+          <NextcloudQuickAccessButtons
+            links={quickAccessLinks}
             onCopied={onQuickAccessCopied}
           />
           <button

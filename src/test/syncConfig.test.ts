@@ -7,6 +7,7 @@ import {
   metaForManualSync,
   metaForRestoredBackup,
   nextcloudLinkFromRouteHash,
+  nextcloudModeFromRouteHash,
   nextcloudQuickAccessUrl
 } from '../domain/syncConfig'
 
@@ -127,25 +128,54 @@ describe('link della cartella Nextcloud', () => {
   })
 })
 
-describe('link rapido alla vista in sola lettura', () => {
-  it('inserisce soltanto l’indirizzo Nextcloud nel link dell’app', () => {
+describe('link rapidi per ruolo', () => {
+  it('genera un percorso distinto per ogni ruolo', () => {
     expect(
       nextcloudQuickAccessUrl(
         'https://davidaffo.github.io/attendance-tracker/',
-        'https://cloud.example.it'
+        'https://cloud.example.it',
+        'viewer'
       )
     ).toBe(
-      'https://davidaffo.github.io/attendance-tracker/#/consultazione?nextcloud=https%3A%2F%2Fcloud.example.it'
+      'https://davidaffo.github.io/attendance-tracker/#/consultazione?nextcloud=https%3A%2F%2Fcloud.example.it&role=viewer'
+    )
+    expect(
+      nextcloudQuickAccessUrl(
+        'https://davidaffo.github.io/attendance-tracker/',
+        'https://cloud.example.it',
+        'coach'
+      )
+    ).toBe(
+      'https://davidaffo.github.io/attendance-tracker/#/allenatore/squadra-condivisa?nextcloud=https%3A%2F%2Fcloud.example.it&role=coach'
+    )
+    expect(
+      nextcloudQuickAccessUrl(
+        'https://davidaffo.github.io/attendance-tracker/',
+        'https://cloud.example.it',
+        'coordinator'
+      )
+    ).toBe(
+      'https://davidaffo.github.io/attendance-tracker/#/coordinatore?nextcloud=https%3A%2F%2Fcloud.example.it&role=coordinator'
     )
   })
 
-  it('recupera l’indirizzo Nextcloud dal parametro della route', () => {
+  it('recupera indirizzo Nextcloud e ruolo dalla route', () => {
     expect(
       nextcloudLinkFromRouteHash(
-        '#/consultazione?nextcloud=https%3A%2F%2Fcloud.example.it'
+        '#/consultazione?nextcloud=https%3A%2F%2Fcloud.example.it&role=viewer'
       )
     ).toBe('https://cloud.example.it')
+    expect(
+      nextcloudModeFromRouteHash(
+        '#/consultazione?nextcloud=https%3A%2F%2Fcloud.example.it&role=viewer'
+      )
+    ).toBe('viewer')
     expect(nextcloudLinkFromRouteHash('#/consultazione')).toBeUndefined()
+    expect(
+      nextcloudModeFromRouteHash(
+        '#/consultazione?nextcloud=https%3A%2F%2Fcloud.example.it'
+      )
+    ).toBeUndefined()
   })
 })
 

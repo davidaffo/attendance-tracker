@@ -1,4 +1,4 @@
-import type { LocalSyncMeta, SyncConfig } from './types'
+import type { AppMode, LocalSyncMeta, SyncConfig } from './types'
 
 export interface NextcloudResourceDetails {
   baseUrl: string
@@ -70,15 +70,34 @@ export function nextcloudLinkFromRouteHash(hash: string): string | undefined {
   return value || undefined
 }
 
+export function nextcloudModeFromRouteHash(hash: string): AppMode | undefined {
+  const queryIndex = hash.indexOf('?')
+  if (queryIndex < 0) return undefined
+  const value = new URLSearchParams(hash.slice(queryIndex + 1)).get('role')?.trim()
+  return value === 'coach' || value === 'coordinator' || value === 'viewer'
+    ? value
+    : undefined
+}
+
+export function nextcloudQuickAccessPath(mode: AppMode): string {
+  if (mode === 'coach') return '/allenatore/squadra-condivisa'
+  if (mode === 'coordinator') return '/coordinatore'
+  return '/consultazione'
+}
+
 export function nextcloudQuickAccessUrl(
   appBaseUrl: string,
-  nextcloudBaseUrl: string
+  nextcloudBaseUrl: string,
+  mode: AppMode
 ): string {
   const appUrl = new URL(appBaseUrl)
   appUrl.search = ''
   appUrl.hash = ''
-  const query = new URLSearchParams({ nextcloud: nextcloudBaseUrl.trim() })
-  return `${appUrl.toString()}#/consultazione?${query.toString()}`
+  const query = new URLSearchParams({
+    nextcloud: nextcloudBaseUrl.trim(),
+    role: mode
+  })
+  return `${appUrl.toString()}#${nextcloudQuickAccessPath(mode)}?${query.toString()}`
 }
 
 export function configForLocalStorage(config: SyncConfig): SyncConfig {

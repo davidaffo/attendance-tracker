@@ -11,6 +11,7 @@ import {
 } from 'lucide-react'
 import { totalsForDocument } from '../domain/document'
 import type {
+  AppMode,
   CoordinatorTeamCache,
   SyncConfig,
   TeamDocument,
@@ -46,7 +47,7 @@ import { AppModeControls } from './AppModeControls'
 import { CoordinatorTeamCreator } from './CoordinatorTeamCreator'
 import { NextcloudSharingPanel } from './NextcloudSharingPanel'
 import { CoordinatorTeamManagement } from './CoordinatorTeamManagement'
-import { NextcloudQuickAccessButton } from './NextcloudQuickAccessButton'
+import { NextcloudQuickAccessButtons } from './NextcloudQuickAccessButton'
 
 interface CoordinatorDashboardProps {
   accessMode: 'coordinator' | 'viewer'
@@ -150,20 +151,29 @@ export function CoordinatorDashboard({
   const freshTeamsLoaded = useRef(false)
   const wasManagingTeams = useRef(false)
 
-  const quickAccessLink = (() => {
+  const quickAccessLinks: Partial<Record<AppMode, string>> = (() => {
     const link = folderLink.trim() || draft.baseUrl.trim()
-    if (!link) return undefined
+    if (!link) return {}
     try {
       const nextcloudBaseUrl = detailsFromNextcloudLink(link).baseUrl
       const appBaseUrl = new URL(import.meta.env.BASE_URL, window.location.origin).toString()
-      return nextcloudQuickAccessUrl(appBaseUrl, nextcloudBaseUrl)
+      return {
+        viewer: nextcloudQuickAccessUrl(appBaseUrl, nextcloudBaseUrl, 'viewer'),
+        coach: nextcloudQuickAccessUrl(appBaseUrl, nextcloudBaseUrl, 'coach'),
+        coordinator: nextcloudQuickAccessUrl(appBaseUrl, nextcloudBaseUrl, 'coordinator')
+      }
     } catch {
-      return undefined
+      return {}
     }
   })()
 
-  const quickAccessCopied = () => {
-    setMessage('Link rapido copiato. Puoi inviarlo ad allenatori e giocatrici.')
+  const quickAccessCopied = (mode: AppMode) => {
+    const recipient = mode === 'coach'
+      ? 'all’allenatore'
+      : mode === 'viewer'
+        ? 'alla giocatrice'
+        : 'al coordinatore'
+    setMessage(`Link rapido copiato. Puoi inviarlo ${recipient}.`)
   }
 
   const rememberTeams = async (
@@ -559,7 +569,7 @@ export function CoordinatorDashboard({
           onCreate={(document) => createTeam(document, false)}
           onDelete={deleteTeam}
           onRefresh={() => void loadCloud(draft, false)}
-          quickAccessLink={quickAccessLink}
+          quickAccessLinks={quickAccessLinks}
           onQuickAccessCopied={quickAccessCopied}
           renderTeamControls={(team) => (
             <>
@@ -665,10 +675,11 @@ export function CoordinatorDashboard({
                 {teams.length ? 'Aggiorna da Nextcloud' : 'Carica da Nextcloud'}
               </button>
               {!isViewer && (
-                <NextcloudQuickAccessButton
-                  link={quickAccessLink}
+                <NextcloudQuickAccessButtons
+                  links={quickAccessLinks}
                   onCopied={quickAccessCopied}
-                  className="button dark-secondary folder-button"
+                  className="coordinator-quick-access-actions"
+                  buttonClassName="button dark-secondary folder-button"
                   disabled={loading}
                 />
               )}
@@ -759,17 +770,17 @@ export function CoordinatorDashboard({
             {!isViewer && <div className="nextcloud-quick-access">
               <div>
                 <strong>
-                  <Link2 size={16} /> Link rapido per allenatori e giocatrici
+                  <Link2 size={16} /> Link rapidi per ruolo
                 </strong>
                 <span>
-                  Su un dispositivo nuovo fa scegliere il ruolo e compila l’indirizzo Nextcloud.
-                  Username e password non vengono inseriti nel link.
+                  Ogni pulsante apre direttamente la modalità indicata e compila l’indirizzo
+                  Nextcloud. Username e password non vengono inseriti nei link.
                 </span>
               </div>
-              <NextcloudQuickAccessButton
-                link={quickAccessLink}
+              <NextcloudQuickAccessButtons
+                links={quickAccessLinks}
                 onCopied={quickAccessCopied}
-                className="button dark-secondary compact"
+                buttonClassName="button dark-secondary compact"
                 disabled={loading}
               />
             </div>}

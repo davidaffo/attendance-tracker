@@ -37,7 +37,8 @@ import { deleteSession, saveSession } from './domain/document'
 import {
   metaForManualSync,
   metaForRestoredBackup,
-  nextcloudLinkFromRouteHash
+  nextcloudLinkFromRouteHash,
+  nextcloudModeFromRouteHash
 } from './domain/syncConfig'
 import type {
   AppMode,
@@ -445,6 +446,7 @@ export default function App() {
                 : 'local'
         )
         const sharedNextcloudLink = nextcloudLinkFromRouteHash(window.location.hash)
+        const requestedMode = nextcloudModeFromRouteHash(window.location.hash)
         const hasStoredSetup = hasStoredSetupForMode(resolvedMode, {
           coachDocument: storedDocument,
           coachConfig: storedConfig,
@@ -460,7 +462,12 @@ export default function App() {
           window.history.replaceState(null, '', routeHref(initialPath))
           setPathname(initialPath)
         } else if (sharedNextcloudLink && !hasStoredSetup) {
-          setSharedAccessBootstrap(true)
+          if (requestedMode) {
+            setSharedAccessBootstrap(false)
+            if (requestedMode !== storedMode) void storeAppMode(requestedMode)
+          } else {
+            setSharedAccessBootstrap(true)
+          }
         } else if (currentRoutePath() === '/' && resolvedMode) {
           const initialPath = resolvedMode === 'coach'
             ? '/allenatore'
@@ -805,6 +812,7 @@ export default function App() {
   }
 
   const initialNextcloudLink = nextcloudLinkFromRouteHash(window.location.hash)
+  const initialNextcloudMode = nextcloudModeFromRouteHash(window.location.hash)
 
   if (sharedAccessBootstrap && initialNextcloudLink) {
     return renderPage(
@@ -820,7 +828,10 @@ export default function App() {
   const viewerTeamMatch = pathname.match(/^\/consultazione\/squadra\/([^/]+)$/)
   const creatingCoordinatorTeam = pathname === '/coordinatore/nuova-squadra'
   const managingCoordinatorTeams = pathname === '/coordinatore/gestione-squadre'
-  const legacyViewerLink = pathname === '/coordinatore' && Boolean(initialNextcloudLink)
+  const legacyViewerLink =
+    pathname === '/coordinatore' &&
+    Boolean(initialNextcloudLink) &&
+    !initialNextcloudMode
   const dashboardMode =
     pathname.startsWith('/consultazione') || legacyViewerLink
       ? 'viewer'
@@ -839,7 +850,12 @@ export default function App() {
         key={dashboardMode}
         accessMode={dashboardMode}
         onChooseMode={() => {
-          if (initialNextcloudLink && viewerMode && !viewerSyncConfig) {
+          if (
+            initialNextcloudLink &&
+            !initialNextcloudMode &&
+            viewerMode &&
+            !viewerSyncConfig
+          ) {
             setSharedAccessBootstrap(true)
             navigate(
               `/consultazione?${new URLSearchParams({
@@ -911,7 +927,7 @@ export default function App() {
         initialNextcloudLink={initialNextcloudLink}
         onOpen={openSharedCoachTeam}
         onBack={() => {
-          if (initialNextcloudLink && !document) {
+          if (initialNextcloudLink && !initialNextcloudMode && !document) {
             setSharedAccessBootstrap(true)
             navigate(
               `/consultazione?${new URLSearchParams({

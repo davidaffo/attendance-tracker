@@ -200,23 +200,30 @@ appartengono a una cartella `attendance-tracker` visibile.
 Non è necessario ricavare o digitare manualmente il percorso WebDAV. La ricerca
 resta limitata ai file che Nextcloud rende leggibili per l'account autenticato.
 
-### Link rapido per allenatori e giocatrici
+### Link rapidi per ruolo
 
-Il comando `Copia link accesso` è disponibile nella home del coordinatore, nel
-pannello di controllo delle squadre e nella sezione Nextcloud `Link rapido per
-allenatori e giocatrici`. Su un dispositivo non ancora configurato il
-collegamento fa scegliere il ruolo e precompila l'indirizzo del server, per
-esempio:
+I tre comandi `Link giocatrice`, `Link allenatore` e `Link coordinatore` sono
+disponibili nella home del coordinatore, nel pannello di controllo delle squadre
+e nella sezione Nextcloud `Link rapidi per ruolo`. Su un dispositivo non ancora
+configurato ciascun collegamento apre direttamente il proprio flusso e
+precompila l'indirizzo del server:
 
 ```text
-https://davidaffo.github.io/attendance-tracker/#/consultazione?nextcloud=https%3A%2F%2Fcloud.example.it
+# giocatrice
+https://davidaffo.github.io/attendance-tracker/#/consultazione?nextcloud=...&role=viewer
+
+# allenatore
+https://davidaffo.github.io/attendance-tracker/#/allenatore/squadra-condivisa?nextcloud=...&role=coach
+
+# coordinatore
+https://davidaffo.github.io/attendance-tracker/#/coordinatore?nextcloud=...&role=coordinator
 ```
 
-Lo stesso link può essere inviato ad allenatori e giocatrici. Non contiene
-username, password o nomi delle squadre: dopo l'accesso, ciascun account vede
-soltanto i registri autorizzati dai permessi Nextcloud. Se il dispositivo è già
-configurato, il parametro del link viene ignorato e l'app apre normalmente il
-ruolo e i dati salvati.
+I link non contengono username, password o nomi delle squadre: dopo l'accesso,
+ciascun account vede soltanto i registri autorizzati dai permessi Nextcloud. Se
+il dispositivo è già configurato, ruolo e parametro cloud del link vengono
+ignorati e l'app apre normalmente il ruolo e i dati salvati. I vecchi link
+senza parametro `role` restano compatibili e mostrano la scelta del ruolo.
 
 I dati di collegamento della vista in sola lettura sono conservati separatamente
 da quelli dell'allenatore e del coordinatore; la password resta esclusa. Dopo il caricamento
