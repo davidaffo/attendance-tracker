@@ -7,9 +7,14 @@ import { AthleteListPaste } from './AthleteListPaste'
 interface TeamSettingsProps {
   document: TeamDocument
   onUpdate: (document: TeamDocument) => Promise<void>
+  managedByCoordinator?: boolean
 }
 
-export function TeamSettings({ document, onUpdate }: TeamSettingsProps) {
+export function TeamSettings({
+  document,
+  onUpdate,
+  managedByCoordinator = false
+}: TeamSettingsProps) {
   const [draft, setDraft] = useState(document)
   const [newAthlete, setNewAthlete] = useState('')
   const [saving, setSaving] = useState(false)
@@ -103,10 +108,12 @@ export function TeamSettings({ document, onUpdate }: TeamSettingsProps) {
         <div>
           <h1>Squadra e rosa</h1>
         </div>
-        <button className="button primary" onClick={save} disabled={saving}>
-          <Save size={17} />
-          {saving ? 'Salvo…' : 'Salva modifiche'}
-        </button>
+        {!managedByCoordinator && (
+          <button className="button primary" onClick={save} disabled={saving}>
+            <Save size={17} />
+            {saving ? 'Salvo…' : 'Salva modifiche'}
+          </button>
+        )}
       </div>
 
       <section className="panel settings-panel">
@@ -115,6 +122,23 @@ export function TeamSettings({ document, onUpdate }: TeamSettingsProps) {
             <h2>Squadra</h2>
           </div>
         </div>
+        {managedByCoordinator ? (
+          <div className="managed-team-summary">
+            <p>
+              Identità e stagione sono state definite dal coordinatore e vengono lette dal
+              registro condiviso.
+            </p>
+            <dl className="sync-details">
+              <div><dt>Società</dt><dd>{draft.organizationName}</dd></div>
+              <div><dt>Squadra</dt><dd>{draft.teamName}</dd></div>
+              <div><dt>Allenatore</dt><dd>{draft.coachName}</dd></div>
+              <div>
+                <dt>Stagione</dt>
+                <dd>{draft.season.startYear}–{draft.season.endYear}</dd>
+              </div>
+            </dl>
+          </div>
+        ) : (
         <div className="form-grid two-columns">
           <label className="field">
             <span>Società</span>
@@ -156,6 +180,7 @@ export function TeamSettings({ document, onUpdate }: TeamSettingsProps) {
             </div>
           </label>
         </div>
+        )}
 
         <div className="field block-field">
           <span>Giorni abituali</span>
@@ -168,6 +193,7 @@ export function TeamSettings({ document, onUpdate }: TeamSettingsProps) {
                   key={day.value}
                   type="button"
                   aria-pressed={selected}
+                  disabled={managedByCoordinator}
                   onClick={() =>
                     update(
                       'trainingWeekdays',
@@ -198,6 +224,7 @@ export function TeamSettings({ document, onUpdate }: TeamSettingsProps) {
               <input
                 value={athlete.name}
                 aria-label={`Nome atleta ${index + 1}`}
+                readOnly={managedByCoordinator}
                 onChange={(event) =>
                   update(
                     'athletes',
@@ -209,39 +236,45 @@ export function TeamSettings({ document, onUpdate }: TeamSettingsProps) {
                   )
                 }
               />
-              <button
-                className="icon-button quiet"
-                onClick={() => archiveAthlete(athlete.id)}
-                title="Archivia atleta"
-                aria-label={`Archivia ${athlete.name}`}
-              >
-                <Archive size={17} />
-              </button>
+              {!managedByCoordinator && (
+                <button
+                  className="icon-button quiet"
+                  onClick={() => archiveAthlete(athlete.id)}
+                  title="Archivia atleta"
+                  aria-label={`Archivia ${athlete.name}`}
+                >
+                  <Archive size={17} />
+                </button>
+              )}
             </div>
           ))}
-          <div className="roster-row add-row">
-            <span className="row-number">+</span>
-            <input
-              value={newAthlete}
-              placeholder="Nuova atleta"
-              onChange={(event) => setNewAthlete(event.target.value)}
-              onKeyDown={(event) => {
-                if (event.key === 'Enter') {
-                  event.preventDefault()
-                  addAthlete()
-                }
-              }}
-            />
-            <button className="icon-button accent" onClick={addAthlete} aria-label="Aggiungi atleta">
-              <Plus size={18} />
-            </button>
-          </div>
+          {!managedByCoordinator && (
+            <div className="roster-row add-row">
+              <span className="row-number">+</span>
+              <input
+                value={newAthlete}
+                placeholder="Nuova atleta"
+                onChange={(event) => setNewAthlete(event.target.value)}
+                onKeyDown={(event) => {
+                  if (event.key === 'Enter') {
+                    event.preventDefault()
+                    addAthlete()
+                  }
+                }}
+              />
+              <button className="icon-button accent" onClick={addAthlete} aria-label="Aggiungi atleta">
+                <Plus size={18} />
+              </button>
+            </div>
+          )}
         </div>
 
-        <AthleteListPaste
-          existingNames={draft.athletes.map((athlete) => athlete.name)}
-          onAdd={addAthletes}
-        />
+        {!managedByCoordinator && (
+          <AthleteListPaste
+            existingNames={draft.athletes.map((athlete) => athlete.name)}
+            onAdd={addAthletes}
+          />
+        )}
 
         {archivedAthletes.length > 0 && (
           <details className="archived">
@@ -250,20 +283,22 @@ export function TeamSettings({ document, onUpdate }: TeamSettingsProps) {
               <div className="roster-row" key={athlete.id}>
                 <span className="row-number">—</span>
                 <span className="archived-name">{athlete.name}</span>
-                <button
-                  className="icon-button quiet"
-                  onClick={() => restoreAthlete(athlete.id)}
-                  aria-label={`Ripristina ${athlete.name}`}
-                >
-                  <RotateCcw size={17} />
-                </button>
+                {!managedByCoordinator && (
+                  <button
+                    className="icon-button quiet"
+                    onClick={() => restoreAthlete(athlete.id)}
+                    aria-label={`Ripristina ${athlete.name}`}
+                  >
+                    <RotateCcw size={17} />
+                  </button>
+                )}
               </div>
             ))}
           </details>
         )}
       </section>
 
-      <section className="panel settings-panel">
+      {!managedByCoordinator && <section className="panel settings-panel">
         <div className="panel-heading">
           <div>
             <h2>Stati di presenza</h2>
@@ -321,7 +356,7 @@ export function TeamSettings({ document, onUpdate }: TeamSettingsProps) {
             </div>
           ))}
         </div>
-      </section>
+      </section>}
     </div>
   )
 }

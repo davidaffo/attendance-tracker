@@ -52,6 +52,17 @@ export function detailsFromNextcloudLink(value: string): NextcloudResourceDetail
 
 export const detailsFromNextcloudFolderLink = detailsFromNextcloudLink
 
+export function coordinatorDetailsFromNextcloudLink(
+  value: string
+): NextcloudResourceDetails {
+  const details = detailsFromNextcloudLink(value)
+  const segments = details.remoteFolder.split('/').filter(Boolean)
+  if (segments.at(-1)?.toLocaleLowerCase() !== 'attendance-tracker') {
+    segments.push('attendance-tracker')
+  }
+  return { ...details, remoteFolder: segments.join('/') }
+}
+
 export function nextcloudLinkFromRouteHash(hash: string): string | undefined {
   const queryIndex = hash.indexOf('?')
   if (queryIndex < 0) return undefined
@@ -67,7 +78,7 @@ export function nextcloudQuickAccessUrl(
   appUrl.search = ''
   appUrl.hash = ''
   const query = new URLSearchParams({ nextcloud: nextcloudBaseUrl.trim() })
-  return `${appUrl.toString()}#/coordinatore?${query.toString()}`
+  return `${appUrl.toString()}#/consultazione?${query.toString()}`
 }
 
 export function configForLocalStorage(config: SyncConfig): SyncConfig {

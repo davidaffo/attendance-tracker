@@ -1,10 +1,8 @@
 import { useEffect, useRef, useState, type ChangeEvent, type FormEvent } from 'react'
 import {
   ArrowLeft,
-  Check,
   ChevronRight,
   Cloud,
-  Copy,
   FolderOpen,
   Link2,
   RefreshCw,
@@ -15,6 +13,7 @@ import { totalsForDocument } from '../domain/document'
 import type {
   CoordinatorTeamCache,
   SyncConfig,
+  TeamDocument,
   TeamSummary
 } from '../domain/types'
 import {
@@ -22,7 +21,13 @@ import {
   pickAndScanDirectory,
   scanDirectoryHandle
 } from '../services/localFiles'
-import { discoverRemoteTeamDocuments } from '../services/webdav'
+import {
+  createRemoteTeamDocument,
+  deleteRemoteTeamDocument,
+  discoverAttendanceTrackerFolders,
+  discoverRemoteTeamDocuments,
+  verifyRemoteFolderWritable
+} from '../services/webdav'
 import {
   loadCoordinatorDirectoryHandle,
   loadCoordinatorTeamCache,
@@ -31,21 +36,32 @@ import {
 } from '../storage/database'
 import { percentageScaleColor } from '../domain/percentageColorScale'
 import {
+  coordinatorDetailsFromNextcloudLink,
   detailsFromNextcloudLink,
   nextcloudQuickAccessUrl
 } from '../domain/syncConfig'
 import { MonthlyRegister } from './MonthlyRegister'
-import { ResetAppDataButton } from './ResetAppDataButton'
+import { AppBrand } from './AppBrand'
+import { AppModeControls } from './AppModeControls'
+import { CoordinatorTeamCreator } from './CoordinatorTeamCreator'
+import { NextcloudSharingPanel } from './NextcloudSharingPanel'
+import { CoordinatorTeamManagement } from './CoordinatorTeamManagement'
+import { NextcloudQuickAccessButton } from './NextcloudQuickAccessButton'
 
 interface CoordinatorDashboardProps {
+  accessMode: 'coordinator' | 'viewer'
   onChooseMode: () => void
   initialNextcloudLink?: string
   selectedTeamId?: string
+  creatingTeam?: boolean
+  managingTeams?: boolean
   onNavigate: (path: string) => void
   config?: SyncConfig
   onSaveConfig: (config: SyncConfig) => Promise<void>
   onPersistConnectionDetails: (config: SyncConfig) => Promise<void>
-  onRequestPassword: (username: string) => Promise<string | undefined>
+  onRequestPassword: (config: SyncConfig) => Promise<string | undefined>
+  onAuthenticated: (config: SyncConfig) => void
+  onForgetPassword: () => void
   onResetAllData: () => Promise<void>
 }
 
@@ -74,26 +90,38 @@ function connectionKey(config: SyncConfig): string {
 
 function cacheMatchesConfig(
   cache: CoordinatorTeamCache,
-  config: SyncConfig | undefined
+  config: SyncConfig | undefined,
+  accessMode: 'coordinator' | 'viewer'
 ): boolean {
+  if ((cache.owner ?? 'coordinator') !== accessMode) return false
   if (cache.source !== 'nextcloud') return true
   return Boolean(config && cache.connectionKey === connectionKey(config))
 }
 
 export function CoordinatorDashboard({
+  accessMode,
   onChooseMode,
   initialNextcloudLink,
   selectedTeamId,
+  creatingTeam,
+  managingTeams,
   onNavigate,
   config,
   onSaveConfig,
   onPersistConnectionDetails,
   onRequestPassword,
+  onAuthenticated,
+  onForgetPassword,
   onResetAllData
 }: CoordinatorDashboardProps) {
+  const isViewer = accessMode === 'viewer'
+  const basePath = isViewer ? '/consultazione' : '/coordinatore'
   const initialLink = initialNextcloudLink ?? config?.folderLink ?? ''
   const initialConfig = (() => {
-    const current = config ?? defaultConfig
+    const current = config ?? {
+      ...defaultConfig,
+      remoteFolder: isViewer ? '' : defaultConfig.remoteFolder
+    }
     if (!initialNextcloudLink) return current
     try {
       return {
@@ -114,10 +142,13 @@ export function CoordinatorDashboard({
   )
   const [draft, setDraft] = useState<SyncConfig>(initialConfig)
   const [folderLink, setFolderLink] = useState(initialLink)
+  const [folderCandidates, setFolderCandidates] = useState<string[]>([])
+  const [pendingConnection, setPendingConnection] = useState<SyncConfig>()
   const [rememberedHandle, setRememberedHandle] = useState<FileSystemDirectoryHandle>()
   const inputRef = useRef<HTMLInputElement>(null)
   const loadedOnce = useRef(false)
   const freshTeamsLoaded = useRef(false)
+  const wasManagingTeams = useRef(false)
 
   const quickAccessLink = (() => {
     const link = folderLink.trim() || draft.baseUrl.trim()
@@ -131,14 +162,8 @@ export function CoordinatorDashboard({
     }
   })()
 
-  const copyQuickAccessLink = async () => {
-    if (!quickAccessLink) return
-    try {
-      await navigator.clipboard.writeText(quickAccessLink)
-      setMessage('Link rapido copiato. Puoi inviarlo alle giocatrici.')
-    } catch {
-      window.prompt('Copia il link rapido per le giocatrici:', quickAccessLink)
-    }
+  const quickAccessCopied = () => {
+    setMessage('Link rapido copiato. Puoi inviarlo ad allenatori e giocatrici.')
   }
 
   const rememberTeams = async (
@@ -154,6 +179,7 @@ export function CoordinatorDashboard({
       loadedAt: new Date().toISOString(),
       source,
       sourceLabel,
+      owner: accessMode,
       ...(connection ? { connectionKey: connectionKey(connection) } : {})
     })
   }
@@ -177,13 +203,27 @@ export function CoordinatorDashboard({
     }
   }
 
-  const loadCloud = async (connection = draft) => {
+  const verifyAndLoadConnection = async (connection: SyncConfig) => {
+    setDraft(connection)
+    await verifyRemoteFolderWritable(connection)
+    setFolderCandidates([])
+    setPendingConnection(undefined)
+    loadedOnce.current = true
+    await onSaveConfig(connection)
+    await loadCloud(connection, true, true)
+  }
+
+  const loadCloud = async (
+    connection = draft,
+    openSingle = true,
+    writableVerified = false
+  ) => {
     setLoading(true)
     setMessage('')
     try {
       let readyConnection = connection
       if (!readyConnection.appPassword) {
-        const password = await onRequestPassword(readyConnection.username)
+        const password = await onRequestPassword(readyConnection)
         if (!password) {
           setMessage('Caricamento da Nextcloud non eseguito.')
           return
@@ -193,22 +233,36 @@ export function CoordinatorDashboard({
         await onSaveConfig(readyConnection)
       }
       const found = await discoverRemoteTeamDocuments(readyConnection)
+      onAuthenticated(readyConnection)
       await rememberTeams(found, 'nextcloud', 'Nextcloud', readyConnection)
-      setMessage(
-        found.length === 1
+      const loadMessage = found.length === 1
           ? `${found[0].document.teamName} caricata da Nextcloud.`
           : found.length > 1
             ? `${found.length} squadre caricate da Nextcloud.`
             : readyConnection.remoteFolder
               ? `Nessun file .attendance.json trovato in ${readyConnection.remoteFolder}.`
               : 'Nessun registro .attendance.json accessibile con questo account.'
+      setMessage(
+        writableVerified
+          ? `Cartella ${readyConnection.remoteFolder} pronta e scrivibile. ${loadMessage}`
+          : loadMessage
       )
-      if (found.length === 1) {
+      if (found.length === 1 && openSingle) {
         onNavigate(
-          `/coordinatore/squadra/${encodeURIComponent(found[0].document.teamId)}`
+          `${basePath}/squadra/${encodeURIComponent(found[0].document.teamId)}`
         )
       }
     } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : ''
+      if (
+        errorMessage.includes('Credenziali non valide') ||
+        errorMessage.includes('Password applicativa non valida')
+      ) {
+        onForgetPassword()
+        const passwordlessConnection = { ...connection, appPassword: '' }
+        setDraft(passwordlessConnection)
+        await onSaveConfig(passwordlessConnection)
+      }
       setMessage(error instanceof Error ? error.message : 'Nextcloud non è raggiungibile.')
     } finally {
       setLoading(false)
@@ -222,7 +276,7 @@ export function CoordinatorDashboard({
         !active ||
         !cache ||
         freshTeamsLoaded.current ||
-        !cacheMatchesConfig(cache, config)
+        !cacheMatchesConfig(cache, config, accessMode)
       ) return
       setTeams(cache.teams)
       setMessage(cachedDataMessage(cache))
@@ -233,6 +287,8 @@ export function CoordinatorDashboard({
   }, [])
 
   useEffect(() => {
+    const openedManagement = Boolean(managingTeams && !wasManagingTeams.current)
+    wasManagingTeams.current = Boolean(managingTeams)
     if (!config) return
     if (!initialNextcloudLink) {
       setDraft((current) =>
@@ -243,13 +299,21 @@ export function CoordinatorDashboard({
           : config
       )
     }
-    if (config.appPassword && !initialNextcloudLink && !loadedOnce.current) {
+    if (
+      config.baseUrl &&
+      config.username &&
+      navigator.onLine &&
+      !initialNextcloudLink &&
+      !creatingTeam &&
+      (!loadedOnce.current || openedManagement)
+    ) {
       loadedOnce.current = true
-      void loadCloud(config)
+      void loadCloud(config, !managingTeams)
     }
-  }, [config])
+  }, [config, creatingTeam, managingTeams])
 
   useEffect(() => {
+    if (isViewer) return
     let active = true
     Promise.all([
       loadCoordinatorDirectoryHandle(),
@@ -275,15 +339,117 @@ export function CoordinatorDashboard({
 
   const connectCloud = async (event: FormEvent) => {
     event.preventDefault()
+    setLoading(true)
     setMessage('')
     try {
-      const connection = connectionFromNextcloudLink(draft)
-      setDraft(connection)
-      loadedOnce.current = true
-      await onSaveConfig(connection)
-      await loadCloud(connection)
+      const baseConnection = connectionFromNextcloudLink(draft)
+      if (isViewer) {
+        setDraft(baseConnection)
+        loadedOnce.current = true
+        await onSaveConfig(baseConnection)
+        await loadCloud(baseConnection)
+        return
+      }
+      const linkedFolder = baseConnection.remoteFolder.split('/').filter(Boolean)
+      if (linkedFolder.at(-1)?.toLocaleLowerCase() === 'attendance-tracker') {
+        await verifyAndLoadConnection(baseConnection)
+        return
+      }
+
+      const found = await discoverAttendanceTrackerFolders(baseConnection)
+      const expectedConnection = {
+        ...baseConnection,
+        ...coordinatorDetailsFromNextcloudLink(folderLink.trim())
+      }
+      if (found.includes(expectedConnection.remoteFolder)) {
+        await verifyAndLoadConnection(expectedConnection)
+        return
+      }
+      if (found.length > 1) {
+        setPendingConnection(baseConnection)
+        setFolderCandidates(found)
+        setMessage('Sono state trovate più cartelle attendance-tracker. Scegli quale usare.')
+        setLoading(false)
+        return
+      }
+
+      const connection = found.length === 1
+        ? { ...baseConnection, remoteFolder: found[0] }
+        : expectedConnection
+      await verifyAndLoadConnection(connection)
     } catch (error) {
       setMessage(error instanceof Error ? error.message : 'Connessione non riuscita.')
+      setLoading(false)
+    }
+  }
+
+  const chooseRemoteFolder = async (remoteFolder: string) => {
+    if (!pendingConnection) return
+    setLoading(true)
+    setMessage('')
+    try {
+      await verifyAndLoadConnection({ ...pendingConnection, remoteFolder })
+    } catch (error) {
+      setMessage(error instanceof Error ? error.message : 'Connessione non riuscita.')
+      setLoading(false)
+    }
+  }
+
+  const createTeam = async (document: TeamDocument, openAfterCreate = true) => {
+    let readyConnection = {
+      ...draft,
+      remoteFolder: draft.remoteFolder || 'attendance-tracker'
+    }
+    if (!readyConnection.baseUrl || !readyConnection.username) {
+      throw new Error('Configura prima il collegamento Nextcloud del coordinatore.')
+    }
+    if (!readyConnection.appPassword) {
+      const password = await onRequestPassword(readyConnection)
+      if (!password) throw new Error('Creazione annullata: password non inserita.')
+      readyConnection = { ...readyConnection, appPassword: password }
+      setDraft(readyConnection)
+    }
+    await verifyRemoteFolderWritable(readyConnection)
+    await onSaveConfig(readyConnection)
+    await createRemoteTeamDocument(document, readyConnection)
+    await loadCloud(readyConnection, false)
+    setMessage(
+      `${document.teamName} creata. Ora puoi assegnare gli accessi direttamente dall’app.`
+    )
+    if (openAfterCreate) {
+      onNavigate(`${basePath}/squadra/${encodeURIComponent(document.teamId)}`)
+    }
+  }
+
+  const deleteTeam = async (team: TeamSummary) => {
+    if (team.remoteFolder === undefined) return
+    if (!window.confirm(
+      `Eliminare il registro di ${team.document.teamName} da Nextcloud? Anche le condivisioni del file verranno rimosse.`
+    )) return
+
+    setLoading(true)
+    setMessage('')
+    try {
+      let readyConnection = { ...draft, remoteFolder: team.remoteFolder }
+      if (!readyConnection.appPassword) {
+        const password = await onRequestPassword(readyConnection)
+        if (!password) return
+        readyConnection = { ...readyConnection, appPassword: password }
+        setDraft(readyConnection)
+        await onSaveConfig(readyConnection)
+      }
+      await deleteRemoteTeamDocument(team.document, readyConnection)
+      const remainingTeams = teams.filter(
+        (candidate) =>
+          candidate.document.teamId !== team.document.teamId ||
+          candidate.source !== team.source
+      )
+      await rememberTeams(remainingTeams, 'nextcloud', 'Nextcloud', readyConnection)
+      setMessage(`${team.document.teamName} eliminata da Nextcloud.`)
+    } catch (error) {
+      setMessage(error instanceof Error ? error.message : 'Eliminazione non riuscita.')
+    } finally {
+      setLoading(false)
     }
   }
 
@@ -329,14 +495,19 @@ export function CoordinatorDashboard({
   const loadFallback = async (event: ChangeEvent<HTMLInputElement>) => {
     if (!event.target.files) return
     setLoading(true)
-    const found = await parseSelectedFiles(event.target.files)
-    await rememberTeams(found, 'files', 'selezione manuale')
-    setMessage(
-      found.length
-        ? `${found.length} squadre caricate dalla cartella locale.`
-        : 'Nessun file .attendance.json valido trovato.'
-    )
-    setLoading(false)
+    try {
+      const found = await parseSelectedFiles(event.target.files)
+      await rememberTeams(found, 'files', 'selezione manuale')
+      setMessage(
+        found.length
+          ? `${found.length} squadre caricate dalla cartella locale.`
+          : 'Nessun file .attendance.json valido trovato.'
+      )
+    } catch (error) {
+      setMessage(error instanceof Error ? error.message : 'File non leggibili.')
+    } finally {
+      setLoading(false)
+    }
   }
 
   const selectedTeam = teams.find((team) => team.document.teamId === selectedTeamId)
@@ -350,35 +521,110 @@ export function CoordinatorDashboard({
   ]
 
   return (
-    <div className="coordinator-page">
-      <header className="coordinator-header">
-        <div className="brand-lockup">
-          <div className="brand-mark small">
-            <Check size={20} strokeWidth={3} />
-          </div>
+    <div className="coordinator-page" aria-busy={loading}>
+      {loading && (
+        <div className="coordinator-loading" role="status" aria-live="polite">
+          <RefreshCw className="spin" size={22} />
           <div>
-            <strong>Registro Presenze</strong>
-            <span>Coordinatore / giocatrice</span>
+            <strong>
+              {isViewer ? 'Carico i registri condivisi…' : 'Aggiorno i registri…'}
+            </strong>
+            <span>Nextcloud potrebbe impiegare qualche secondo.</span>
+            <div className="loading-progress" aria-hidden="true">
+              <i />
+            </div>
           </div>
         </div>
-        <div className="coordinator-header-actions">
-          <ResetAppDataButton
-            onReset={onResetAllData}
-            className="button ghost dark-ghost reset-dark"
-          />
-          <button className="button ghost dark-ghost" onClick={onChooseMode}>
-            <ArrowLeft size={17} />
-            Cambia modalità
-          </button>
-        </div>
+      )}
+      <header className="coordinator-header">
+        <AppBrand subtitle={isViewer ? 'Giocatrice · sola lettura' : 'Coordinatore'} />
+        <AppModeControls
+          variant="dark"
+          onChooseMode={onChooseMode}
+          onReset={onResetAllData}
+        />
       </header>
 
-      {selectedTeam ? (
+      {creatingTeam ? (
+        <CoordinatorTeamCreator
+          onCreate={createTeam}
+          onCancel={() => onNavigate('/coordinatore/gestione-squadre')}
+        />
+      ) : managingTeams && !isViewer ? (
+        <CoordinatorTeamManagement
+          teams={teams}
+          loading={loading}
+          message={message}
+          onBack={() => onNavigate(basePath)}
+          onCreate={(document) => createTeam(document, false)}
+          onDelete={deleteTeam}
+          onRefresh={() => void loadCloud(draft, false)}
+          quickAccessLink={quickAccessLink}
+          onQuickAccessCopied={quickAccessCopied}
+          renderTeamControls={(team) => (
+            <>
+              {team.remoteFolder !== undefined && (
+                <NextcloudSharingPanel
+                  document={team.document}
+                  config={{ ...draft, remoteFolder: team.remoteFolder }}
+                  onEnsureConfig={async () => {
+                    let readyConnection = {
+                      ...draft,
+                      remoteFolder: team.remoteFolder ?? draft.remoteFolder
+                    }
+                    if (!readyConnection.baseUrl || !readyConnection.username) {
+                      return undefined
+                    }
+                    if (!readyConnection.appPassword) {
+                      const password = await onRequestPassword(readyConnection)
+                      if (!password) return undefined
+                      readyConnection = { ...readyConnection, appPassword: password }
+                      setDraft(readyConnection)
+                      await onSaveConfig(readyConnection)
+                    }
+                    return readyConnection
+                  }}
+                />
+              )}
+              <section className="coordinator-report-shell team-management-report">
+                <MonthlyRegister document={team.document} />
+              </section>
+            </>
+          )}
+        />
+      ) : selectedTeam ? (
         <main className="coordinator-main coordinator-detail">
-          <button className="button ghost report-back" onClick={() => onNavigate('/coordinatore')}>
+          <button
+            className="button ghost report-back"
+            onClick={() =>
+              onNavigate(isViewer ? basePath : '/coordinatore/gestione-squadre')
+            }
+          >
             <ArrowLeft size={17} />
             Torna ai registri
           </button>
+          {message && <div className="coordinator-message">{message}</div>}
+          {!isViewer && selectedTeam.remoteFolder !== undefined && (
+            <NextcloudSharingPanel
+              document={selectedTeam.document}
+              config={{ ...draft, remoteFolder: selectedTeam.remoteFolder }}
+              onEnsureConfig={async () => {
+                let readyConnection = {
+                  ...draft,
+                  remoteFolder: selectedTeam.remoteFolder ?? draft.remoteFolder
+                }
+                if (!readyConnection.baseUrl || !readyConnection.username) return undefined
+                if (!readyConnection.appPassword) {
+                  const password = await onRequestPassword(readyConnection)
+                  if (!password) return undefined
+                  readyConnection = { ...readyConnection, appPassword: password }
+                  setDraft(readyConnection)
+                  await onSaveConfig(readyConnection)
+                }
+                return readyConnection
+              }}
+            />
+          )}
           <section className="coordinator-report-shell">
             <MonthlyRegister document={selectedTeam.document} />
           </section>
@@ -387,13 +633,29 @@ export function CoordinatorDashboard({
         <main className="coordinator-main">
           <section className="coordinator-hero">
             <div>
-              <h1>Registri accessibili</h1>
+              <h1>{isViewer ? 'I registri condivisi' : 'Registri accessibili'}</h1>
               <p>
-                Consulta in sola lettura le squadre autorizzate per il tuo account Nextcloud,
-                oppure carica i registri da una cartella locale.
+                {isViewer
+                  ? 'Consulta in sola lettura i file di squadra condivisi con il tuo account Nextcloud.'
+                  : 'Crea i registri delle squadre e consulta quelli autorizzati per il tuo account Nextcloud, oppure caricali da una cartella locale.'}
               </p>
             </div>
             <div className="coordinator-load-actions">
+              {!isViewer && <button
+                className="button light folder-button"
+                onClick={() => {
+                  if (!draft.baseUrl || !draft.username) {
+                    setCloudConfigOpen(true)
+                    setMessage('Configura Nextcloud prima di aprire il pannello di controllo.')
+                    return
+                  }
+                  onNavigate('/coordinatore/gestione-squadre')
+                }}
+                disabled={loading}
+              >
+                <ShieldCheck size={20} />
+                Pannello di controllo
+              </button>}
               <button
                 className="button light folder-button"
                 onClick={() => void loadCloud()}
@@ -402,10 +664,18 @@ export function CoordinatorDashboard({
                 {loading ? <RefreshCw className="spin" size={19} /> : <Cloud size={20} />}
                 {teams.length ? 'Aggiorna da Nextcloud' : 'Carica da Nextcloud'}
               </button>
-              <button className="button dark-secondary" onClick={loadFolder} disabled={loading}>
+              {!isViewer && (
+                <NextcloudQuickAccessButton
+                  link={quickAccessLink}
+                  onCopied={quickAccessCopied}
+                  className="button dark-secondary folder-button"
+                  disabled={loading}
+                />
+              )}
+              {!isViewer && <button className="button dark-secondary" onClick={loadFolder} disabled={loading}>
                 <FolderOpen size={19} />
                 {rememberedHandle ? rememberedHandle.name : 'Cartella locale'}
-              </button>
+              </button>}
             </div>
             <input
               ref={inputRef}
@@ -425,7 +695,9 @@ export function CoordinatorDashboard({
             open={cloudConfigOpen}
             onToggle={(event) => setCloudConfigOpen(event.currentTarget.open)}
           >
-            <summary>Collegamento Nextcloud e link rapido</summary>
+            <summary>
+              {isViewer ? 'Collegamento Nextcloud' : 'Collegamento Nextcloud e link rapido'}
+            </summary>
             <form className="form-grid" onSubmit={connectCloud} autoComplete="on">
               <div className="form-grid coordinator-config-grid">
                 <label className="field">
@@ -437,6 +709,8 @@ export function CoordinatorDashboard({
                     onChange={(event) => {
                       if (event.target.value !== folderLink) {
                         setTeams([])
+                        setFolderCandidates([])
+                        setPendingConnection(undefined)
                         setMessage('Link modificato: carica nuovamente i registri autorizzati.')
                       }
                       setFolderLink(event.target.value)
@@ -444,9 +718,11 @@ export function CoordinatorDashboard({
                     required
                   />
                   <small>
-                    Dopo l’accesso a Nextcloud, apri il file o la cartella nell’app File e copia
-                    l’indirizzo del browser. Puoi anche usare l’indirizzo del server; l’app troverà
-                    automaticamente i registri accessibili.
+                    {isViewer ? (
+                      <>Incolla l’indirizzo del server o il link ricevuto. L’app cerca soltanto i file <code>*.attendance.json</code> leggibili dal tuo account.</>
+                    ) : (
+                      <>Incolla l’indirizzo del server oppure il link di una cartella. L’app cerca <code>attendance-tracker</code> anche nelle sottocartelle; se non esiste, la crea nel percorso indicato e verifica i permessi di scrittura.</>
+                    )}
                   </small>
                 </label>
                 <label className="field">
@@ -470,38 +746,53 @@ export function CoordinatorDashboard({
                     required
                   />
                   <small>
-                    L’app non la salva. Il browser può proporti di ricordarla e compilarla.
+                    Resta soltanto nella sessione di questa scheda e non viene scritta
+                    in IndexedDB. Verrà richiesta di nuovo dopo la chiusura.
                   </small>
                 </label>
               </div>
               <button className="button primary" type="submit" disabled={loading}>
-                <Cloud size={17} />
-                Salva e carica i registri
+                {loading ? <RefreshCw className="spin" size={17} /> : <Cloud size={17} />}
+                {isViewer ? 'Carica i registri condivisi' : 'Verifica e carica i registri'}
               </button>
             </form>
-            <div className="nextcloud-quick-access">
+            {!isViewer && <div className="nextcloud-quick-access">
               <div>
                 <strong>
-                  <Link2 size={16} /> Link rapido per le giocatrici
+                  <Link2 size={16} /> Link rapido per allenatori e giocatrici
                 </strong>
                 <span>
-                  Apre direttamente questa modalità e compila l’indirizzo Nextcloud. Username e
-                  password non vengono inseriti nel link.
+                  Su un dispositivo nuovo fa scegliere il ruolo e compila l’indirizzo Nextcloud.
+                  Username e password non vengono inseriti nel link.
                 </span>
               </div>
-              <button
+              <NextcloudQuickAccessButton
+                link={quickAccessLink}
+                onCopied={quickAccessCopied}
                 className="button dark-secondary compact"
-                type="button"
-                onClick={() => void copyQuickAccessLink()}
-                disabled={!quickAccessLink}
-              >
-                <Copy size={16} />
-                Copia link
-              </button>
-            </div>
+                disabled={loading}
+              />
+            </div>}
           </details>
 
           {message && <div className="coordinator-message">{message}</div>}
+
+          {!isViewer && folderCandidates.length > 1 && (
+            <section className="coordinator-folder-choice" aria-label="Cartella da utilizzare">
+              {folderCandidates.map((remoteFolder) => (
+                <button
+                  className="button dark-secondary"
+                  type="button"
+                  key={remoteFolder}
+                  disabled={loading}
+                  onClick={() => void chooseRemoteFolder(remoteFolder)}
+                >
+                  <FolderOpen size={17} />
+                  {remoteFolder}
+                </button>
+              ))}
+            </section>
+          )}
 
           <section className="coordinator-metrics">
             <article>
@@ -534,8 +825,9 @@ export function CoordinatorDashboard({
                 <Cloud size={38} />
                 <h2>Nessun dato caricato</h2>
                 <p>
-                  Configura il tuo account e carica i registri autorizzati da Nextcloud, oppure
-                  scegli la cartella locale attendance-tracker.
+                  {isViewer
+                    ? 'Collega il tuo account Nextcloud per caricare i file di squadra che ti sono stati condivisi.'
+                    : 'Configura il tuo account e carica i registri autorizzati da Nextcloud, oppure scegli la cartella locale attendance-tracker.'}
                 </p>
               </div>
             ) : (
@@ -601,7 +893,7 @@ export function CoordinatorDashboard({
                                 className="icon-button quiet"
                                 onClick={() =>
                                   onNavigate(
-                                    `/coordinatore/squadra/${encodeURIComponent(document.teamId)}`
+                                    `${basePath}/squadra/${encodeURIComponent(document.teamId)}`
                                   )
                                 }
                                 aria-label={`Apri riepilogo ${document.teamName}`}
@@ -663,7 +955,7 @@ export function CoordinatorDashboard({
                           className="button team-report-button"
                           onClick={() =>
                             onNavigate(
-                              `/coordinatore/squadra/${encodeURIComponent(document.teamId)}`
+                              `${basePath}/squadra/${encodeURIComponent(document.teamId)}`
                             )
                           }
                         >

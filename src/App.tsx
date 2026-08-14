@@ -5,24 +5,34 @@ import {
   ClipboardCheck,
   Cloud,
   CloudOff,
+  ChevronsUpDown,
+  Eye,
   LoaderCircle,
   Settings,
   ShieldCheck,
   Users
 } from 'lucide-react'
 import { AttendanceEditor } from './components/AttendanceEditor'
+import { AppBrand } from './components/AppBrand'
+import { AppModeControls } from './components/AppModeControls'
 import { CoachOnboarding } from './components/CoachOnboarding'
+import { CoachStart } from './components/CoachStart'
+import { CoachTeamSwitcher } from './components/CoachTeamSwitcher'
 import { CoordinatorDashboard } from './components/CoordinatorDashboard'
 import { Dashboard } from './components/Dashboard'
 import { MonthlyRegister } from './components/MonthlyRegister'
 import { PasswordPrompt } from './components/PasswordPrompt'
-import { SetupCoach } from './components/SetupCoach'
+import { ResetAppDataButton } from './components/ResetAppDataButton'
+import { SharedTeamSetup } from './components/SharedTeamSetup'
 import { SyncSettings } from './components/SyncSettings'
 import { TeamSettings } from './components/TeamSettings'
 import {
-  COACH_ONBOARDING_VERSION,
-  isFirstCoachUse
+  COACH_ONBOARDING_VERSION
 } from './domain/defaults'
+import {
+  allowsCoachBackgroundSync,
+  hasStoredSetupForMode
+} from './domain/accessPolicy'
 import { deleteSession, saveSession } from './domain/document'
 import {
   metaForManualSync,
@@ -31,25 +41,41 @@ import {
 } from './domain/syncConfig'
 import type {
   AppMode,
+  CoachDocumentOrigin,
   LocalSyncMeta,
   SyncConfig,
   SyncIndicator,
   TeamDocument,
+  TeamSummary,
   TrainingSession
 } from './domain/types'
-import { synchronizeDocument } from './services/webdav'
+import {
+  discoverRemoteTeamDocuments,
+  synchronizeDocument,
+  testNextcloudCredentials
+} from './services/webdav'
+import {
+  clearSessionPasswords,
+  forgetSessionPassword,
+  loadSessionPassword,
+  rememberSessionPassword,
+  type CredentialOwner
+} from './services/sessionCredentials'
 import {
   clearLocalData,
   loadAppMode,
-  loadCoachOnboardingVersion,
+  loadCoachDocumentOrigin,
   loadCoordinatorSyncConfig,
+  loadViewerSyncConfig,
   loadDocument,
   loadSyncConfig,
   loadSyncMeta,
   removeLegacyEncryptedCredentials,
   storeAppMode,
   storeCoachOnboardingVersion,
+  storeCoachDocumentOrigin,
   storeCoordinatorSyncConfig,
+  storeViewerSyncConfig,
   storeDocument,
   storeSyncConfig,
   storeSyncMeta
@@ -121,25 +147,50 @@ function syncLabel(indicator: SyncIndicator): string {
   }
 }
 
-function Welcome({ onSelect }: { onSelect: (mode: AppMode) => void }) {
+function Welcome({
+  onSelect,
+  onReset,
+  sharedAccess = false
+}: {
+  onSelect: (mode: AppMode) => void
+  onReset: () => Promise<void>
+  sharedAccess?: boolean
+}) {
   return (
     <main className="welcome-page">
+      <div className="welcome-toolbar">
+        <ResetAppDataButton
+          onReset={onReset}
+          className="mode-control reset-control welcome-reset"
+        />
+      </div>
       <div className="welcome-content">
         <div className="brand-mark welcome-mark">
           <Check size={34} strokeWidth={3} />
         </div>
-        <h1>Registro presenze</h1>
-        <p>Seleziona la modalità per questo dispositivo.</p>
+        <h1>{sharedAccess ? 'Apri i registri condivisi' : 'Registro presenze'}</h1>
+        <p>
+          {sharedAccess
+            ? 'Il server Nextcloud è già configurato. Indica come userai questo dispositivo.'
+            : 'Seleziona la modalità per questo dispositivo.'}
+        </p>
         <div className="mode-grid">
           <button className="mode-card" onClick={() => onSelect('coach')}>
             <ClipboardCheck size={26} />
             <strong>Allenatore</strong>
             <span>Inserimento e modifica delle presenze.</span>
           </button>
-          <button className="mode-card" onClick={() => onSelect('coordinator')}>
-            <ShieldCheck size={26} />
-            <strong>Coordinatore / giocatrice</strong>
-            <span>Consultazione in sola lettura dei registri autorizzati.</span>
+          {!sharedAccess && (
+            <button className="mode-card" onClick={() => onSelect('coordinator')}>
+              <ShieldCheck size={26} />
+              <strong>Coordinatore</strong>
+              <span>Crea squadre e consulta tutti i registri autorizzati.</span>
+            </button>
+          )}
+          <button className="mode-card" onClick={() => onSelect('viewer')}>
+            <Eye size={26} />
+            <strong>Giocatrice</strong>
+            <span>Consulta in sola lettura uno o più registri condivisi.</span>
           </button>
         </div>
       </div>
@@ -150,36 +201,44 @@ function Welcome({ onSelect }: { onSelect: (mode: AppMode) => void }) {
 export default function App() {
   const [loading, setLoading] = useState(true)
   const [loadingError, setLoadingError] = useState(false)
+  const [sharedAccessBootstrap, setSharedAccessBootstrap] = useState(false)
   const [pathname, setPathname] = useState(currentRoutePath)
   const [document, setDocument] = useState<TeamDocument>()
   const [syncConfig, setSyncConfig] = useState<SyncConfig>()
   const [coordinatorSyncConfig, setCoordinatorSyncConfig] = useState<SyncConfig>()
+  const [viewerSyncConfig, setViewerSyncConfig] = useState<SyncConfig>()
   const [syncMeta, setSyncMeta] = useState<LocalSyncMeta>({ dirty: false })
   const [syncIndicator, setSyncIndicator] = useState<SyncIndicator>('local')
-  const [coachOnboardingVersion, setCoachOnboardingVersion] = useState<number>()
+  const [coachDocumentOrigin, setCoachDocumentOrigin] = useState<CoachDocumentOrigin>()
+  const [coachTeams, setCoachTeams] = useState<TeamSummary[]>([])
+  const [coachTeamsLoading, setCoachTeamsLoading] = useState(false)
+  const [coachTeamsError, setCoachTeamsError] = useState<string>()
   const [passwordPrompt, setPasswordPrompt] = useState<{
-    owner: 'coach' | 'coordinator'
-    username: string
+    owner: CredentialOwner
+    config: SyncConfig
   }>()
   const documentRef = useRef<TeamDocument | undefined>(undefined)
   const configRef = useRef<SyncConfig | undefined>(undefined)
   const metaRef = useRef<LocalSyncMeta>({ dirty: false })
+  const coachDocumentOriginRef = useRef<CoachDocumentOrigin | undefined>(undefined)
   const syncPromiseRef = useRef<Promise<SyncOutcome> | undefined>(undefined)
   const resettingRef = useRef(false)
   const passwordRequestRef = useRef<{
-    owner: 'coach' | 'coordinator'
+    owner: CredentialOwner
     promise: Promise<string | undefined>
     resolve: (password: string | undefined) => void
   } | undefined>(undefined)
 
   const navigate = useCallback(
     (path: string, options?: { replace?: boolean; from?: string }) => {
-      const nextPath = normalizePath(path)
+      const queryIndex = path.indexOf('?')
+      const nextPath = normalizePath(queryIndex >= 0 ? path.slice(0, queryIndex) : path)
+      const route = queryIndex >= 0 ? `${nextPath}${path.slice(queryIndex)}` : nextPath
       const state = options?.from ? { from: options.from } : null
       if (options?.replace) {
-        window.history.replaceState(state, '', routeHref(nextPath))
+        window.history.replaceState(state, '', routeHref(route))
       } else {
-        window.history.pushState(state, '', routeHref(nextPath))
+        window.history.pushState(state, '', routeHref(route))
       }
       setPathname(nextPath)
       window.scrollTo({ top: 0 })
@@ -198,9 +257,15 @@ export default function App() {
   }, [])
 
   const requestPassword = useCallback(
-    (owner: 'coach' | 'coordinator', username: string): Promise<string | undefined> => {
+    (
+      owner: CredentialOwner,
+      config: SyncConfig
+    ): Promise<string | undefined> => {
       const currentRequest = passwordRequestRef.current
       if (currentRequest) return currentRequest.promise
+
+      const sessionPassword = loadSessionPassword(owner, config)
+      if (sessionPassword) return Promise.resolve(sessionPassword)
 
       let resolveRequest!: (password: string | undefined) => void
       const promise = new Promise<string | undefined>((resolve) => {
@@ -211,7 +276,7 @@ export default function App() {
         promise,
         resolve: resolveRequest
       }
-      setPasswordPrompt({ owner, username })
+      setPasswordPrompt({ owner, config: { ...config, appPassword: '' } })
       return promise
     },
     []
@@ -240,6 +305,11 @@ export default function App() {
     setSyncMeta(next)
   }
 
+  const applyCoachDocumentOrigin = (next: CoachDocumentOrigin | undefined) => {
+    coachDocumentOriginRef.current = next
+    setCoachDocumentOrigin(next)
+  }
+
   const performSync = useCallback(
     (
       currentDocument = documentRef.current,
@@ -264,7 +334,7 @@ export default function App() {
           let readyConfig = currentConfig
           if (!readyConfig.appPassword) {
             setSyncIndicator(currentMeta.dirty ? 'pending' : 'local')
-            const password = await requestPassword('coach', readyConfig.username)
+            const password = await requestPassword('coach', readyConfig)
             if (!password) return { status: 'cancelled' }
             readyConfig = { ...readyConfig, appPassword: password }
             applyConfig(readyConfig)
@@ -276,6 +346,7 @@ export default function App() {
             currentMeta,
             readyConfig
           )
+          rememberSessionPassword('coach', readyConfig)
           if (resettingRef.current) return { status: 'skipped' }
           await Promise.all([storeDocument(result.document), storeSyncMeta(result.meta)])
           applyDocument(result.document)
@@ -288,8 +359,10 @@ export default function App() {
             error instanceof Error ? error.message : 'Sincronizzazione non riuscita.'
           if (
             message.includes('Credenziali non valide') ||
-            message.includes('account non può leggere')
+            message.includes('account non può leggere') ||
+            message.includes('Password applicativa non valida')
           ) {
+            forgetSessionPassword('coach')
             const current = configRef.current
             if (current) applyConfig({ ...current, appPassword: '' })
           }
@@ -321,8 +394,9 @@ export default function App() {
       loadDocument(),
       loadSyncConfig(),
       loadCoordinatorSyncConfig(),
+      loadViewerSyncConfig(),
       loadSyncMeta(),
-      loadCoachOnboardingVersion(),
+      loadCoachDocumentOrigin(),
       removeLegacyEncryptedCredentials()
     ]).then(
       ([
@@ -330,18 +404,35 @@ export default function App() {
         storedDocument,
         storedConfig,
         storedCoordinatorConfig,
+        storedViewerConfig,
         storedMeta,
-        storedOnboardingVersion
+        storedDocumentOrigin
       ]) => {
         if (!active) return
         applyDocument(storedDocument)
         applyConfig(storedConfig)
+        const resolvedDocumentOrigin =
+          storedDocumentOrigin ?? (storedDocument ? 'self-managed' : undefined)
+        applyCoachDocumentOrigin(resolvedDocumentOrigin)
         setCoordinatorSyncConfig(storedCoordinatorConfig)
-        if (!storedOnboardingVersion && storedDocument) {
-          void storeCoachOnboardingVersion(COACH_ONBOARDING_VERSION)
-          setCoachOnboardingVersion(COACH_ONBOARDING_VERSION)
-        } else {
-          setCoachOnboardingVersion(storedOnboardingVersion)
+        const legacyReadOnlyConfig =
+          storedMode === 'coordinator' &&
+          !storedViewerConfig &&
+          storedCoordinatorConfig &&
+          storedCoordinatorConfig.remoteFolder
+            .split('/')
+            .filter(Boolean)
+            .at(-1)?.toLocaleLowerCase() !== 'attendance-tracker'
+            ? storedCoordinatorConfig
+            : undefined
+        const resolvedViewerConfig = storedViewerConfig ?? legacyReadOnlyConfig
+        const resolvedMode = legacyReadOnlyConfig ? 'viewer' : storedMode
+        setViewerSyncConfig(resolvedViewerConfig)
+        if (legacyReadOnlyConfig) {
+          void Promise.all([
+            storeViewerSyncConfig(legacyReadOnlyConfig),
+            storeAppMode('viewer')
+          ])
         }
         applyMeta(storedMeta)
         setSyncIndicator(
@@ -353,16 +444,43 @@ export default function App() {
                 ? 'synced'
                 : 'local'
         )
-        if (currentRoutePath() === '/' && storedMode) {
-          const initialPath = storedMode === 'coach' ? '/allenatore' : '/coordinatore'
+        const sharedNextcloudLink = nextcloudLinkFromRouteHash(window.location.hash)
+        const hasStoredSetup = hasStoredSetupForMode(resolvedMode, {
+          coachDocument: storedDocument,
+          coachConfig: storedConfig,
+          coordinatorConfig: storedCoordinatorConfig,
+          viewerConfig: resolvedViewerConfig
+        })
+        if (sharedNextcloudLink && hasStoredSetup && resolvedMode) {
+          const initialPath = resolvedMode === 'coach'
+            ? '/allenatore'
+            : resolvedMode === 'viewer'
+              ? '/consultazione'
+              : '/coordinatore'
+          window.history.replaceState(null, '', routeHref(initialPath))
+          setPathname(initialPath)
+        } else if (sharedNextcloudLink && !hasStoredSetup) {
+          setSharedAccessBootstrap(true)
+        } else if (currentRoutePath() === '/' && resolvedMode) {
+          const initialPath = resolvedMode === 'coach'
+            ? '/allenatore'
+            : resolvedMode === 'viewer'
+              ? '/consultazione'
+              : '/coordinatore'
           window.history.replaceState(null, '', routeHref(initialPath))
           setPathname(initialPath)
         }
         setLoading(false)
         const shouldSyncCoach =
           isCoachSyncRoute(currentRoutePath()) ||
-          (currentRoutePath() === '/' && storedMode === 'coach')
-        if (storedDocument && storedConfig && navigator.onLine && shouldSyncCoach) {
+          (currentRoutePath() === '/' && resolvedMode === 'coach')
+        if (
+          storedDocument &&
+          storedConfig &&
+          navigator.onLine &&
+          shouldSyncCoach &&
+          allowsCoachBackgroundSync(resolvedDocumentOrigin)
+        ) {
           void performSync(storedDocument, storedMeta, storedConfig)
         }
       },
@@ -380,11 +498,17 @@ export default function App() {
 
   useEffect(() => {
     const syncWhenAvailable = () => {
-      if (isCoachSyncRoute(currentRoutePath())) void performSync()
+      if (
+        allowsCoachBackgroundSync(coachDocumentOriginRef.current) &&
+        isCoachSyncRoute(currentRoutePath())
+      ) {
+        void performSync()
+      }
     }
     const syncWhenVisible = () => {
       if (
         window.document.visibilityState === 'visible' &&
+        allowsCoachBackgroundSync(coachDocumentOriginRef.current) &&
         isCoachSyncRoute(currentRoutePath())
       ) {
         void performSync()
@@ -400,7 +524,26 @@ export default function App() {
 
   const chooseMode = async (nextMode: AppMode) => {
     await storeAppMode(nextMode)
-    navigate(nextMode === 'coach' ? '/allenatore' : '/coordinatore')
+    navigate(
+      nextMode === 'coach'
+        ? '/allenatore'
+        : nextMode === 'viewer'
+          ? '/consultazione'
+          : '/coordinatore'
+    )
+  }
+
+  const chooseSharedAccessMode = async (nextMode: AppMode) => {
+    if (nextMode === 'coordinator') return
+    const initialNextcloudLink = nextcloudLinkFromRouteHash(window.location.hash)
+    await storeAppMode(nextMode)
+    setSharedAccessBootstrap(false)
+    const query = new URLSearchParams()
+    if (initialNextcloudLink) query.set('nextcloud', initialNextcloudLink)
+    const destination = nextMode === 'coach'
+      ? '/allenatore/squadra-condivisa'
+      : '/consultazione'
+    navigate(query.size ? `${destination}?${query.toString()}` : destination)
   }
 
   const commitDocument = async (next: TeamDocument, syncNow = true) => {
@@ -412,13 +555,6 @@ export default function App() {
     if (syncNow && configRef.current && navigator.onLine) {
       void performSync(next, nextMeta, configRef.current)
     }
-  }
-
-  const completeSetup = async (next: TeamDocument) => {
-    await storeCoachOnboardingVersion(COACH_ONBOARDING_VERSION)
-    setCoachOnboardingVersion(COACH_ONBOARDING_VERSION)
-    await commitDocument(next, false)
-    navigate('/allenatore', { replace: true })
   }
 
   const completeCoachOnboarding = async (
@@ -437,7 +573,8 @@ export default function App() {
       void performSync(next, metaRef.current, configRef.current)
     }
     await storeCoachOnboardingVersion(COACH_ONBOARDING_VERSION)
-    setCoachOnboardingVersion(COACH_ONBOARDING_VERSION)
+    await storeCoachDocumentOrigin('self-managed')
+    applyCoachDocumentOrigin('self-managed')
     navigate(reopening ? '/allenatore/impostazioni' : '/allenatore', {
       replace: true
     })
@@ -445,7 +582,6 @@ export default function App() {
 
   const skipCoachOnboarding = async () => {
     await storeCoachOnboardingVersion(COACH_ONBOARDING_VERSION)
-    setCoachOnboardingVersion(COACH_ONBOARDING_VERSION)
     navigate(document ? '/allenatore/impostazioni' : '/allenatore', {
       replace: true
     })
@@ -453,6 +589,7 @@ export default function App() {
 
   const resetAllLocalData = async () => {
     resettingRef.current = true
+    clearSessionPasswords()
     await clearLocalData()
     window.history.replaceState(null, '', routeHref('/'))
     window.location.reload()
@@ -465,11 +602,12 @@ export default function App() {
     await Promise.all([
       storeDocument(restoredDocument),
       storeSyncMeta(restoredMeta),
-      storeCoachOnboardingVersion(COACH_ONBOARDING_VERSION)
+      storeCoachOnboardingVersion(COACH_ONBOARDING_VERSION),
+      storeCoachDocumentOrigin('self-managed')
     ])
     applyDocument(restoredDocument)
     applyMeta(restoredMeta)
-    setCoachOnboardingVersion(COACH_ONBOARDING_VERSION)
+    applyCoachDocumentOrigin('self-managed')
     setSyncIndicator(configRef.current ? 'pending' : 'local')
     if (wasEmpty) navigate('/allenatore', { replace: true })
   }
@@ -503,6 +641,7 @@ export default function App() {
   const saveConfig = async (config: SyncConfig) => {
     await storeSyncConfig(config)
     applyConfig(config)
+    if (coachDocumentOriginRef.current === 'coordinator-managed') return
     if (documentRef.current) {
       if (syncPromiseRef.current) await syncPromiseRef.current
       applyConfig(config)
@@ -531,14 +670,105 @@ export default function App() {
     setCoordinatorSyncConfig({ ...config, appPassword: '' })
   }
 
+  const persistViewerConnectionDetails = async (config: SyncConfig) => {
+    await storeViewerSyncConfig(config)
+    setViewerSyncConfig({ ...config, appPassword: '' })
+  }
+
+  const openSharedCoachTeam = async (
+    team: { document: TeamDocument },
+    config: SyncConfig
+  ) => {
+    const currentDocument = documentRef.current
+    if (
+      currentDocument &&
+      (currentDocument.teamId !== team.document.teamId ||
+        currentDocument.season.startYear !== team.document.season.startYear) &&
+      metaRef.current.dirty
+    ) {
+      const outcome = await performSync(
+        currentDocument,
+        metaRef.current,
+        configRef.current
+      )
+      if (outcome.status !== 'synced' && metaRef.current.dirty) {
+        throw new Error(
+          'La squadra attuale contiene modifiche non sincronizzate. Sincronizzale prima di cambiare squadra.'
+        )
+      }
+    }
+    const result = await synchronizeDocument(team.document, { dirty: false }, config)
+    rememberSessionPassword('coach', config)
+    await Promise.all([
+      storeDocument(result.document),
+      storeSyncConfig(config),
+      storeSyncMeta(result.meta),
+      storeCoachOnboardingVersion(COACH_ONBOARDING_VERSION),
+      storeCoachDocumentOrigin('coordinator-managed')
+    ])
+    applyDocument(result.document)
+    applyConfig(config)
+    applyMeta(result.meta)
+    applyCoachDocumentOrigin('coordinator-managed')
+    setSyncIndicator('synced')
+    navigate('/allenatore', { replace: true })
+  }
+
+  const loadCoachTeamChoices = async () => {
+    const currentConfig = configRef.current
+    if (!currentConfig) {
+      setCoachTeamsError('Collegamento Nextcloud non configurato.')
+      return
+    }
+    setCoachTeamsLoading(true)
+    setCoachTeamsError(undefined)
+    try {
+      let readyConfig = currentConfig
+      if (!readyConfig.appPassword) {
+        const password = await requestPassword('coach', readyConfig)
+        if (!password) return
+        readyConfig = { ...readyConfig, appPassword: password }
+        applyConfig(readyConfig)
+      }
+      const found = await discoverRemoteTeamDocuments({
+        ...readyConfig,
+        remoteFolder: ''
+      })
+      setCoachTeams(found)
+    } catch (error) {
+      setCoachTeamsError(
+        error instanceof Error ? error.message : 'Impossibile caricare le squadre.'
+      )
+    } finally {
+      setCoachTeamsLoading(false)
+    }
+  }
+
+  const selectCoachTeam = async (team: TeamSummary) => {
+    const currentConfig = configRef.current
+    if (!currentConfig) throw new Error('Collegamento Nextcloud non configurato.')
+    await openSharedCoachTeam(team, {
+      ...currentConfig,
+      remoteFolder: team.remoteFolder ?? ''
+    })
+  }
+
   const renderPage = (page: ReactNode) => (
     <>
       {page}
       {passwordPrompt && (
         <PasswordPrompt
-          key={`${passwordPrompt.owner}-${passwordPrompt.username}`}
-          username={passwordPrompt.username}
-          onSubmit={(password) => finishPasswordRequest(password)}
+          key={`${passwordPrompt.owner}-${passwordPrompt.config.username}`}
+          username={passwordPrompt.config.username}
+          onSubmit={async (password) => {
+            const authenticatedConfig = {
+              ...passwordPrompt.config,
+              appPassword: password
+            }
+            await testNextcloudCredentials(authenticatedConfig)
+            rememberSessionPassword(passwordPrompt.owner, authenticatedConfig)
+            finishPasswordRequest(password)
+          }}
           onCancel={() => finishPasswordRequest()}
         />
       )}
@@ -568,25 +798,94 @@ export default function App() {
     )
   }
 
-  if (pathname === '/') return renderPage(<Welcome onSelect={chooseMode} />)
+  if (pathname === '/') {
+    return renderPage(
+      <Welcome onSelect={chooseMode} onReset={resetAllLocalData} />
+    )
+  }
+
+  const initialNextcloudLink = nextcloudLinkFromRouteHash(window.location.hash)
+
+  if (sharedAccessBootstrap && initialNextcloudLink) {
+    return renderPage(
+      <Welcome
+        sharedAccess
+        onSelect={chooseSharedAccessMode}
+        onReset={resetAllLocalData}
+      />
+    )
+  }
 
   const coordinatorTeamMatch = pathname.match(/^\/coordinatore\/squadra\/([^/]+)$/)
-  if (pathname === '/coordinatore' || coordinatorTeamMatch) {
+  const viewerTeamMatch = pathname.match(/^\/consultazione\/squadra\/([^/]+)$/)
+  const creatingCoordinatorTeam = pathname === '/coordinatore/nuova-squadra'
+  const managingCoordinatorTeams = pathname === '/coordinatore/gestione-squadre'
+  const legacyViewerLink = pathname === '/coordinatore' && Boolean(initialNextcloudLink)
+  const dashboardMode =
+    pathname.startsWith('/consultazione') || legacyViewerLink
+      ? 'viewer'
+      : 'coordinator'
+  if (
+    pathname === '/coordinatore' ||
+    coordinatorTeamMatch ||
+    creatingCoordinatorTeam ||
+    managingCoordinatorTeams ||
+    pathname === '/consultazione' ||
+    viewerTeamMatch
+  ) {
+    const viewerMode = dashboardMode === 'viewer'
     return renderPage(
       <CoordinatorDashboard
-        onChooseMode={() => navigate('/')}
-        initialNextcloudLink={nextcloudLinkFromRouteHash(window.location.hash)}
-        selectedTeamId={
-          coordinatorTeamMatch ? decodeURIComponent(coordinatorTeamMatch[1]) : undefined
-        }
-        onNavigate={navigate}
-        config={coordinatorSyncConfig}
-        onSaveConfig={async (config) => {
-          await storeCoordinatorSyncConfig(config)
-          setCoordinatorSyncConfig(config)
+        key={dashboardMode}
+        accessMode={dashboardMode}
+        onChooseMode={() => {
+          if (initialNextcloudLink && viewerMode && !viewerSyncConfig) {
+            setSharedAccessBootstrap(true)
+            navigate(
+              `/consultazione?${new URLSearchParams({
+                nextcloud: initialNextcloudLink
+              }).toString()}`,
+              { replace: true }
+            )
+            return
+          }
+          navigate('/')
         }}
-        onPersistConnectionDetails={persistCoordinatorConnectionDetails}
-        onRequestPassword={(username) => requestPassword('coordinator', username)}
+        initialNextcloudLink={initialNextcloudLink}
+        selectedTeamId={
+          coordinatorTeamMatch
+            ? decodeURIComponent(coordinatorTeamMatch[1])
+            : viewerTeamMatch
+              ? decodeURIComponent(viewerTeamMatch[1])
+              : undefined
+        }
+        creatingTeam={creatingCoordinatorTeam}
+        managingTeams={managingCoordinatorTeams}
+        onNavigate={navigate}
+        config={viewerMode ? viewerSyncConfig : coordinatorSyncConfig}
+        onSaveConfig={async (config) => {
+          if (viewerMode) {
+            await storeViewerSyncConfig(config)
+            setViewerSyncConfig(config)
+          } else {
+            await storeCoordinatorSyncConfig(config)
+            setCoordinatorSyncConfig(config)
+          }
+        }}
+        onPersistConnectionDetails={
+          viewerMode
+            ? persistViewerConnectionDetails
+            : persistCoordinatorConnectionDetails
+        }
+        onRequestPassword={(config) =>
+          requestPassword(viewerMode ? 'viewer' : 'coordinator', config)
+        }
+        onAuthenticated={(config) =>
+          rememberSessionPassword(viewerMode ? 'viewer' : 'coordinator', config)
+        }
+        onForgetPassword={() =>
+          forgetSessionPassword(viewerMode ? 'viewer' : 'coordinator')
+        }
         onResetAllData={resetAllLocalData}
       />
     )
@@ -605,9 +904,32 @@ export default function App() {
     )
   }
 
-  const showCoachOnboarding =
-    pathname === '/allenatore/configurazione-guidata' ||
-    isFirstCoachUse(coachOnboardingVersion, Boolean(document))
+  if (pathname === '/allenatore/squadra-condivisa') {
+    return renderPage(
+      <SharedTeamSetup
+        initialConfig={syncConfig}
+        initialNextcloudLink={initialNextcloudLink}
+        onOpen={openSharedCoachTeam}
+        onBack={() => {
+          if (initialNextcloudLink && !document) {
+            setSharedAccessBootstrap(true)
+            navigate(
+              `/consultazione?${new URLSearchParams({
+                nextcloud: initialNextcloudLink
+              }).toString()}`,
+              { replace: true }
+            )
+            return
+          }
+          navigate(document ? '/allenatore/impostazioni' : '/allenatore', {
+            replace: true
+          })
+        }}
+      />
+    )
+  }
+
+  const showCoachOnboarding = pathname === '/allenatore/configurazione-guidata'
 
   if (showCoachOnboarding) {
     return renderPage(
@@ -623,9 +945,10 @@ export default function App() {
 
   if (!document) {
     return renderPage(
-      <SetupCoach
-        onComplete={completeSetup}
-        onSwitchMode={() => void chooseMode('coordinator')}
+      <CoachStart
+        onCreateTeam={() => navigate('/allenatore/configurazione-guidata')}
+        onOpenSharedTeam={() => navigate('/allenatore/squadra-condivisa')}
+        onChooseMode={() => navigate('/')}
         onRestoreBackup={restoreCoachBackup}
       />
     )
@@ -683,15 +1006,7 @@ export default function App() {
   return renderPage(
     <div className="app-shell">
       <aside className="sidebar">
-        <div className="brand-lockup">
-          <div className="brand-mark small">
-            <Check size={20} strokeWidth={3} />
-          </div>
-          <div>
-            <strong>Registro Presenze</strong>
-            <span>{document.organizationName}</span>
-          </div>
-        </div>
+        <AppBrand subtitle={document.organizationName} />
         <nav>
           {navigation.map((item) => (
             <a
@@ -708,29 +1023,59 @@ export default function App() {
             </a>
           ))}
         </nav>
-        <div className="sidebar-team">
-          <span>Squadra attiva</span>
-          <strong>{document.teamName}</strong>
-          <small>
-            {document.season.startYear}–{document.season.endYear}
-          </small>
-        </div>
+        {coachDocumentOrigin === 'coordinator-managed' ? (
+          <CoachTeamSwitcher
+            currentDocument={document}
+            teams={coachTeams}
+            loading={coachTeamsLoading}
+            error={coachTeamsError}
+            onLoad={loadCoachTeamChoices}
+            onSelect={selectCoachTeam}
+          />
+        ) : (
+          <div className="sidebar-team">
+            <span>Squadra attiva</span>
+            <strong>{document.teamName}</strong>
+            <small>
+              {document.season.startYear}–{document.season.endYear}
+            </small>
+          </div>
+        )}
       </aside>
 
       <div className="main-column">
         <header className="topbar">
-          <div>
-            <span>{document.organizationName}</span>
-            <strong>{document.teamName}</strong>
+          {coachDocumentOrigin === 'coordinator-managed' ? (
+            <button
+              className="topbar-team topbar-team-switch"
+              type="button"
+              onClick={() => navigate('/allenatore/squadra-condivisa')}
+              aria-label="Cambia squadra"
+            >
+              <span>{document.organizationName}</span>
+              <strong>{document.teamName}</strong>
+              <ChevronsUpDown size={16} />
+            </button>
+          ) : (
+            <div className="topbar-team">
+              <span>{document.organizationName}</span>
+              <strong>{document.teamName}</strong>
+            </div>
+          )}
+          <div className="topbar-actions">
+            <AppModeControls
+              onChooseMode={() => navigate('/')}
+              onReset={resetAllLocalData}
+            />
+            <button
+              className={`sync-chip ${syncIndicator}`}
+              onClick={() => navigate('/allenatore/impostazioni')}
+              title={syncMeta.lastError}
+            >
+              <SyncIcon className={syncIndicator === 'syncing' ? 'spin' : ''} size={15} />
+              {syncLabel(syncIndicator)}
+            </button>
           </div>
-          <button
-            className={`sync-chip ${syncIndicator}`}
-            onClick={() => navigate('/allenatore/impostazioni')}
-            title={syncMeta.lastError}
-          >
-            <SyncIcon className={syncIndicator === 'syncing' ? 'spin' : ''} size={15} />
-            {syncLabel(syncIndicator)}
-          </button>
         </header>
 
         <main className="main-view">
@@ -760,7 +1105,13 @@ export default function App() {
               }
             />
           )}
-          {view === 'team' && <TeamSettings document={document} onUpdate={commitDocument} />}
+          {view === 'team' && (
+            <TeamSettings
+              document={document}
+              onUpdate={commitDocument}
+              managedByCoordinator={coachDocumentOrigin === 'coordinator-managed'}
+            />
+          )}
           {view === 'settings' && (
             <SyncSettings
               document={document}
@@ -775,6 +1126,8 @@ export default function App() {
               onOpenOnboarding={() =>
                 navigate('/allenatore/configurazione-guidata')
               }
+              managedByCoordinator={coachDocumentOrigin === 'coordinator-managed'}
+              onChooseTeam={() => navigate('/allenatore/squadra-condivisa')}
               onResetAllData={resetAllLocalData}
             />
           )}

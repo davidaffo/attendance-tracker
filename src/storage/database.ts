@@ -2,6 +2,7 @@ import { openDB, type DBSchema } from 'idb'
 import { configForLocalStorage } from '../domain/syncConfig'
 import type {
   AppMode,
+  CoachDocumentOrigin,
   CoordinatorTeamCache,
   LocalSyncMeta,
   SyncConfig,
@@ -14,9 +15,11 @@ interface AttendanceDatabase extends DBSchema {
       | 'document'
       | 'sync-config'
       | 'coordinator-sync-config'
+      | 'viewer-sync-config'
       | 'coordinator-directory-handle'
       | 'coordinator-team-cache'
       | 'coach-onboarding-version'
+      | 'coach-document-origin'
       | 'coach-credential'
       | 'coordinator-credential'
       | 'sync-meta'
@@ -26,6 +29,7 @@ interface AttendanceDatabase extends DBSchema {
       | SyncConfig
       | LocalSyncMeta
       | AppMode
+      | CoachDocumentOrigin
       | number
       | CoordinatorTeamCache
       | FileSystemDirectoryHandle
@@ -80,6 +84,19 @@ export async function storeCoordinatorSyncConfig(config: SyncConfig): Promise<vo
     configForLocalStorage(config),
     'coordinator-sync-config'
   )
+}
+
+export async function loadViewerSyncConfig(): Promise<SyncConfig | undefined> {
+  const db = await database
+  const config = (await db.get('state', 'viewer-sync-config')) as SyncConfig | undefined
+  if (config?.appPassword) {
+    await db.put('state', configForLocalStorage(config), 'viewer-sync-config')
+  }
+  return config
+}
+
+export async function storeViewerSyncConfig(config: SyncConfig): Promise<void> {
+  await (await database).put('state', configForLocalStorage(config), 'viewer-sync-config')
 }
 
 export async function loadCoordinatorDirectoryHandle(): Promise<
@@ -148,6 +165,18 @@ export async function loadCoachOnboardingVersion(): Promise<number | undefined> 
 
 export async function storeCoachOnboardingVersion(version: number): Promise<void> {
   await (await database).put('state', version, 'coach-onboarding-version')
+}
+
+export async function loadCoachDocumentOrigin(): Promise<CoachDocumentOrigin | undefined> {
+  return (await database).get('state', 'coach-document-origin') as Promise<
+    CoachDocumentOrigin | undefined
+  >
+}
+
+export async function storeCoachDocumentOrigin(
+  origin: CoachDocumentOrigin
+): Promise<void> {
+  await (await database).put('state', origin, 'coach-document-origin')
 }
 
 export async function clearLocalData(): Promise<void> {

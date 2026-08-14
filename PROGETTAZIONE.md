@@ -1,8 +1,8 @@
 # Registro presenze — progettazione della PWA
 
 **Stato:** progettazione approvata operativamente, prototipo MVP avviato  
-**Versione:** 1.6
-**Data:** 28 luglio 2026  
+**Versione:** 1.7
+**Data:** 14 agosto 2026
 **Fonte analizzata:** `Registro stagionale.xlsx`
 
 ## 1. Decisione progettuale in breve
@@ -222,7 +222,18 @@ Questo evita tre ambiguità:
 I giorni abituali servono solo a suggerire le date e a velocizzare la
 creazione. Non generano automaticamente allenamenti conteggiati.
 
-### 5.2 Flusso principale dell'allenatore
+### 5.2 Avvio dell'allenatore
+
+L'allenatore può creare e configurare autonomamente una squadra oppure aprire
+un registro già preparato dal coordinatore. Nel secondo caso inserisce soltanto
+le credenziali Nextcloud: società, squadra, stagione, giorni, rosa e stati sono
+letti dal file condiviso. I permessi sul singolo file sono gestiti da
+Nextcloud. Se sono disponibili più registri, l'allenatore può cambiare squadra
+direttamente dalla barra laterale su desktop, dalla barra superiore su mobile o
+dalle Impostazioni; le modifiche pendenti della squadra corrente devono essere
+sincronizzate prima del passaggio.
+
+### 5.3 Flusso principale dell'allenatore
 
 1. Apre l'app e trova la propria squadra.
 2. Tocca `Registra allenamento`.
@@ -237,7 +248,7 @@ Scorciatoia prevista: `Segna tutte P`, seguita dalla modifica delle sole
 eccezioni. Deve avere conferma/annullamento immediato per evitare tocchi
 accidentali.
 
-### 5.3 Vista mobile
+### 5.4 Vista mobile
 
 La vista primaria è una sessione alla volta:
 
@@ -254,7 +265,7 @@ Atleta 3       [ P ] [ A ] [ R ] [ E ] [ I ]
 I codici restano sempre accompagnati da una legenda accessibile. Il colore è
 un aiuto, non l'unico modo per distinguere gli stati.
 
-### 5.4 Vista desktop
+### 5.5 Vista desktop
 
 La schermata Registro si apre sul riepilogo dell'intera stagione. In alto mostra
 sempre `Stagione` e i dodici mesi da agosto a luglio, con il numero di sessioni
@@ -274,7 +285,7 @@ Caratteristiche:
 - colonna vuota nei giorni senza sessione;
 - totali calcolati, mai modificabili manualmente.
 
-### 5.5 Riepilogo
+### 5.6 Riepilogo
 
 Per una singola squadra:
 
@@ -300,18 +311,22 @@ contenute nel file.
 | Ruolo | Ambito | Permessi |
 |---|---|---|
 | Amministratore Nextcloud | istanza | utenti, gruppi e condivisioni |
-| Coordinatore tecnico | cartella principale | lettura dei file di tutte le squadre |
-| Allenatore | cartella di squadra | lettura e modifica del file della propria squadra |
+| Coordinatore tecnico | cartella principale | creazione, lettura e gestione delle condivisioni dei file autorizzati |
+| Allenatore | singolo file condiviso | lettura e modifica del registro della propria squadra |
+| Giocatrice | uno o più file condivisi | sola lettura dei registri autorizzati |
 
-Il coordinatore è inizialmente in sola lettura, salvo diversa decisione. Non
-sono previsti utenti pubblici o anonimi.
+Il coordinatore crea i registri iniziali e li condivide singolarmente dalla PWA
+tramite le API OCS di Nextcloud. I preset applicativi concedono lettura e
+modifica agli allenatori e sola lettura alle giocatrici; Nextcloud resta
+l'autorità che verifica il diritto del coordinatore a condividere ciascun
+file. Non sono previsti utenti pubblici o anonimi.
 
 ### 6.2 Regole essenziali
 
 - la PWA non implementa un secondo sistema di account;
 - l'accesso ai dati è determinato dalle condivisioni Nextcloud già esistenti;
-- ogni allenatore usa il proprio account Nextcloud e vede soltanto la cartella
-  di squadra autorizzata;
+- ogni allenatore usa il proprio account Nextcloud e vede soltanto il file di
+  squadra autorizzato;
 - un dato resta sempre collegato a squadra e stagione nel relativo JSON;
 - un'atleta rimossa dalla rosa viene archiviata, non cancellata dallo storico;
 - i totali sono calcolati dai record originali e non salvati come numeri
@@ -418,7 +433,7 @@ Allenatore
 PWA ── IndexedDB locale ── WebDAV HTTPS ── file JSON su Nextcloud
 
 Coordinatore
-account supervisore ── WebDAV ───────────────┐
+account supervisore ── WebDAV (lettura/creazione) ─┐
 Nextcloud Desktop ── cartella locale ────────┴─ PWA coordinatore
                                                 └─ sommari in sola lettura
 ```
@@ -434,7 +449,8 @@ Scelta proposta, ancora modificabile prima dell'avvio:
 - **sincronizzazione allenatore:** WebDAV Nextcloud;
 - **autenticazione:** account Nextcloud esistenti e password applicative
   revocabili;
-- **protezione credenziali locale:** password solo in memoria; salvataggio e
+- **protezione credenziali locale:** password limitata alla `sessionStorage` della
+  scheda, mai in IndexedDB o `localStorage`; salvataggio e
   compilazione demandati al password manager del browser quando disponibile;
 - **accesso coordinatore:** WebDAV con credenziali proprie oppure cartella
   aggiornata da Nextcloud Desktop e letta con File System Access API;
@@ -450,7 +466,7 @@ Una PWA usa il service worker per cache, aggiornamenti e funzionamento offline
 ### 9.2 Perché non serve un backend applicativo
 
 I dati sono piccoli, ogni squadra modifica il proprio documento e il
-coordinatore lavora in sola lettura sulle copie sincronizzate. Autenticazione,
+coordinatore crea i registri e consulta le copie sincronizzate. Autenticazione,
 permessi, versioni e trasferimento sono già forniti da Nextcloud. Calcoli,
 esportazioni e aggregazione possono essere eseguiti localmente nella PWA.
 
@@ -487,6 +503,10 @@ consegnare nuove credenziali.
 Storage Share sarà l'archivio remoto operativo. La PWA usa gli endpoint WebDAV
 Nextcloud per `PROPFIND`, `GET` e `PUT`
 ([documentazione ufficiale](https://docs.nextcloud.com/server/stable/developer_manual/client_apis/WebDAV/basic.html)).
+Per elencare, creare, modificare e revocare le condivisioni del singolo registro
+usa inoltre il proxy CORS della OCS Share API esposto da WebAppPassword in
+`/index.php/apps/webapppassword/api/v1/shares`, con autenticazione tramite password applicativa
+([documentazione ufficiale](https://docs.nextcloud.com/server/stable/developer_manual/client_apis/OCS/ocs-share-api.html)).
 
 Una PWA ospitata su un dominio diverso incontra normalmente le restrizioni CORS
 del browser. Storage Share permette di installare applicazioni dal catalogo
@@ -496,6 +516,10 @@ temporanee e revocabili
 ([app Nextcloud](https://apps.nextcloud.com/apps/webapppassword),
 [documentazione](https://github.com/digital-blueprint/webapppassword)).
 
+Le origini per WebDAV e per `Files sharing API` sono impostazioni distinte:
+l'origine esatta della PWA deve comparire in entrambe, compresi protocollo e
+porta, senza percorso.
+
 Prima di implementare l'intera applicazione verrà eseguita una prova tecnica
 sull'istanza reale:
 
@@ -503,7 +527,8 @@ sull'istanza reale:
 2. autorizzazione del dominio esatto della PWA;
 3. accesso con un account allenatore di prova;
 4. `PROPFIND`, `GET` e `PUT` soltanto nella cartella autorizzata;
-5. verifica del comportamento su Android e iOS.
+5. richieste OCS di elenco e modifica condivisioni dall'origine della PWA;
+6. verifica del comportamento su Android e iOS.
 
 Se questa prova fallisse per una limitazione specifica dell'istanza gestita, si
 valuterà un piccolo proxy. Non è una componente prevista nell'architettura
@@ -593,7 +618,7 @@ La progettazione tecnica deve includere:
 - permessi minimi applicati dalle cartelle e condivisioni Nextcloud;
 - HTTPS obbligatorio;
 - password applicative revocabili, senza memorizzare la password principale;
-- password applicativa mai persistita dall'app;
+- password applicativa persistita soltanto nella sessione della scheda;
 - form compatibili con password manager tramite `username` e
   `current-password`;
 - richiesta contestuale della password quando una sincronizzazione ne è priva,
@@ -664,7 +689,7 @@ Obiettivi pratici:
   chiamando direttamente WebDAV;
 - il coordinatore legge tutti i file presenti nella propria cartella
   sincronizzata;
-- una giocatrice legge soltanto il file di squadra condiviso con il proprio
+- una giocatrice legge soltanto i file di squadra condivisi con il proprio
   account;
 - un utente non autenticato non legge alcun dato;
 - i test verificano lettura e scrittura WebDAV con un account allenatore e il
@@ -741,13 +766,12 @@ Obiettivi pratici:
 Prima di scrivere codice vanno confermati questi punti:
 
 1. **Uso offline:** necessario sempre o soltanto desiderabile?
-2. **Modifica coordinatore:** sola lettura oppure può correggere i dati?
-3. **Denominatore:** tutte le sessioni di squadra, come Excel, anche per chi
+2. **Denominatore:** tutte le sessioni di squadra, come Excel, anche per chi
    entra a stagione iniziata?
-4. **Legenda:** sempre esattamente cinque stati oppure numero variabile?
-5. **Identità fra squadre:** serve già nell'MVP un totale della stessa atleta
+3. **Legenda:** sempre esattamente cinque stati oppure numero variabile?
+4. **Identità fra squadre:** serve già nell'MVP un totale della stessa atleta
    su più squadre?
-6. **Conservazione:** per quanti anni devono restare disponibili i registri?
+5. **Conservazione:** per quanti anni devono restare disponibili i registri?
 
 Le risposte non richiedono nuove funzionalità: servono a evitare che
 l'implementazione prenda decisioni implicite sui dati.
@@ -784,6 +808,20 @@ realizzati:
   abituali e rosa;
 - configurazione guidata allenatore in passaggi brevi, saltabile e riapribile
   dalle Impostazioni;
+- scelta iniziale fra creazione autonoma della squadra e apertura di un
+  registro preparato dal coordinatore;
+- apertura allenatore tramite sole credenziali Nextcloud, con selezione della
+  squadra soltanto quando sono accessibili più registri;
+- creazione dei registri dal coordinatore direttamente su Nextcloud, inclusa
+  la creazione della cartella remota e la protezione da sovrascritture;
+- pannello coordinatore unico ed espandibile per creare squadre, consultare i
+  riepiloghi e amministrare gli accessi senza aprire una pagina per squadra;
+- rubrica grafica degli account visibili ottenuta dall’indirizzario di sistema
+  CardDAV, con assegnazione lettura/modifica o sola lettura, cambio permessi e
+  revoca tramite OCS Share API;
+- ricerca ricorsiva lato server della cartella `attendance-tracker`, scelta del
+  percorso in caso di più risultati, creazione quando assente e verifica
+  effettiva dei permessi di scrittura;
 - criterio di prima apertura basato su versione onboarding in IndexedDB e
   assenza di un documento squadra, con migrazione silenziosa degli utenti già
   esistenti;
@@ -806,12 +844,13 @@ realizzati:
   allenamento nella stessa data;
 - vista coordinatore che legge ricorsivamente i file locali
   `*.attendance.json`;
-- caricamento coordinatore / giocatrice diretto dei JSON autorizzati via
+- caricamento coordinatore e giocatrice diretto dei JSON autorizzati via
   WebDAV, con scansione della cartella condivisa o ricerca automatica dei file
   singoli;
 - credenziali allenatore e coordinatore conservate separatamente;
 - URL Nextcloud, nome utente e cartella remota ricordati in IndexedDB;
-- password applicativa mantenuta soltanto in memoria durante la sessione;
+- password applicativa mantenuta nella `sessionStorage` durante la sessione
+  della scheda e rimossa dal reset;
 - password manager del browser abilitato nei form di allenatore, coordinatore e
   richiesta contestuale;
 - rimozione automatica degli archivi credenziali sperimentali delle versioni
@@ -833,7 +872,7 @@ realizzati:
 - URL a hash compatibili con GitHub Pages per selezione modalità, sezioni
   allenatore, modifica allenamento e dettaglio squadra coordinatore, con
   cronologia Indietro/Avanti;
-- link rapido condivisibile che apre la modalità coordinatore / giocatrice e
+- link rapido condivisibile che apre la modalità giocatrice in sola lettura e
   precompila il solo indirizzo Nextcloud, senza credenziali o dati di squadra;
 - navigazione desktop e mobile realizzata con collegamenti, non con sole viste
   interne prive di indirizzo;

@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import {
   configForLocalStorage,
+  coordinatorDetailsFromNextcloudLink,
   detailsFromNextcloudFolderLink,
   detailsFromNextcloudLink,
   metaForManualSync,
@@ -37,6 +38,26 @@ describe('persistenza configurazione cloud', () => {
 })
 
 describe('link della cartella Nextcloud', () => {
+  it('usa attendance-tracker dal solo indirizzo del coordinatore', () => {
+    expect(coordinatorDetailsFromNextcloudLink('https://cloud.example.it/')).toEqual({
+      baseUrl: 'https://cloud.example.it',
+      remoteFolder: 'attendance-tracker'
+    })
+  })
+
+  it('aggiunge attendance-tracker alla cartella padre senza duplicarla', () => {
+    expect(
+      coordinatorDetailsFromNextcloudLink(
+        'https://cloud.example.it/apps/files/files/42?dir=%2FVolley%2FStagione%202026-2027'
+      ).remoteFolder
+    ).toBe('Volley/Stagione 2026-2027/attendance-tracker')
+    expect(
+      coordinatorDetailsFromNextcloudLink(
+        'https://cloud.example.it/apps/files/files/42?dir=%2FVolley%2Fattendance-tracker'
+      ).remoteFolder
+    ).toBe('Volley/attendance-tracker')
+  })
+
   it('estrae server e percorso dal link dell’app File', () => {
     expect(
       detailsFromNextcloudFolderLink(
@@ -114,17 +135,17 @@ describe('link rapido alla vista in sola lettura', () => {
         'https://cloud.example.it'
       )
     ).toBe(
-      'https://davidaffo.github.io/attendance-tracker/#/coordinatore?nextcloud=https%3A%2F%2Fcloud.example.it'
+      'https://davidaffo.github.io/attendance-tracker/#/consultazione?nextcloud=https%3A%2F%2Fcloud.example.it'
     )
   })
 
   it('recupera l’indirizzo Nextcloud dal parametro della route', () => {
     expect(
       nextcloudLinkFromRouteHash(
-        '#/coordinatore?nextcloud=https%3A%2F%2Fcloud.example.it'
+        '#/consultazione?nextcloud=https%3A%2F%2Fcloud.example.it'
       )
     ).toBe('https://cloud.example.it')
-    expect(nextcloudLinkFromRouteHash('#/coordinatore')).toBeUndefined()
+    expect(nextcloudLinkFromRouteHash('#/consultazione')).toBeUndefined()
   })
 })
 

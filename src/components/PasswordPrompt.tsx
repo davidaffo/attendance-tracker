@@ -1,9 +1,9 @@
 import { useEffect, useRef, useState, type FormEvent } from 'react'
-import { KeyRound, X } from 'lucide-react'
+import { KeyRound, RefreshCw, X } from 'lucide-react'
 
 interface PasswordPromptProps {
   username: string
-  onSubmit: (password: string) => void
+  onSubmit: (password: string) => Promise<void>
   onCancel: () => void
 }
 
@@ -13,6 +13,8 @@ export function PasswordPrompt({
   onCancel
 }: PasswordPromptProps) {
   const [password, setPassword] = useState('')
+  const [submitting, setSubmitting] = useState(false)
+  const [error, setError] = useState('')
   const inputRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
@@ -24,9 +26,24 @@ export function PasswordPrompt({
     return () => window.removeEventListener('keydown', closeOnEscape)
   }, [onCancel])
 
-  const submit = (event: FormEvent) => {
+  const submit = async (event: FormEvent) => {
     event.preventDefault()
-    if (password) onSubmit(password)
+    if (!password || submitting) return
+    setSubmitting(true)
+    setError('')
+    try {
+      await onSubmit(password)
+    } catch (submitError) {
+      setError(
+        submitError instanceof Error
+          ? submitError.message
+          : 'Impossibile verificare la password applicativa.'
+      )
+      setPassword('')
+      requestAnimationFrame(() => inputRef.current?.focus())
+    } finally {
+      setSubmitting(false)
+    }
   }
 
   return (
@@ -41,6 +58,7 @@ export function PasswordPrompt({
           className="icon-button quiet password-dialog-close"
           type="button"
           onClick={onCancel}
+          disabled={submitting}
           aria-label="Annulla"
         >
           <X size={18} />
@@ -51,8 +69,9 @@ export function PasswordPrompt({
         <div>
           <h2 id="password-dialog-title">Password Nextcloud</h2>
           <p>
-            Inserisci la password applicativa di <strong>{username}</strong>. Puoi lasciare che
-            sia il browser a salvarla e compilarla in futuro.
+            Inserisci la password applicativa di <strong>{username}</strong>. Dopo la
+            verifica resterà disponibile soltanto in questa scheda, anche se ricarichi
+            la pagina, e verrà scartata quando la chiudi.
           </p>
         </div>
         <form onSubmit={submit} autoComplete="on">
@@ -72,15 +91,32 @@ export function PasswordPrompt({
               name="password"
               autoComplete="current-password"
               value={password}
-              onChange={(event) => setPassword(event.target.value)}
+              onChange={(event) => {
+                setPassword(event.target.value)
+                setError('')
+              }}
+              aria-invalid={Boolean(error)}
+              aria-describedby={error ? 'password-dialog-error' : undefined}
+              disabled={submitting}
               required
             />
           </label>
+          {error && (
+            <p className="password-dialog-error" id="password-dialog-error" role="alert">
+              {error}
+            </p>
+          )}
           <div className="inline-actions password-dialog-actions">
-            <button className="button primary" type="submit">
-              Continua e sincronizza
+            <button className="button primary" type="submit" disabled={submitting}>
+              {submitting && <RefreshCw className="spin" size={16} />}
+              {submitting ? 'Verifico…' : 'Continua e sincronizza'}
             </button>
-            <button className="button secondary" type="button" onClick={onCancel}>
+            <button
+              className="button secondary"
+              type="button"
+              onClick={onCancel}
+              disabled={submitting}
+            >
               Non ora
             </button>
           </div>

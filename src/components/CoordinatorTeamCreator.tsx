@@ -1,39 +1,45 @@
-import { useMemo, useRef, useState, type FormEvent, type KeyboardEvent } from 'react'
-import { ArrowRight, Check, Plus, Trash2 } from 'lucide-react'
-import { getCurrentSeason, WEEKDAYS } from '../domain/defaults'
+import {
+  useMemo,
+  useRef,
+  useState,
+  type FormEvent,
+  type KeyboardEvent
+} from 'react'
+import { ArrowLeft, Check, CloudUpload, Plus, Trash2 } from 'lucide-react'
+import { createTeamDocument, getCurrentSeason, WEEKDAYS } from '../domain/defaults'
 import type { TeamDocument } from '../domain/types'
-import { createTeamDocument } from '../domain/defaults'
-import { RestoreBackupButton } from './RestoreBackupButton'
 import { AthleteListPaste } from './AthleteListPaste'
 
-interface SetupCoachProps {
-  onComplete: (document: TeamDocument) => Promise<void>
-  onSwitchMode: () => void
-  onRestoreBackup: (document: TeamDocument) => Promise<void>
+interface CoordinatorTeamCreatorProps {
+  onCreate: (document: TeamDocument) => Promise<void>
+  onCancel: () => void
+  embedded?: boolean
 }
 
-export function SetupCoach({
-  onComplete,
-  onSwitchMode,
-  onRestoreBackup
-}: SetupCoachProps) {
+export function CoordinatorTeamCreator({
+  onCreate,
+  onCancel,
+  embedded = false
+}: CoordinatorTeamCreatorProps) {
   const currentSeason = useMemo(() => getCurrentSeason(), [])
-  const [teamName, setTeamName] = useState('')
   const [organizationName, setOrganizationName] = useState('')
+  const [teamName, setTeamName] = useState('')
   const [coachName, setCoachName] = useState('')
   const [startYear, setStartYear] = useState(currentSeason.startYear)
   const [weekdays, setWeekdays] = useState<number[]>([])
   const [athletes, setAthletes] = useState<string[]>([''])
   const [submitting, setSubmitting] = useState(false)
+  const [message, setMessage] = useState('')
   const athleteInputs = useRef<Array<HTMLInputElement | null>>([])
 
-  const updateAthlete = (index: number, name: string) => {
-    setAthletes((current) =>
-      current.map((candidate, candidateIndex) => (candidateIndex === index ? name : candidate))
-    )
+  const addAthleteRow = () => {
+    setAthletes((current) => [...current, ''])
   }
 
-  const handleAthleteEnter = (event: KeyboardEvent<HTMLInputElement>, index: number) => {
+  const handleAthleteEnter = (
+    event: KeyboardEvent<HTMLInputElement>,
+    index: number
+  ) => {
     if (event.key !== 'Enter') return
     event.preventDefault()
 
@@ -42,43 +48,51 @@ export function SetupCoach({
       nextInput.focus()
       return
     }
+    if (!athletes[index]?.trim()) return
 
-    if (!athletes[index].trim()) return
-    setAthletes((current) => [...current, ''])
+    addAthleteRow()
     requestAnimationFrame(() => athleteInputs.current[index + 1]?.focus())
   }
 
   const submit = async (event: FormEvent) => {
     event.preventDefault()
-    if (!teamName.trim() || !organizationName.trim() || !coachName.trim()) return
     setSubmitting(true)
+    setMessage('')
     try {
-      await onComplete(
+      await onCreate(
         createTeamDocument({
-          teamName,
           organizationName,
+          teamName,
           coachName,
           startYear,
           weekdays,
           athleteNames: athletes
         })
       )
+    } catch (error) {
+      setMessage(error instanceof Error ? error.message : 'Creazione non riuscita.')
     } finally {
       setSubmitting(false)
     }
   }
 
-  return (
-    <main className="setup-page">
-      <div className="setup-brand">
-        <div className="brand-mark" aria-hidden="true">
-          <Check size={28} strokeWidth={3} />
-        </div>
-        <span>Registro Presenze</span>
-      </div>
+  const content = (
+    <>
+      <button className="button ghost report-back" type="button" onClick={onCancel}>
+        <ArrowLeft size={17} />
+        {embedded ? 'Chiudi creazione' : 'Torna ai registri'}
+      </button>
 
-      <form className="setup-card" onSubmit={submit}>
-        <h1>Configurazione squadra</h1>
+      <form className="panel coordinator-create-card" onSubmit={submit}>
+        <div>
+          <span className="eyebrow">Nuovo registro</span>
+          <h1>Crea una squadra</h1>
+          <p className="section-copy">
+            Il registro verrà caricato nella cartella Nextcloud configurata. Subito dopo potrai
+            assegnare dall’app l’accesso in modifica agli allenatori e quello in lettura alle
+            giocatrici.
+          </p>
+        </div>
 
         <div className="form-grid two-columns">
           <label className="field">
@@ -86,7 +100,6 @@ export function SetupCoach({
             <input
               value={organizationName}
               onChange={(event) => setOrganizationName(event.target.value)}
-              placeholder="es. Volley Club"
               required
             />
           </label>
@@ -95,7 +108,6 @@ export function SetupCoach({
             <input
               value={teamName}
               onChange={(event) => setTeamName(event.target.value)}
-              placeholder="es. Under 14"
               required
             />
           </label>
@@ -104,7 +116,6 @@ export function SetupCoach({
             <input
               value={coachName}
               onChange={(event) => setCoachName(event.target.value)}
-              placeholder="Nome e cognome"
               required
             />
           </label>
@@ -136,6 +147,7 @@ export function SetupCoach({
                   className={`weekday-button ${selected ? 'selected' : ''}`}
                   key={day.value}
                   type="button"
+                  aria-pressed={selected}
                   onClick={() =>
                     setWeekdays((current) =>
                       selected
@@ -143,7 +155,6 @@ export function SetupCoach({
                         : [...current, day.value]
                     )
                   }
-                  aria-pressed={selected}
                 >
                   {selected && <Check size={14} />}
                   {day.short}
@@ -154,7 +165,7 @@ export function SetupCoach({
         </fieldset>
 
         <fieldset className="fieldset">
-          <legend>Rosa</legend>
+          <legend>Rosa iniziale</legend>
           <div className="athlete-inputs">
             {athletes.map((athlete, index) => (
               <div className="athlete-input-row" key={index}>
@@ -164,23 +175,29 @@ export function SetupCoach({
                     athleteInputs.current[index] = element
                   }}
                   value={athlete}
-                  onChange={(event) => updateAthlete(index, event.target.value)}
-                  onKeyDown={(event) => handleAthleteEnter(event, index)}
+                  onChange={(event) =>
+                    setAthletes((current) =>
+                      current.map((name, candidateIndex) =>
+                        candidateIndex === index ? event.target.value : name
+                      )
+                    )
+                  }
                   placeholder="Nome atleta"
                   aria-label={`Atleta ${index + 1}`}
+                  onKeyDown={(event) => handleAthleteEnter(event, index)}
                 />
                 <button
-                  type="button"
                   className="icon-button quiet"
-                  aria-label={`Rimuovi atleta ${index + 1}`}
+                  type="button"
                   disabled={athletes.length === 1}
                   onClick={() =>
                     setAthletes((current) =>
                       current.filter((_, candidateIndex) => candidateIndex !== index)
                     )
                   }
+                  aria-label={`Rimuovi atleta ${index + 1}`}
                 >
-                  <Trash2 size={18} />
+                  <Trash2 size={17} />
                 </button>
               </div>
             ))}
@@ -188,7 +205,7 @@ export function SetupCoach({
           <button
             className="text-button"
             type="button"
-            onClick={() => setAthletes((current) => [...current, ''])}
+            onClick={addAthleteRow}
           >
             <Plus size={17} />
             Aggiungi atleta
@@ -201,23 +218,24 @@ export function SetupCoach({
           />
         </fieldset>
 
-        <div className="setup-actions">
+        {message && <p className="form-message">{message}</p>}
+
+        <div className="inline-actions">
           <button className="button primary" type="submit" disabled={submitting}>
-            {submitting ? 'Preparazione…' : 'Crea il registro'}
-            <ArrowRight size={18} />
+            <CloudUpload size={17} />
+            {submitting ? 'Creo il registro…' : 'Crea squadra'}
           </button>
-          <button className="button ghost" type="button" onClick={onSwitchMode}>
-            Sono coordinatore / giocatrice
+          <button className="button ghost" type="button" onClick={onCancel}>
+            Annulla
           </button>
-        </div>
-        <div className="setup-restore">
-          <span>Hai già un backup del Registro Presenze?</span>
-          <RestoreBackupButton
-            onRestore={onRestoreBackup}
-            label="Ripristina da JSON"
-          />
         </div>
       </form>
-    </main>
+    </>
+  )
+
+  return embedded ? (
+    <section className="coordinator-create-inline">{content}</section>
+  ) : (
+    <main className="coordinator-main coordinator-create-main">{content}</main>
   )
 }

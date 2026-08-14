@@ -8,7 +8,9 @@ export type SyncIndicator =
   | 'conflict'
   | 'error'
 
-export type AppMode = 'coach' | 'coordinator'
+export type AppMode = 'coach' | 'coordinator' | 'viewer'
+
+export type CoachDocumentOrigin = 'self-managed' | 'coordinator-managed'
 
 export interface AttendanceStatus {
   id: string
@@ -76,6 +78,7 @@ export interface LocalSyncMeta {
 export interface TeamSummary {
   source: string
   document: TeamDocument
+  remoteFolder?: string
 }
 
 export interface CoordinatorTeamCache {
@@ -84,6 +87,7 @@ export interface CoordinatorTeamCache {
   source: 'nextcloud' | 'directory' | 'files'
   sourceLabel: string
   connectionKey?: string
+  owner?: 'coordinator' | 'viewer'
 }
 
 export interface TeamTotals {

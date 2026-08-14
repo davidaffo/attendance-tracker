@@ -2,6 +2,7 @@ import { useEffect, useState, type FormEvent } from 'react'
 import {
   Cloud,
   CloudUpload,
+  ChevronsUpDown,
   Download,
   ExternalLink,
   ListChecks,
@@ -26,6 +27,8 @@ interface SyncSettingsProps {
   onChooseMode: () => void
   onOpenOnboarding: () => void
   onResetAllData: () => Promise<void>
+  managedByCoordinator?: boolean
+  onChooseTeam?: () => void
 }
 
 export function SyncSettings({
@@ -39,7 +42,9 @@ export function SyncSettings({
   onRestoreBackup,
   onChooseMode,
   onOpenOnboarding,
-  onResetAllData
+  onResetAllData,
+  managedByCoordinator = false,
+  onChooseTeam
 }: SyncSettingsProps) {
   const [draft, setDraft] = useState<SyncConfig>(
     config ?? {
@@ -80,7 +85,9 @@ export function SyncSettings({
       await testWebDavConnection(draft)
       await onSaveConfig(draft)
       setMessage(
-        'Connessione verificata e registro sincronizzato correttamente.'
+        managedByCoordinator
+          ? 'Connessione verificata. Nessuna sincronizzazione automatica è stata eseguita.'
+          : 'Connessione verificata e registro sincronizzato correttamente.'
       )
     } catch (error) {
       setMessage(error instanceof Error ? error.message : 'Connessione non riuscita.')
@@ -106,6 +113,23 @@ export function SyncSettings({
           <h1>Impostazioni</h1>
         </div>
       </div>
+
+      <section className="panel settings-panel register-origin-panel">
+        <div>
+          <h2>Origine del registro</h2>
+          <p>
+            {managedByCoordinator
+              ? 'Squadra preparata dal coordinatore e condivisa tramite Nextcloud.'
+              : 'Squadra configurata e gestita autonomamente su questo dispositivo.'}
+          </p>
+        </div>
+        {managedByCoordinator && onChooseTeam && (
+          <button className="button secondary" type="button" onClick={onChooseTeam}>
+            <ChevronsUpDown size={17} />
+            Cambia squadra
+          </button>
+        )}
+      </section>
 
       <section className="panel settings-panel">
         <div className="panel-heading">
@@ -151,11 +175,12 @@ export function SyncSettings({
                 required
               />
               <small>
-                L’app non la salva. Il browser può proporti di ricordarla e compilarla.
+                Resta soltanto nella sessione di questa scheda e non viene scritta in
+                IndexedDB. Verrà richiesta di nuovo dopo la chiusura.
               </small>
             </label>
           </div>
-          <label className="field">
+          {!managedByCoordinator && <label className="field">
             <span>Cartella squadra</span>
             <input
               placeholder="attendance-tracker"
@@ -167,13 +192,13 @@ export function SyncSettings({
               {' '}
               <code>attendance-tracker</code>.
             </small>
-          </label>
+          </label>}
           <div className="inline-actions">
             <button className="button primary" type="submit" disabled={testing}>
               <Save size={17} />
               {testing ? 'Verifica…' : 'Verifica e salva'}
             </button>
-            {config && (
+            {config && !managedByCoordinator && (
               <button
                 className="button secondary"
                 type="button"
@@ -234,26 +259,29 @@ export function SyncSettings({
       <section className="panel settings-panel">
         <div className="panel-heading">
           <div>
-            <h2>Backup e ripristino</h2>
+            <h2>{managedByCoordinator ? 'Esporta registro' : 'Backup e ripristino'}</h2>
           </div>
         </div>
         <p className="section-copy">
-          Scarica una copia completa del registro oppure ripristina una copia JSON salvata in
-          precedenza. Il ripristino non modifica Nextcloud finché non lo confermi manualmente.
+          {managedByCoordinator
+            ? 'Puoi scaricare una copia del registro. Il ripristino completo è riservato al coordinatore.'
+            : 'Scarica una copia completa del registro oppure ripristina una copia JSON salvata in precedenza. Il ripristino non modifica Nextcloud finché non lo confermi manualmente.'}
         </p>
         <div className="backup-actions">
           <button className="button secondary" type="button" onClick={downloadJson}>
             <Download size={17} />
             Scarica backup JSON
           </button>
-          <RestoreBackupButton
-            currentDocument={document}
-            onRestore={onRestoreBackup}
-          />
+          {!managedByCoordinator && (
+            <RestoreBackupButton
+              currentDocument={document}
+              onRestore={onRestoreBackup}
+            />
+          )}
         </div>
       </section>
 
-      <section className="panel settings-panel coordinator-switch">
+      {!managedByCoordinator && <section className="panel settings-panel coordinator-switch">
         <div>
           <h2>Configurazione guidata</h2>
           <p>
@@ -264,13 +292,13 @@ export function SyncSettings({
           Apri la guida
           <ListChecks size={17} />
         </button>
-      </section>
+      </section>}
 
       <section className="panel settings-panel coordinator-switch">
         <div>
           <h2>Cambia modalità</h2>
           <p>
-            Torna alla scelta fra allenatore e coordinatore / giocatrice senza cancellare i dati
+            Torna alla scelta fra allenatore, coordinatore e giocatrice senza cancellare i dati
             locali.
           </p>
         </div>

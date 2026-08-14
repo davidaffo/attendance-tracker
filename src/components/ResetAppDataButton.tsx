@@ -24,9 +24,14 @@ export function ResetAppDataButton({
 
   return (
     <>
-      <button className={className} type="button" onClick={() => setConfirming(true)}>
+      <button
+        className={className}
+        type="button"
+        onClick={() => setConfirming(true)}
+        aria-label="Resetta app"
+      >
         <RotateCcw size={17} />
-        Resetta app
+        <span>Resetta app</span>
       </button>
 
       {confirming && (
