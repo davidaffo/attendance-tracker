@@ -108,27 +108,32 @@ Per ragioni di sicurezza il browser non espone il percorso assoluto della
 cartella locale. Può ricordare il riferimento alla cartella e, dopo un riavvio,
 potrebbe chiedere di confermare nuovamente il permesso di lettura.
 
-## Vista coordinatore
+## Vista coordinatore / giocatrice
 
-La modalità coordinatore offre due modalità di caricamento:
+La modalità coordinatore / giocatrice è una vista in sola lettura. Mostra
+soltanto i file autorizzati dalle condivisioni Nextcloud associate all'account:
+un coordinatore può quindi consultare tutte le squadre, mentre una giocatrice
+vede soltanto il registro della propria squadra.
 
-1. collegamento WebDAV con l'account Nextcloud del supervisore, che legge tutti
-   i file `*.attendance.json` presenti in `attendance-tracker`;
+La modalità offre due modalità di caricamento:
+
+1. collegamento WebDAV con l'account Nextcloud, che legge i file
+   `*.attendance.json` per i quali l'utente dispone del permesso;
 2. selezione della cartella locale già sincronizzata da Nextcloud Desktop.
 
-Nel collegamento WebDAV il supervisore può incollare direttamente il link della
+Nel collegamento WebDAV l'utente può incollare direttamente il link della
 cartella aperta nell’app File di Nextcloud, per esempio un indirizzo che termina
 con `?dir=/Volley/Stagioni/2026-2027/attendance-tracker`. L’app ricava dal link
 il server e il percorso WebDAV; il numero presente in `/files/12345` è soltanto
 un identificatore dell’interfaccia Nextcloud e non viene usato per l’accesso.
 
-I dati di collegamento del supervisore sono conservati separatamente da quelli
+I dati di collegamento della vista in sola lettura sono conservati separatamente da quelli
 dell'allenatore; la password resta esclusa. Dopo il caricamento vengono mostrati
-il sommario di tutte le squadre e, per ciascuna squadra, riepilogo stagionale,
+il sommario delle squadre accessibili e, per ciascuna squadra, riepilogo stagionale,
 conteggi e percentuali per atleta e matrici mensili.
 
 L'ultimo insieme di squadre caricato viene conservato in IndexedDB insieme a
-data e sorgente del caricamento. Alla riapertura della PWA il coordinatore vede
+data e sorgente del caricamento. Alla riapertura della PWA l'utente vede
 quindi subito l'ultimo riepilogo, anche offline e senza reinserire la password.
 
 Se l'ultima sorgente era una cartella locale, la PWA conserva anche il
@@ -222,12 +227,12 @@ Da `Impostazioni → Ricomincia da zero` è possibile cancellare, dopo una doppi
 conferma:
 
 - registro locale e sessioni;
-- configurazioni allenatore e coordinatore;
-- cache dei riepiloghi del coordinatore;
+- configurazioni allenatore e coordinatore / giocatrice;
+- cache dei riepiloghi in sola lettura;
 - riferimento alla cartella locale;
 - modalità selezionata e stato della configurazione guidata.
 
 Dopo il reset la PWA viene ricaricata sulla scelta iniziale
-allenatore/coordinatore. Non vengono cancellati i file già sincronizzati su
+allenatore o coordinatore / giocatrice. Non vengono cancellati i file già sincronizzati su
 Nextcloud né le password conservate dal password manager del browser. Il
-comando è disponibile anche nell'intestazione della modalità coordinatore.
+comando è disponibile anche nell'intestazione della modalità in sola lettura.

@@ -274,7 +274,7 @@ export function CoordinatorDashboard({
           </div>
           <div>
             <strong>Registro Presenze</strong>
-            <span>Coordinatore</span>
+            <span>Coordinatore / giocatrice</span>
           </div>
         </div>
         <div className="coordinator-header-actions">
@@ -303,9 +303,10 @@ export function CoordinatorDashboard({
         <main className="coordinator-main">
           <section className="coordinator-hero">
             <div>
-              <h1>Squadre</h1>
+              <h1>Registri accessibili</h1>
               <p>
-                Carica i registri da Nextcloud oppure da una cartella locale.
+                Consulta in sola lettura le squadre autorizzate per il tuo account Nextcloud,
+                oppure carica i registri da una cartella locale.
               </p>
             </div>
             <div className="coordinator-load-actions">
@@ -340,7 +341,7 @@ export function CoordinatorDashboard({
             open={cloudConfigOpen}
             onToggle={(event) => setCloudConfigOpen(event.currentTarget.open)}
           >
-            <summary>Collegamento Nextcloud del supervisore</summary>
+            <summary>Collegamento Nextcloud in sola lettura</summary>
             <form className="form-grid" onSubmit={connectCloud} autoComplete="on">
               <div className="form-grid coordinator-config-grid">
                 <label className="field">
@@ -357,7 +358,7 @@ export function CoordinatorDashboard({
                   </small>
                 </label>
                 <label className="field">
-                  <span>Nome utente supervisore</span>
+                  <span>Nome utente Nextcloud</span>
                   <input
                     name="username"
                     autoComplete="username"
@@ -383,7 +384,7 @@ export function CoordinatorDashboard({
               </div>
               <button className="button primary" type="submit" disabled={loading}>
                 <Cloud size={17} />
-                Salva e carica i riepiloghi
+                Salva e carica i registri
               </button>
             </form>
           </details>
@@ -421,8 +422,8 @@ export function CoordinatorDashboard({
                 <Cloud size={38} />
                 <h2>Nessun dato caricato</h2>
                 <p>
-                  Configura l’account supervisore e carica da Nextcloud, oppure scegli la cartella
-                  locale attendance-tracker.
+                  Configura il tuo account e carica i registri autorizzati da Nextcloud, oppure
+                  scegli la cartella locale attendance-tracker.
                 </p>
               </div>
             ) : (

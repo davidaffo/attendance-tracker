@@ -269,7 +269,10 @@ export function SyncSettings({
       <section className="panel settings-panel coordinator-switch">
         <div>
           <h2>Cambia modalità</h2>
-          <p>Torna alla scelta fra allenatore e coordinatore senza cancellare i dati locali.</p>
+          <p>
+            Torna alla scelta fra allenatore e coordinatore / giocatrice senza cancellare i dati
+            locali.
+          </p>
         </div>
         <button className="button secondary" onClick={onChooseMode}>
           Scegli modalità

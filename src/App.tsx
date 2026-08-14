@@ -137,8 +137,8 @@ function Welcome({ onSelect }: { onSelect: (mode: AppMode) => void }) {
           </button>
           <button className="mode-card" onClick={() => onSelect('coordinator')}>
             <ShieldCheck size={26} />
-            <strong>Coordinatore</strong>
-            <span>Consultazione dei registri delle squadre.</span>
+            <strong>Coordinatore / giocatrice</strong>
+            <span>Consultazione in sola lettura dei registri autorizzati.</span>
           </button>
         </div>
       </div>

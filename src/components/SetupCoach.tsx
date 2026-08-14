@@ -207,7 +207,7 @@ export function SetupCoach({
             <ArrowRight size={18} />
           </button>
           <button className="button ghost" type="button" onClick={onSwitchMode}>
-            Sono il coordinatore
+            Sono coordinatore / giocatrice
           </button>
         </div>
         <div className="setup-restore">

@@ -52,8 +52,8 @@ export function ResetAppDataButton({
               <div className="eyebrow">Azione irreversibile</div>
               <h2 id="reset-dialog-title">Cancellare tutti i dati locali?</h2>
               <p>
-                Verranno rimossi registro, configurazioni, cache del coordinatore, cartella
-                ricordata e stato della guida. L’app tornerà alla schermata iniziale.
+                Verranno rimossi registro, configurazioni, cache della vista in sola lettura,
+                cartella ricordata e stato della guida. L’app tornerà alla schermata iniziale.
               </p>
               <p>
                 I file già caricati su Nextcloud e le password salvate dal browser non verranno
