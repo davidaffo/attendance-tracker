@@ -2,8 +2,11 @@ import { describe, expect, it } from 'vitest'
 import {
   configForLocalStorage,
   detailsFromNextcloudFolderLink,
+  detailsFromNextcloudLink,
   metaForManualSync,
-  metaForRestoredBackup
+  metaForRestoredBackup,
+  nextcloudLinkFromRouteHash,
+  nextcloudQuickAccessUrl
 } from '../domain/syncConfig'
 
 const config = {
@@ -56,10 +59,72 @@ describe('link della cartella Nextcloud', () => {
     })
   })
 
-  it('rifiuta un indirizzo generico privo del percorso della cartella', () => {
+  it('accetta un file condiviso visibile nella radice dell’account', () => {
+    expect(
+      detailsFromNextcloudLink(
+        'https://cloud.example.it/apps/files/files/42?dir=%2F&openfile=731'
+      )
+    ).toEqual({
+      baseUrl: 'https://cloud.example.it',
+      remoteFolder: ''
+    })
+  })
+
+  it('accetta l’indirizzo del server per la ricerca automatica', () => {
+    expect(detailsFromNextcloudLink('https://cloud.example.it/')).toEqual({
+      baseUrl: 'https://cloud.example.it',
+      remoteFolder: ''
+    })
+  })
+
+  it('accetta l’indirizzo WebDAV di Nextcloud', () => {
+    expect(
+      detailsFromNextcloudLink(
+        'https://cloud.example.it/nextcloud/remote.php/dav/files/giocatrice'
+      )
+    ).toEqual({
+      baseUrl: 'https://cloud.example.it/nextcloud',
+      remoteFolder: ''
+    })
+  })
+
+  it('ricava il server da un link interno a un file', () => {
+    expect(
+      detailsFromNextcloudLink(
+        'https://cloud.example.it/nextcloud/index.php/f/731'
+      )
+    ).toEqual({
+      baseUrl: 'https://cloud.example.it/nextcloud',
+      remoteFolder: ''
+    })
+  })
+
+  it('spiega che un link pubblico non identifica il percorso WebDAV', () => {
     expect(() =>
-      detailsFromNextcloudFolderLink('https://cloud.example.it/apps/files/')
-    ).toThrow('Incolla il link aperto dalla cartella')
+      detailsFromNextcloudLink('https://cloud.example.it/s/token-pubblico')
+    ).toThrow('Il link pubblico non identifica il file WebDAV')
+  })
+})
+
+describe('link rapido alla vista in sola lettura', () => {
+  it('inserisce soltanto l’indirizzo Nextcloud nel link dell’app', () => {
+    expect(
+      nextcloudQuickAccessUrl(
+        'https://davidaffo.github.io/attendance-tracker/',
+        'https://cloud.example.it'
+      )
+    ).toBe(
+      'https://davidaffo.github.io/attendance-tracker/#/coordinatore?nextcloud=https%3A%2F%2Fcloud.example.it'
+    )
+  })
+
+  it('recupera l’indirizzo Nextcloud dal parametro della route', () => {
+    expect(
+      nextcloudLinkFromRouteHash(
+        '#/coordinatore?nextcloud=https%3A%2F%2Fcloud.example.it'
+      )
+    ).toBe('https://cloud.example.it')
+    expect(nextcloudLinkFromRouteHash('#/coordinatore')).toBeUndefined()
   })
 })
 

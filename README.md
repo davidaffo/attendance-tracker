@@ -121,20 +121,44 @@ La modalità offre due modalità di caricamento:
    `*.attendance.json` per i quali l'utente dispone del permesso;
 2. selezione della cartella locale già sincronizzata da Nextcloud Desktop.
 
-Nel collegamento WebDAV l'utente può incollare direttamente il link della
-cartella aperta nell’app File di Nextcloud, per esempio un indirizzo che termina
-con `?dir=/Volley/Stagioni/2026-2027/attendance-tracker`. L’app ricava dal link
-il server e il percorso WebDAV; il numero presente in `/files/12345` è soltanto
-un identificatore dell’interfaccia Nextcloud e non viene usato per l’accesso.
+Nel collegamento WebDAV l'utente può incollare il link di un file condiviso, di
+una cartella condivisa oppure il semplice indirizzo del server Nextcloud.
 
-I dati di collegamento della vista in sola lettura sono conservati separatamente da quelli
-dell'allenatore; la password resta esclusa. Dopo il caricamento vengono mostrati
-il sommario delle squadre accessibili e, per ciascuna squadra, riepilogo stagionale,
-conteggi e percentuali per atleta e matrici mensili.
+- Se il link indica una cartella, l'app legge i registri presenti in quella
+  cartella: è il flusso previsto per il coordinatore.
+- Se il link indica un file nella radice o il server, l'app cerca
+  automaticamente tutti i registri accessibili dall'account: è il flusso
+  previsto per la giocatrice che riceve un singolo file condiviso.
+- Se viene trovato un solo registro, il dettaglio della squadra si apre
+  automaticamente; con più registri viene mostrata la scelta delle squadre.
+
+Non è necessario ricavare o digitare manualmente il percorso WebDAV. La ricerca
+resta limitata ai file che Nextcloud rende leggibili per l'account autenticato.
+
+### Link rapido per le giocatrici
+
+La configurazione Nextcloud contiene il comando `Copia link` nella sezione
+`Link rapido per le giocatrici`. Il collegamento apre direttamente la modalità
+in sola lettura e precompila l'indirizzo del server, per esempio:
+
+```text
+https://davidaffo.github.io/attendance-tracker/#/coordinatore?nextcloud=https%3A%2F%2Fcloud.example.it
+```
+
+Lo stesso link può essere inviato a tutte le giocatrici. Non contiene username,
+password o nomi delle squadre: dopo l'accesso, ciascun account vede soltanto i
+registri autorizzati dai permessi Nextcloud.
+
+I dati di collegamento della vista in sola lettura sono conservati separatamente
+da quelli dell'allenatore; la password resta esclusa. Dopo il caricamento
+vengono mostrati il sommario delle squadre accessibili e, per ciascuna squadra,
+riepilogo stagionale, conteggi e percentuali per atleta e matrici mensili.
 
 L'ultimo insieme di squadre caricato viene conservato in IndexedDB insieme a
 data e sorgente del caricamento. Alla riapertura della PWA l'utente vede
 quindi subito l'ultimo riepilogo, anche offline e senza reinserire la password.
+La cache Nextcloud è legata a server, username e percorso selezionato: cambiando
+account o collegamento, i riepiloghi precedenti non vengono mostrati.
 
 Se l'ultima sorgente era una cartella locale, la PWA conserva anche il
 riferimento sicuro alla cartella e prova a rileggerla automaticamente. Il

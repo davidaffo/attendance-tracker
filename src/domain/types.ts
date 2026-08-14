@@ -83,6 +83,7 @@ export interface CoordinatorTeamCache {
   loadedAt: string
   source: 'nextcloud' | 'directory' | 'files'
   sourceLabel: string
+  connectionKey?: string
 }
 
 export interface TeamTotals {

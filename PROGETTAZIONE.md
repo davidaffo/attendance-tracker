@@ -664,6 +664,8 @@ Obiettivi pratici:
   chiamando direttamente WebDAV;
 - il coordinatore legge tutti i file presenti nella propria cartella
   sincronizzata;
+- una giocatrice legge soltanto il file di squadra condiviso con il proprio
+  account;
 - un utente non autenticato non legge alcun dato;
 - i test verificano lettura e scrittura WebDAV con un account allenatore e il
   rifiuto sulle cartelle non autorizzate.
@@ -804,7 +806,9 @@ realizzati:
   allenamento nella stessa data;
 - vista coordinatore che legge ricorsivamente i file locali
   `*.attendance.json`;
-- caricamento coordinatore diretto di tutti i JSON via WebDAV;
+- caricamento coordinatore / giocatrice diretto dei JSON autorizzati via
+  WebDAV, con scansione della cartella condivisa o ricerca automatica dei file
+  singoli;
 - credenziali allenatore e coordinatore conservate separatamente;
 - URL Nextcloud, nome utente e cartella remota ricordati in IndexedDB;
 - password applicativa mantenuta soltanto in memoria durante la sessione;
@@ -817,8 +821,8 @@ realizzati:
 - riferimento alla cartella locale del coordinatore ricordato tramite File
   System Access API, con eventuale nuova conferma del permesso richiesta dal
   browser;
-- cache IndexedDB dell'ultimo insieme di squadre caricato dal coordinatore, con
-  sorgente e data di aggiornamento;
+- cache IndexedDB dell'ultimo insieme di squadre caricato in sola lettura, con
+  sorgente, data di aggiornamento e collegamento all'account usato;
 - ripristino immediato dei riepiloghi coordinatore alla riapertura, anche
   offline;
 - rilettura automatica della cartella locale quando era l'ultima sorgente usata
@@ -829,6 +833,8 @@ realizzati:
 - URL a hash compatibili con GitHub Pages per selezione modalità, sezioni
   allenatore, modifica allenamento e dettaglio squadra coordinatore, con
   cronologia Indietro/Avanti;
+- link rapido condivisibile che apre la modalità coordinatore / giocatrice e
+  precompila il solo indirizzo Nextcloud, senza credenziali o dati di squadra;
 - navigazione desktop e mobile realizzata con collegamenti, non con sole viste
   interne prive di indirizzo;
 - workflow GitHub Actions con test, build PWA e deploy automatico su Pages;

@@ -75,7 +75,7 @@ export function MonthlyRegister({
       <div className="page-title-row">
         <div>
           <h1>
-            Stagione {document.season.startYear}–{document.season.endYear}
+            {document.teamName} · Stagione {document.season.startYear}–{document.season.endYear}
           </h1>
         </div>
         {onNewSession && (

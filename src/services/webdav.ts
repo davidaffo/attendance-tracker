@@ -44,10 +44,17 @@ function basicAuthorization(username: string, password: string): string {
 }
 
 function folderUrl(config: SyncConfig): string {
-  const baseUrl = normalizeBaseUrl(config.baseUrl)
-  const root = `${baseUrl}/remote.php/dav/files/${encodeURIComponent(config.username)}`
+  const root = filesRootUrl(config)
   const folder = encodePath(config.remoteFolder)
   return folder ? `${root}/${folder}` : root
+}
+
+function davRootUrl(config: SyncConfig): string {
+  return `${normalizeBaseUrl(config.baseUrl)}/remote.php/dav`
+}
+
+function filesRootUrl(config: SyncConfig): string {
+  return `${davRootUrl(config)}/files/${encodeURIComponent(config.username)}`
 }
 
 export function documentUrl(config: SyncConfig, document: TeamDocument): string {
@@ -149,6 +156,13 @@ export async function listRemoteTeamDocuments(config: SyncConfig): Promise<TeamS
     throw new Error(`Impossibile leggere la cartella remota (${response.status}).`)
   }
 
+  return teamDocumentsFromDavResponse(config, response)
+}
+
+async function teamDocumentsFromDavResponse(
+  config: SyncConfig,
+  response: Response
+): Promise<TeamSummary[]> {
   const xml = new DOMParser().parseFromString(await response.text(), 'application/xml')
   const entries = [...xml.getElementsByTagNameNS('DAV:', 'response')]
   const fileUrls = entries
@@ -183,6 +197,55 @@ export async function listRemoteTeamDocuments(config: SyncConfig): Promise<TeamS
   return documents
     .filter((entry): entry is TeamSummary => Boolean(entry))
     .sort((a, b) => a.document.teamName.localeCompare(b.document.teamName))
+}
+
+export async function discoverRemoteTeamDocuments(
+  config: SyncConfig
+): Promise<TeamSummary[]> {
+  if (config.remoteFolder) return listRemoteTeamDocuments(config)
+
+  const scope = `/files/${encodeURIComponent(config.username)}`
+  const response = await davFetch(config, davRootUrl(config), {
+    method: 'SEARCH',
+    headers: { 'Content-Type': 'application/xml; charset=utf-8' },
+    body: `<?xml version="1.0" encoding="UTF-8"?>
+      <d:searchrequest xmlns:d="DAV:">
+        <d:basicsearch>
+          <d:select>
+            <d:prop>
+              <d:displayname/>
+              <d:getcontenttype/>
+              <d:getetag/>
+            </d:prop>
+          </d:select>
+          <d:from>
+            <d:scope>
+              <d:href>${scope}</d:href>
+              <d:depth>infinity</d:depth>
+            </d:scope>
+          </d:from>
+          <d:where>
+            <d:like>
+              <d:prop><d:displayname/></d:prop>
+              <d:literal>%.attendance.json</d:literal>
+            </d:like>
+          </d:where>
+          <d:orderby/>
+        </d:basicsearch>
+      </d:searchrequest>`
+  })
+
+  if (response.status === 401 || response.status === 403) {
+    throw new Error('Credenziali non valide o account non autorizzato.')
+  }
+  if (response.status === 405 || response.status === 501) {
+    return listRemoteTeamDocuments(config)
+  }
+  if (response.status !== 207 && !response.ok) {
+    throw new Error(`Impossibile cercare i registri su Nextcloud (${response.status}).`)
+  }
+
+  return teamDocumentsFromDavResponse(config, response)
 }
 
 async function readRemote(config: SyncConfig, local: TeamDocument): Promise<RemoteFile> {

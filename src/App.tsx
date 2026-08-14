@@ -26,7 +26,8 @@ import {
 import { deleteSession, saveSession } from './domain/document'
 import {
   metaForManualSync,
-  metaForRestoredBackup
+  metaForRestoredBackup,
+  nextcloudLinkFromRouteHash
 } from './domain/syncConfig'
 import type {
   AppMode,
@@ -82,10 +83,10 @@ function normalizePath(path: string): string {
 }
 
 function currentRoutePath(): string {
-  const hashPath = window.location.hash.startsWith('#/')
+  const routeWithQuery = window.location.hash.startsWith('#/')
     ? window.location.hash.slice(1)
     : '/'
-  return normalizePath(hashPath)
+  return normalizePath(routeWithQuery.split('?')[0])
 }
 
 function routeHref(path: string): string {
@@ -574,6 +575,7 @@ export default function App() {
     return renderPage(
       <CoordinatorDashboard
         onChooseMode={() => navigate('/')}
+        initialNextcloudLink={nextcloudLinkFromRouteHash(window.location.hash)}
         selectedTeamId={
           coordinatorTeamMatch ? decodeURIComponent(coordinatorTeamMatch[1]) : undefined
         }

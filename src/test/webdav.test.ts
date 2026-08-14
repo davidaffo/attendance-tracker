@@ -2,7 +2,12 @@ import { afterEach, describe, expect, it, vi } from 'vitest'
 import { createTeamDocument } from '../domain/defaults'
 import { serializeTeamDocument } from '../domain/document'
 import { detailsFromNextcloudFolderLink } from '../domain/syncConfig'
-import { documentUrl, normalizeEtag, synchronizeDocument } from '../services/webdav'
+import {
+  discoverRemoteTeamDocuments,
+  documentUrl,
+  normalizeEtag,
+  synchronizeDocument
+} from '../services/webdav'
 
 afterEach(() => {
   vi.unstubAllGlobals()
@@ -53,6 +58,53 @@ describe('percorso WebDAV del supervisore', () => {
     ).toBe(
       'https://nx100087.your-storageshare.de/remote.php/dav/files/supervisore/Volley/Stagioni/2026-2027/attendance-tracker/u14__2026-2027.attendance.json'
     )
+  })
+})
+
+describe('scoperta dei registri in sola lettura', () => {
+  const connection = {
+    baseUrl: 'https://cloud.example.it',
+    username: 'giocatrice',
+    appPassword: 'password-app',
+    remoteFolder: ''
+  }
+
+  it('cerca automaticamente i file accessibili quando non è indicata una cartella', async () => {
+    const fetchMock = vi
+      .fn<typeof fetch>()
+      .mockResolvedValue(new Response('', { status: 401 }))
+    vi.stubGlobal('fetch', fetchMock)
+
+    await expect(discoverRemoteTeamDocuments(connection)).rejects.toThrow(
+      'Credenziali non valide'
+    )
+
+    const [url, init] = fetchMock.mock.calls[0]
+    expect(url).toBe('https://cloud.example.it/remote.php/dav')
+    expect(init?.method).toBe('SEARCH')
+    expect(String(init?.body)).toContain('<d:href>/files/giocatrice</d:href>')
+    expect(String(init?.body)).toContain('<d:literal>%.attendance.json</d:literal>')
+  })
+
+  it('scansiona soltanto la cartella quando il coordinatore ne indica una', async () => {
+    const fetchMock = vi
+      .fn<typeof fetch>()
+      .mockResolvedValue(new Response('', { status: 401 }))
+    vi.stubGlobal('fetch', fetchMock)
+
+    await expect(
+      discoverRemoteTeamDocuments({
+        ...connection,
+        username: 'coordinatore',
+        remoteFolder: 'Condivisi/attendance-tracker'
+      })
+    ).rejects.toThrow('Credenziali non valide')
+
+    const [url, init] = fetchMock.mock.calls[0]
+    expect(url).toBe(
+      'https://cloud.example.it/remote.php/dav/files/coordinatore/Condivisi/attendance-tracker'
+    )
+    expect(init?.method).toBe('PROPFIND')
   })
 })
 

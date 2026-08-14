@@ -2009,6 +2009,35 @@ h2 {
   color: #b8c8c2;
 }
 
+.nextcloud-quick-access {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-top: 1.2rem;
+  padding-top: 1rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.11);
+}
+
+.nextcloud-quick-access > div {
+  display: grid;
+  gap: 0.35rem;
+}
+
+.nextcloud-quick-access strong {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  color: #edf5f2;
+  font-size: 0.82rem;
+}
+
+.nextcloud-quick-access span {
+  color: #aebfb9;
+  font-size: 0.75rem;
+  line-height: 1.45;
+}
+
 .coordinator-message {
   margin-top: 1rem;
   padding: 0.75rem 1rem;
@@ -2424,6 +2453,11 @@ h2 {
 }
 
 @media (max-width: 580px) {
+  .nextcloud-quick-access {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
   .two-columns,
   .mode-grid {
     grid-template-columns: 1fr;
