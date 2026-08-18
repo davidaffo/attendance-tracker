@@ -1,4 +1,5 @@
 import type { AttendanceStatus, TeamDocument } from './types'
+import { formatAthleteName } from './athleteList'
 import { ATTENDANCE_SCHEMA_VERSION } from './types'
 
 export const COACH_ONBOARDING_VERSION = 1
@@ -67,7 +68,7 @@ export function createTeamDocument(input: {
     statuses: DEFAULT_STATUSES.map((status) => ({ ...status })),
     trainingWeekdays: [...input.weekdays].sort(),
     athletes: input.athleteNames
-      .map((name) => name.trim())
+      .map(formatAthleteName)
       .filter(Boolean)
       .map((name, order) => ({
         id: crypto.randomUUID(),

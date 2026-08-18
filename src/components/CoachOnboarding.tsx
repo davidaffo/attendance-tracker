@@ -20,6 +20,7 @@ import {
   WEEKDAYS
 } from '../domain/defaults'
 import type { SyncConfig, TeamDocument } from '../domain/types'
+import { formatAthleteName } from '../domain/athleteList'
 import { testWebDavConnection } from '../services/webdav'
 import { RestoreBackupButton } from './RestoreBackupButton'
 import { AthleteListPaste } from './AthleteListPaste'
@@ -114,7 +115,7 @@ export function CoachOnboarding({
   }
 
   const buildDocument = (): TeamDocument => {
-    const athleteNames = athletes.map((athlete) => athlete.name.trim()).filter(Boolean)
+    const athleteNames = athletes.map((athlete) => formatAthleteName(athlete.name)).filter(Boolean)
     if (!document) {
       return createTeamDocument({
         teamName,
@@ -144,7 +145,7 @@ export function CoachOnboarding({
           : undefined
         return {
           id: existing?.id ?? crypto.randomUUID(),
-          name: athlete.name.trim(),
+          name: formatAthleteName(athlete.name),
           order,
           active: true,
           createdAt: existing?.createdAt ?? now
@@ -346,6 +347,15 @@ export function CoachOnboarding({
                           current.map((candidate) =>
                             candidate.key === athlete.key
                               ? { ...candidate, name: event.target.value }
+                              : candidate
+                          )
+                        )
+                      }
+                      onBlur={() =>
+                        setAthletes((current) =>
+                          current.map((candidate) =>
+                            candidate.key === athlete.key
+                              ? { ...candidate, name: formatAthleteName(candidate.name) }
                               : candidate
                           )
                         )

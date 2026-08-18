@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react'
 import { Archive, Plus, RotateCcw, Save } from 'lucide-react'
 import { WEEKDAYS } from '../domain/defaults'
 import type { TeamDocument } from '../domain/types'
+import { formatAthleteName } from '../domain/athleteList'
 import { AthleteListPaste } from './AthleteListPaste'
 
 interface TeamSettingsProps {
@@ -29,7 +30,7 @@ export function TeamSettings({
   }
 
   const addAthlete = () => {
-    const name = newAthlete.trim()
+    const name = formatAthleteName(newAthlete)
     if (!name) return
     setDraft((current) => ({
       ...current,
@@ -55,7 +56,7 @@ export function TeamSettings({
         ...current.athletes,
         ...names.map((name, index) => ({
           id: crypto.randomUUID(),
-          name,
+          name: formatAthleteName(name),
           order: current.athletes.length + index,
           active: true,
           createdAt: now

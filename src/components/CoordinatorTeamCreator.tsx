@@ -7,6 +7,7 @@ import {
 } from 'react'
 import { ArrowLeft, Check, CloudUpload, Plus, Trash2 } from 'lucide-react'
 import { createTeamDocument, getCurrentSeason, WEEKDAYS } from '../domain/defaults'
+import { formatAthleteName } from '../domain/athleteList'
 import type { TeamDocument } from '../domain/types'
 import { AthleteListPaste } from './AthleteListPaste'
 
@@ -179,6 +180,13 @@ export function CoordinatorTeamCreator({
                     setAthletes((current) =>
                       current.map((name, candidateIndex) =>
                         candidateIndex === index ? event.target.value : name
+                      )
+                    )
+                  }
+                  onBlur={() =>
+                    setAthletes((current) =>
+                      current.map((name, candidateIndex) =>
+                        candidateIndex === index ? formatAthleteName(name) : name
                       )
                     )
                   }
