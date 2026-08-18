@@ -770,11 +770,6 @@ h2 {
   font-size: 0.76rem;
 }
 
-.onboarding-weekdays .weekday-button {
-  min-height: 48px;
-  padding-inline: 1rem;
-}
-
 .onboarding-athletes {
   max-height: 290px;
   overflow: auto;

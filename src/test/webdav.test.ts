@@ -45,7 +45,6 @@ describe('percorso WebDAV del supervisore', () => {
       organizationName: 'Volley Club',
       coachName: 'Mario',
       startYear: 2026,
-      weekdays: [],
       athleteNames: ['Anna']
     })
     const details = detailsFromNextcloudFolderLink(
@@ -224,7 +223,6 @@ describe('scrittura condizionale WebDAV', () => {
       organizationName: 'Volley Club',
       coachName: 'Mario',
       startYear: 2026,
-      weekdays: [],
       athleteNames: ['Anna']
     })
     const fetchMock = vi
@@ -270,7 +268,6 @@ describe('scrittura condizionale WebDAV', () => {
       organizationName: 'Volley Club',
       coachName: 'Mario',
       startYear: 2026,
-      weekdays: [],
       athleteNames: ['Anna']
     })
     const localDocument = {
@@ -335,7 +332,6 @@ describe('creazione dei registri del coordinatore', () => {
     organizationName: 'Volley Club',
     coachName: 'Mario',
     startYear: 2026,
-    weekdays: [1, 3],
     athleteNames: ['Anna']
   })
   const connection = {

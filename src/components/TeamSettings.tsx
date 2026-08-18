@@ -1,6 +1,5 @@
 import { useMemo, useState } from 'react'
 import { Archive, Plus, RotateCcw, Save } from 'lucide-react'
-import { WEEKDAYS } from '../domain/defaults'
 import type { TeamDocument } from '../domain/types'
 import { formatAthleteName } from '../domain/athleteList'
 import { AthleteListPaste } from './AthleteListPaste'
@@ -183,33 +182,6 @@ export function TeamSettings({
         </div>
         )}
 
-        <div className="field block-field">
-          <span>Giorni abituali</span>
-          <div className="weekday-grid">
-            {WEEKDAYS.map((day) => {
-              const selected = draft.trainingWeekdays.includes(day.value)
-              return (
-                <button
-                  className={`weekday-button ${selected ? 'selected' : ''}`}
-                  key={day.value}
-                  type="button"
-                  aria-pressed={selected}
-                  disabled={managedByCoordinator}
-                  onClick={() =>
-                    update(
-                      'trainingWeekdays',
-                      selected
-                        ? draft.trainingWeekdays.filter((value) => value !== day.value)
-                        : [...draft.trainingWeekdays, day.value]
-                    )
-                  }
-                >
-                  {day.short}
-                </button>
-              )
-            })}
-          </div>
-        </div>
       </section>
 
       <section className="panel settings-panel">

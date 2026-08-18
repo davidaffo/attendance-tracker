@@ -5,8 +5,8 @@ import {
   type FormEvent,
   type KeyboardEvent
 } from 'react'
-import { ArrowLeft, Check, CloudUpload, Plus, Trash2 } from 'lucide-react'
-import { createTeamDocument, getCurrentSeason, WEEKDAYS } from '../domain/defaults'
+import { ArrowLeft, CloudUpload, Plus, Trash2 } from 'lucide-react'
+import { createTeamDocument, getCurrentSeason } from '../domain/defaults'
 import { formatAthleteName } from '../domain/athleteList'
 import type { TeamDocument } from '../domain/types'
 import { AthleteListPaste } from './AthleteListPaste'
@@ -27,7 +27,6 @@ export function CoordinatorTeamCreator({
   const [teamName, setTeamName] = useState('')
   const [coachName, setCoachName] = useState('')
   const [startYear, setStartYear] = useState(currentSeason.startYear)
-  const [weekdays, setWeekdays] = useState<number[]>([])
   const [athletes, setAthletes] = useState<string[]>([''])
   const [submitting, setSubmitting] = useState(false)
   const [message, setMessage] = useState('')
@@ -66,7 +65,6 @@ export function CoordinatorTeamCreator({
           teamName,
           coachName,
           startYear,
-          weekdays,
           athleteNames: athletes
         })
       )
@@ -137,33 +135,6 @@ export function CoordinatorTeamCreator({
             </div>
           </label>
         </div>
-
-        <fieldset className="fieldset">
-          <legend>Giorni abituali</legend>
-          <div className="weekday-grid">
-            {WEEKDAYS.map((day) => {
-              const selected = weekdays.includes(day.value)
-              return (
-                <button
-                  className={`weekday-button ${selected ? 'selected' : ''}`}
-                  key={day.value}
-                  type="button"
-                  aria-pressed={selected}
-                  onClick={() =>
-                    setWeekdays((current) =>
-                      selected
-                        ? current.filter((value) => value !== day.value)
-                        : [...current, day.value]
-                    )
-                  }
-                >
-                  {selected && <Check size={14} />}
-                  {day.short}
-                </button>
-              )
-            })}
-          </div>
-        </fieldset>
 
         <fieldset className="fieldset">
           <legend>Rosa iniziale</legend>

@@ -29,7 +29,7 @@ Alla prima scelta della modalità allenatore, se sul dispositivo non esiste
 ancora un registro, l’app propone due percorsi:
 
 1. `Crea una nuova squadra`, per l’uso autonomo: apre la guida con società,
-   squadra, allenatore, stagione, giorni abituali, rosa e collegamento
+   squadra, allenatore, stagione, rosa e collegamento
    Nextcloud facoltativo;
 2. `Apri una squadra condivisa`, quando il coordinatore ha già preparato il
    registro: richiede soltanto server Nextcloud, username e password

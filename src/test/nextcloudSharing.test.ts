@@ -25,7 +25,6 @@ const document = createTeamDocument({
   organizationName: 'Volley Club',
   coachName: 'Mario',
   startYear: 2026,
-  weekdays: [],
   athleteNames: ['Anna']
 })
 

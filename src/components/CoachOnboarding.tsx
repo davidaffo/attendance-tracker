@@ -16,8 +16,7 @@ import {
 } from 'lucide-react'
 import {
   createTeamDocument,
-  getCurrentSeason,
-  WEEKDAYS
+  getCurrentSeason
 } from '../domain/defaults'
 import type { SyncConfig, TeamDocument } from '../domain/types'
 import { formatAthleteName } from '../domain/athleteList'
@@ -39,7 +38,7 @@ interface CoachOnboardingProps {
   onRestoreBackup: (document: TeamDocument) => Promise<void>
 }
 
-const LAST_STEP = 4
+const LAST_STEP = 3
 
 export function CoachOnboarding({
   document,
@@ -57,9 +56,6 @@ export function CoachOnboarding({
   const [coachName, setCoachName] = useState(document?.coachName ?? '')
   const [startYear, setStartYear] = useState(
     document?.season.startYear ?? currentSeason.startYear
-  )
-  const [weekdays, setWeekdays] = useState<number[]>(
-    document?.trainingWeekdays ?? []
   )
   const [athletes, setAthletes] = useState<AthleteDraft[]>(
     document
@@ -122,7 +118,6 @@ export function CoachOnboarding({
         organizationName,
         coachName,
         startYear,
-        weekdays,
         athleteNames
       })
     }
@@ -159,7 +154,6 @@ export function CoachOnboarding({
       teamName: teamName.trim(),
       coachName: coachName.trim(),
       season: { startYear, endYear: startYear + 1 },
-      trainingWeekdays: [...weekdays].sort(),
       athletes: [
         ...active,
         ...archived.filter((athlete) => !activeIdSet.has(athlete.id))
@@ -217,8 +211,8 @@ export function CoachOnboarding({
           </button>
         </header>
 
-        <div className="onboarding-progress" aria-label={`Passaggio ${step + 1} di 5`}>
-          {Array.from({ length: 5 }, (_, index) => (
+        <div className="onboarding-progress" aria-label={`Passaggio ${step + 1} di 4`}>
+          {Array.from({ length: 4 }, (_, index) => (
             <i key={index} className={index <= step ? 'active' : ''} />
           ))}
         </div>
@@ -231,7 +225,7 @@ export function CoachOnboarding({
               </div>
               <h1>Configurazione allenatore</h1>
               <p className="lead">
-                Inserisci squadra, giorni di allenamento e rosa. Il collegamento a Nextcloud è
+                Inserisci squadra e rosa. Il collegamento a Nextcloud è
                 facoltativo.
               </p>
               <div className="onboarding-restore">
@@ -247,7 +241,7 @@ export function CoachOnboarding({
 
           {step === 1 && (
             <section>
-              <div className="eyebrow">Passaggio 1 di 4</div>
+              <div className="eyebrow">Passaggio 1 di 3</div>
               <h1>Squadra e stagione</h1>
               <div className="form-grid two-columns">
                 <label className="field">
@@ -300,37 +294,7 @@ export function CoachOnboarding({
 
           {step === 2 && (
             <section>
-              <div className="eyebrow">Passaggio 2 di 4</div>
-              <h1>Giorni di allenamento</h1>
-              <div className="weekday-grid onboarding-weekdays">
-                {WEEKDAYS.map((day) => {
-                  const selected = weekdays.includes(day.value)
-                  return (
-                    <button
-                      className={`weekday-button ${selected ? 'selected' : ''}`}
-                      key={day.value}
-                      type="button"
-                      onClick={() =>
-                        setWeekdays((current) =>
-                          selected
-                            ? current.filter((value) => value !== day.value)
-                            : [...current, day.value]
-                        )
-                      }
-                      aria-pressed={selected}
-                    >
-                      {selected && <Check size={14} />}
-                      {day.label}
-                    </button>
-                  )
-                })}
-              </div>
-            </section>
-          )}
-
-          {step === 3 && (
-            <section>
-              <div className="eyebrow">Passaggio 3 di 4</div>
+              <div className="eyebrow">Passaggio 2 di 3</div>
               <h1>Rosa</h1>
               <div className="athlete-inputs onboarding-athletes">
                 {athletes.map((athlete, index) => (
@@ -398,9 +362,9 @@ export function CoachOnboarding({
             </section>
           )}
 
-          {step === 4 && (
+          {step === 3 && (
             <section>
-              <div className="eyebrow">Passaggio 4 di 4</div>
+              <div className="eyebrow">Passaggio 3 di 3</div>
               <h1>Nextcloud</h1>
               <p className="lead">
                 Serve per salvare il registro nella cartella della squadra. Puoi farlo anche

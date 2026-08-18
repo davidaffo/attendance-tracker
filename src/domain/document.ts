@@ -63,8 +63,6 @@ export function isTeamDocument(value: unknown): value is TeamDocument {
     isString(value.updatedBy) &&
     Array.isArray(value.statuses) &&
     value.statuses.every(isStatus) &&
-    Array.isArray(value.trainingWeekdays) &&
-    value.trainingWeekdays.every((day) => Number.isInteger(day) && day >= 0 && day <= 6) &&
     Array.isArray(value.athletes) &&
     value.athletes.every(isAthlete) &&
     Array.isArray(value.sessions) &&

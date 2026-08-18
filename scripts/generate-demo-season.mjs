@@ -184,7 +184,6 @@ function createDocument(team) {
     updatedAt: generatedAt,
     updatedBy: team.coach,
     statuses,
-    trainingWeekdays: team.weekdays,
     athletes,
     sessions
   }

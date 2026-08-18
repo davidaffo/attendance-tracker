@@ -28,7 +28,6 @@ describe('documento squadra', () => {
       organizationName: 'Volley Club',
       coachName: 'Mario Rossi',
       startYear: 2026,
-      weekdays: [1, 3],
       athleteNames: ['Anna', 'Bea']
     })
 
@@ -48,7 +47,6 @@ describe('documento squadra', () => {
       organizationName: 'Volley Club',
       coachName: 'Mario',
       startYear: 2026,
-      weekdays: [],
       athleteNames: ['Anna']
     })
     document.sessions.push({
@@ -68,7 +66,6 @@ describe('documento squadra', () => {
       organizationName: 'Volley Club',
       coachName: 'Mario',
       startYear: 2026,
-      weekdays: [],
       athleteNames: ['Anna', 'Bea']
     })
     document.athletes[1] = {
@@ -97,7 +94,6 @@ describe('documento squadra', () => {
       organizationName: 'Volley Club',
       coachName: 'Mario',
       startYear: 2026,
-      weekdays: [],
       athleteNames: ['Anna']
     })
     const athlete = document.athletes[0]
@@ -120,7 +116,6 @@ describe('documento squadra', () => {
       organizationName: 'Volley Club',
       coachName: 'Mario',
       startYear: 2026,
-      weekdays: [],
       athleteNames: ['Anna']
     })
     const local = saveSession(
@@ -143,7 +138,6 @@ describe('documento squadra', () => {
       organizationName: 'Volley Club',
       coachName: 'Mario',
       startYear: 2026,
-      weekdays: [],
       athleteNames: ['Anna']
     })
     const first = saveSession(

@@ -53,7 +53,6 @@ export interface TeamDocument {
   updatedAt: string
   updatedBy: string
   statuses: AttendanceStatus[]
-  trainingWeekdays: number[]
   athletes: Athlete[]
   sessions: TrainingSession[]
 }

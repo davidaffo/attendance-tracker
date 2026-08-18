@@ -31,7 +31,7 @@ export function CoachStart({
           <button className="mode-card" type="button" onClick={onCreateTeam}>
             <Settings2 size={26} />
             <strong>Crea una nuova squadra</strong>
-            <span>Inserisci squadra, stagione, giorni abituali e rosa.</span>
+            <span>Inserisci squadra, stagione e rosa.</span>
           </button>
           <button className="mode-card" type="button" onClick={onOpenSharedTeam}>
             <Cloud size={26} />

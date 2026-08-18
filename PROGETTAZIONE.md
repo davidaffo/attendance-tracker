@@ -71,12 +71,10 @@ Il file è organizzato in 14 fogli:
 | Società | nome in un unico campo |
 | Squadra | nome in un unico campo |
 | Legenda | cinque codici e cinque descrizioni modificabili |
-| Giorni abituali | selezione dei giorni della settimana |
 | Rosa | ID progressivo e nome atleta in un unico campo |
 
-La configurazione presente nel file analizzato usa la stagione 2025–2026 e
-seleziona lunedì, martedì e giovedì come giorni abituali. Allenatore, società e
-squadra non risultano compilati.
+La configurazione presente nel file analizzato usa la stagione 2025–2026.
+Allenatore, società e squadra non risultano compilati.
 
 ### 3.2 Stati di presenza predefiniti
 
@@ -219,9 +217,6 @@ Questo evita tre ambiguità:
 - una giornata senza allenamento non entra per errore nei conteggi;
 - una sessione annullata può essere eliminata senza cancellare celle una a una.
 
-I giorni abituali servono solo a suggerire le date e a velocizzare la
-creazione. Non generano automaticamente allenamenti conteggiati.
-
 ### 5.2 Avvio dell'allenatore
 
 L'allenatore può creare e configurare autonomamente una squadra oppure aprire
@@ -360,7 +355,6 @@ Il file contiene:
   "updatedAt": "2026-09-15T20:30:00Z",
   "updatedBy": "account-nextcloud",
   "statuses": [],
-  "trainingWeekdays": [],
   "athletes": [],
   "sessions": []
 }

@@ -35,9 +35,6 @@ describe('stagione dimostrativa del coordinatore', () => {
       const athleteIds = new Set(document.athletes.map((athlete) => athlete.id))
       const statusIds = new Set(document.statuses.map((status) => status.id))
       for (const session of document.sessions) {
-        expect(new Date(`${session.date}T12:00:00.000Z`).getUTCDay()).toSatisfy((day: number) =>
-          document.trainingWeekdays.includes(day)
-        )
         for (const [athleteId, statusId] of Object.entries(session.attendances)) {
           expect(athleteIds.has(athleteId)).toBe(true)
           expect(statusIds.has(statusId)).toBe(true)

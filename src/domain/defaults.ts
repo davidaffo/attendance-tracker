@@ -19,16 +19,6 @@ export const DEFAULT_STATUSES: AttendanceStatus[] = [
   { id: 'injured', code: 'I', label: 'Infortunio', color: '#7f5aa2' }
 ]
 
-export const WEEKDAYS = [
-  { value: 1, short: 'Lun', label: 'Lunedì' },
-  { value: 2, short: 'Mar', label: 'Martedì' },
-  { value: 3, short: 'Mer', label: 'Mercoledì' },
-  { value: 4, short: 'Gio', label: 'Giovedì' },
-  { value: 5, short: 'Ven', label: 'Venerdì' },
-  { value: 6, short: 'Sab', label: 'Sabato' },
-  { value: 0, short: 'Dom', label: 'Domenica' }
-] as const
-
 export function getCurrentSeason(now = new Date()): { startYear: number; endYear: number } {
   const startYear = now.getMonth() >= 7 ? now.getFullYear() : now.getFullYear() - 1
   return { startYear, endYear: startYear + 1 }
@@ -49,7 +39,6 @@ export function createTeamDocument(input: {
   organizationName: string
   coachName: string
   startYear: number
-  weekdays: number[]
   athleteNames: string[]
 }): TeamDocument {
   const now = new Date().toISOString()
@@ -66,7 +55,6 @@ export function createTeamDocument(input: {
     updatedAt: now,
     updatedBy: input.coachName.trim(),
     statuses: DEFAULT_STATUSES.map((status) => ({ ...status })),
-    trainingWeekdays: [...input.weekdays].sort(),
     athletes: input.athleteNames
       .map(formatAthleteName)
       .filter(Boolean)
