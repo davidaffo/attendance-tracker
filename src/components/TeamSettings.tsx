@@ -119,12 +119,10 @@ export function TeamSettings({
         <div>
           <h1>Squadra e rosa</h1>
         </div>
-        {!managedByCoordinator && (
-          <button className="button primary" onClick={save} disabled={saving}>
-            <Save size={17} />
-            {saving ? 'Salvo…' : 'Salva modifiche'}
-          </button>
-        )}
+        <button className="button primary" onClick={save} disabled={saving}>
+          <Save size={17} />
+          {saving ? 'Salvo…' : 'Salva modifiche'}
+        </button>
       </div>
 
       <section className="panel settings-panel">
@@ -210,7 +208,6 @@ export function TeamSettings({
               <input
                 value={athlete.name}
                 aria-label={`Nome atleta ${index + 1}`}
-                readOnly={managedByCoordinator}
                 onChange={(event) =>
                   update(
                     'athletes',
@@ -222,45 +219,39 @@ export function TeamSettings({
                   )
                 }
               />
-              {!managedByCoordinator && (
-                <button
-                  className="icon-button quiet"
-                  onClick={() => archiveAthlete(athlete.id)}
-                  title="Archivia atleta"
-                  aria-label={`Archivia ${athlete.name}`}
-                >
-                  <Archive size={17} />
-                </button>
-              )}
-            </div>
-          ))}
-          {!managedByCoordinator && (
-            <div className="roster-row add-row">
-              <span className="row-number">+</span>
-              <input
-                value={newAthlete}
-                placeholder="Nuova atleta"
-                onChange={(event) => setNewAthlete(event.target.value)}
-                onKeyDown={(event) => {
-                  if (event.key === 'Enter') {
-                    event.preventDefault()
-                    addAthlete()
-                  }
-                }}
-              />
-              <button className="icon-button accent" onClick={addAthlete} aria-label="Aggiungi atleta">
-                <Plus size={18} />
+              <button
+                className="icon-button quiet"
+                onClick={() => archiveAthlete(athlete.id)}
+                title="Archivia atleta"
+                aria-label={`Archivia ${athlete.name}`}
+              >
+                <Archive size={17} />
               </button>
             </div>
-          )}
+          ))}
+          <div className="roster-row add-row">
+            <span className="row-number">+</span>
+            <input
+              value={newAthlete}
+              placeholder="Nuova atleta"
+              onChange={(event) => setNewAthlete(event.target.value)}
+              onKeyDown={(event) => {
+                if (event.key === 'Enter') {
+                  event.preventDefault()
+                  addAthlete()
+                }
+              }}
+            />
+            <button className="icon-button accent" onClick={addAthlete} aria-label="Aggiungi atleta">
+              <Plus size={18} />
+            </button>
+          </div>
         </div>
 
-        {!managedByCoordinator && (
-          <AthleteListPaste
-            existingNames={draft.athletes.map((athlete) => athlete.name)}
-            onAdd={addAthletes}
-          />
-        )}
+        <AthleteListPaste
+          existingNames={draft.athletes.map((athlete) => athlete.name)}
+          onAdd={addAthletes}
+        />
 
         {archivedAthletes.length > 0 && (
           <details className="archived">
@@ -269,15 +260,13 @@ export function TeamSettings({
               <div className="roster-row" key={athlete.id}>
                 <span className="row-number">—</span>
                 <span className="archived-name">{athlete.name}</span>
-                {!managedByCoordinator && (
-                  <button
-                    className="icon-button quiet"
-                    onClick={() => restoreAthlete(athlete.id)}
-                    aria-label={`Ripristina ${athlete.name}`}
-                  >
-                    <RotateCcw size={17} />
-                  </button>
-                )}
+                <button
+                  className="icon-button quiet"
+                  onClick={() => restoreAthlete(athlete.id)}
+                  aria-label={`Ripristina ${athlete.name}`}
+                >
+                  <RotateCcw size={17} />
+                </button>
               </div>
             ))}
           </details>
