@@ -1,4 +1,5 @@
 import { parseTeamDocument } from '../domain/document'
+import { isBackupPath } from '../domain/backup'
 import type { TeamSummary } from '../domain/types'
 
 async function scanHandle(
@@ -9,10 +10,11 @@ async function scanHandle(
   for await (const entry of handle.values()) {
     const path = prefix ? `${prefix}/${entry.name}` : entry.name
     if (entry.kind === 'directory') {
+      if (isBackupPath(path)) continue
       await scanHandle(entry, path, output)
       continue
     }
-    if (!entry.name.endsWith('.attendance.json')) continue
+    if (!entry.name.endsWith('.attendance.json') || isBackupPath(path)) continue
 
     try {
       const file = await entry.getFile()
@@ -45,7 +47,7 @@ export async function pickAndScanDirectory(): Promise<{
 export async function parseSelectedFiles(files: FileList): Promise<TeamSummary[]> {
   const output: TeamSummary[] = []
   for (const file of files) {
-    if (!file.name.endsWith('.attendance.json')) continue
+    if (!file.name.endsWith('.attendance.json') || isBackupPath(file.webkitRelativePath)) continue
     try {
       output.push({
         source: file.webkitRelativePath || file.name,

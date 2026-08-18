@@ -1,4 +1,5 @@
 import { mergeDocuments, parseTeamDocument, serializeTeamDocument } from '../domain/document'
+import { isBackupPath } from '../domain/backup'
 import { remoteFileName } from '../domain/defaults'
 import type {
   LocalSyncMeta,
@@ -252,9 +253,8 @@ async function teamDocumentsFromDavResponse(
     .filter((href): href is string => Boolean(href))
     .filter((href) => {
       try {
-        return decodeURIComponent(new URL(href, config.baseUrl).pathname).endsWith(
-          '.attendance.json'
-        )
+        const path = decodeURIComponent(new URL(href, config.baseUrl).pathname)
+        return path.endsWith('.attendance.json') && !isBackupPath(path)
       } catch {
         return false
       }
