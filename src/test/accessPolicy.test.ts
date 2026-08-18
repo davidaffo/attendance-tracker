@@ -12,8 +12,8 @@ const cloudConfig = {
 }
 
 describe('politiche di accesso ai registri', () => {
-  it('disattiva la sincronizzazione in background per le squadre del coordinatore', () => {
-    expect(allowsCoachBackgroundSync('coordinator-managed')).toBe(false)
+  it('attiva la sincronizzazione in background per ogni origine del registro', () => {
+    expect(allowsCoachBackgroundSync('coordinator-managed')).toBe(true)
     expect(allowsCoachBackgroundSync('self-managed')).toBe(true)
   })
 

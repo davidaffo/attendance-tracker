@@ -28,6 +28,7 @@ import {
   deleteRemoteTeamDocument,
   discoverAttendanceTrackerFolders,
   discoverRemoteTeamDocuments,
+  updateRemoteTeamDocument,
   verifyRemoteFolderWritable
 } from '../services/webdav'
 import {
@@ -49,6 +50,7 @@ import { CoordinatorTeamCreator } from './CoordinatorTeamCreator'
 import { NextcloudSharingPanel } from './NextcloudSharingPanel'
 import { CoordinatorTeamManagement } from './CoordinatorTeamManagement'
 import { NextcloudQuickAccessButtons } from './NextcloudQuickAccessButton'
+import { TeamSettings } from './TeamSettings'
 
 interface CoordinatorDashboardProps {
   accessMode: 'coordinator' | 'viewer'
@@ -493,6 +495,42 @@ export function CoordinatorDashboard({
     }
   }
 
+  const updateTeam = async (team: TeamSummary, document: TeamDocument) => {
+    if (team.remoteFolder === undefined) {
+      throw new Error('La modifica è disponibile soltanto per registri Nextcloud.')
+    }
+
+    setLoading(true)
+    setMessage('')
+    try {
+      let readyConnection = { ...draft, remoteFolder: team.remoteFolder }
+      if (!readyConnection.baseUrl || !readyConnection.username) {
+        throw new Error('Configura prima il collegamento Nextcloud del coordinatore.')
+      }
+      if (!readyConnection.appPassword) {
+        const password = await onRequestPassword(readyConnection)
+        if (!password) return
+        readyConnection = { ...readyConnection, appPassword: password }
+        setDraft(readyConnection)
+        await onSaveConfig(readyConnection)
+      }
+
+      const updated = await updateRemoteTeamDocument(document, readyConnection)
+      const nextTeams = teams.map((candidate) =>
+        candidate.source === team.source && candidate.document.teamId === team.document.teamId
+          ? { ...candidate, document: updated }
+          : candidate
+      )
+      await rememberTeams(nextTeams, 'nextcloud', 'Nextcloud', readyConnection)
+      setMessage(`${updated.teamName}: modifiche salvate.`)
+    } catch (error) {
+      setMessage(error instanceof Error ? error.message : 'Modifica non riuscita.')
+      throw error
+    } finally {
+      setLoading(false)
+    }
+  }
+
   const loadFolder = async () => {
     setLoading(true)
     setMessage('')
@@ -628,6 +666,12 @@ export function CoordinatorDashboard({
                   }}
                 />
               )}
+              {team.remoteFolder !== undefined && (
+                <TeamSettings
+                  document={team.document}
+                  onUpdate={(updated) => updateTeam(team, updated)}
+                />
+              )}
               <section className="coordinator-report-shell team-management-report">
                 <MonthlyRegister document={team.document} />
               </section>
@@ -665,6 +709,12 @@ export function CoordinatorDashboard({
                 }
                 return readyConnection
               }}
+            />
+          )}
+          {!isViewer && selectedTeam.remoteFolder !== undefined && (
+            <TeamSettings
+              document={selectedTeam.document}
+              onUpdate={(updated) => updateTeam(selectedTeam, updated)}
             />
           )}
           <section className="coordinator-report-shell">

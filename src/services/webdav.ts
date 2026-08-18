@@ -473,11 +473,25 @@ export async function createRemoteTeamDocument(
   }
 }
 
+export async function updateRemoteTeamDocument(
+  document: TeamDocument,
+  config: SyncConfig
+): Promise<TeamDocument> {
+  const remote = await readRemote(config, document)
+  if (!remote.document || !remote.etag) {
+    throw new Error('Il registro remoto non è disponibile per la modifica.')
+  }
+
+  const nextDocument = documentsAreEqual(remote.document, document)
+    ? document
+    : mergeDocuments(document, remote.document)
+  await writeRemote(config, nextDocument, remote.etag)
+  return nextDocument
+}
+
 function backupFolderName(config: SyncConfig): string {
-  const segments = config.remoteFolder.split('/').filter(Boolean)
-  const currentName = segments.pop() || 'attendance-tracker'
-  segments.push(`${currentName}-backups`)
-  return segments.join('/')
+  const folder = config.remoteFolder.split('/').filter(Boolean).join('/')
+  return folder ? `${folder}/backup` : 'backup'
 }
 
 function backupTimestamp(now = new Date()): string {

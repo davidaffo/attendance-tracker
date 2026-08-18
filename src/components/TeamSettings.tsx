@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Archive, Plus, RotateCcw, Save } from 'lucide-react'
 import type { TeamDocument } from '../domain/types'
 import { compareAthletesByName } from '../domain/document'
@@ -19,6 +19,10 @@ export function TeamSettings({
   const [draft, setDraft] = useState(document)
   const [newAthlete, setNewAthlete] = useState('')
   const [saving, setSaving] = useState(false)
+  const [message, setMessage] = useState('')
+  useEffect(() => {
+    setDraft(document)
+  }, [document])
   const activeAthletes = useMemo(
     () => [...draft.athletes].filter((athlete) => athlete.active).sort(compareAthletesByName),
     [draft.athletes]
@@ -91,6 +95,7 @@ export function TeamSettings({
 
   const save = async () => {
     setSaving(true)
+    setMessage('')
     try {
       const now = new Date().toISOString()
       const updated = {
@@ -101,6 +106,8 @@ export function TeamSettings({
       }
       await onUpdate(updated)
       setDraft(updated)
+    } catch (error) {
+      setMessage(error instanceof Error ? error.message : 'Salvataggio non riuscito.')
     } finally {
       setSaving(false)
     }
@@ -187,6 +194,8 @@ export function TeamSettings({
         )}
 
       </section>
+
+      {message && <p className="form-message">{message}</p>}
 
       <section className="panel settings-panel">
         <div className="panel-heading">

@@ -926,10 +926,12 @@ h2 {
 .sidebar-team-options {
   position: absolute;
   z-index: 50;
-  right: 0;
+  left: 0;
+  right: auto;
   bottom: calc(100% + 0.55rem);
   display: grid;
-  width: max(100%, 270px);
+  width: min(300px, calc(100vw - 2rem));
+  max-width: calc(100vw - 2rem);
   max-height: min(340px, 55vh);
   gap: 0.35rem;
   overflow-y: auto;
@@ -960,7 +962,14 @@ h2 {
 
 .sidebar-team-options > button span {
   display: grid;
+  min-width: 0;
   gap: 0.15rem;
+}
+
+.sidebar-team-options > button strong {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .sidebar-team-options > button small,

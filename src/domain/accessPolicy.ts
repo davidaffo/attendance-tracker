@@ -8,7 +8,9 @@ import type {
 export function allowsCoachBackgroundSync(
   origin: CoachDocumentOrigin | undefined
 ): boolean {
-  return origin !== 'coordinator-managed'
+  // Anche i registri condivisi devono rileggere il remoto all'apertura:
+  // l'ETag e il merge proteggono le modifiche locali pendenti.
+  return origin === 'self-managed' || origin === 'coordinator-managed' || origin === undefined
 }
 
 export function hasStoredSetupForMode(

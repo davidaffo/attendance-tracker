@@ -54,7 +54,7 @@ describe('stagione dimostrativa del coordinatore', () => {
     const files = [under18, under12, { nonValido: true }, serieD, under14].map((contents, index) => ({
       name: index === 2 ? 'rotto.attendance.json' : `squadra-${index}.attendance.json`,
       webkitRelativePath: index === 4
-        ? 'attendance-tracker-backups/2026-08-18_120000Z/squadra-4.attendance.json'
+        ? 'attendance-tracker/backup/2026-08-18_120000Z/squadra-4.attendance.json'
         : `attendance-tracker/squadra-${index}.attendance.json`,
       text: async () => JSON.stringify(contents)
     }))
