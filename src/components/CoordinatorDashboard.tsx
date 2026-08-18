@@ -24,6 +24,7 @@ import {
 } from '../services/localFiles'
 import {
   createRemoteTeamDocument,
+  backupRemoteTeamDocuments,
   deleteRemoteTeamDocument,
   discoverAttendanceTrackerFolders,
   discoverRemoteTeamDocuments,
@@ -463,6 +464,35 @@ export function CoordinatorDashboard({
     }
   }
 
+  const backupTeams = async () => {
+    if (teams.length === 0 || teams.some((team) => team.remoteFolder === undefined)) {
+      setMessage('Carica prima i registri da Nextcloud per creare il backup.')
+      return
+    }
+
+    setLoading(true)
+    setMessage('')
+    try {
+      let readyConnection = { ...draft }
+      if (!readyConnection.baseUrl || !readyConnection.username) {
+        throw new Error('Configura prima il collegamento Nextcloud del coordinatore.')
+      }
+      if (!readyConnection.appPassword) {
+        const password = await onRequestPassword(readyConnection)
+        if (!password) return
+        readyConnection = { ...readyConnection, appPassword: password }
+        setDraft(readyConnection)
+        await onSaveConfig(readyConnection)
+      }
+      const result = await backupRemoteTeamDocuments(teams, readyConnection)
+      setMessage(`${result.count} registri salvati in ${result.folder}.`)
+    } catch (error) {
+      setMessage(error instanceof Error ? error.message : 'Backup non riuscito.')
+    } finally {
+      setLoading(false)
+    }
+  }
+
   const loadFolder = async () => {
     setLoading(true)
     setMessage('')
@@ -569,6 +599,8 @@ export function CoordinatorDashboard({
           onCreate={(document) => createTeam(document, false)}
           onDelete={deleteTeam}
           onRefresh={() => void loadCloud(draft, false)}
+          onBackup={backupTeams}
+          canBackup={teams.length > 0 && teams.every((team) => team.remoteFolder !== undefined)}
           quickAccessLinks={quickAccessLinks}
           onQuickAccessCopied={quickAccessCopied}
           renderTeamControls={(team) => (

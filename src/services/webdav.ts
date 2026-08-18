@@ -473,6 +473,32 @@ export async function createRemoteTeamDocument(
   }
 }
 
+function backupFolderName(config: SyncConfig): string {
+  const segments = config.remoteFolder.split('/').filter(Boolean)
+  const currentName = segments.pop() || 'attendance-tracker'
+  segments.push(`${currentName}-backups`)
+  return segments.join('/')
+}
+
+function backupTimestamp(now = new Date()): string {
+  return now.toISOString().replace(/:/g, '').replace(/\.\d{3}Z$/, 'Z')
+}
+
+export async function backupRemoteTeamDocuments(
+  teams: TeamSummary[],
+  config: SyncConfig
+): Promise<{ folder: string; count: number }> {
+  const folder = `${backupFolderName(config)}/${backupTimestamp()}`
+  const backupConfig = { ...config, remoteFolder: folder }
+  await ensureRemoteFolder(backupConfig)
+
+  for (const team of teams) {
+    await writeRemote(backupConfig, team.document, undefined, true)
+  }
+
+  return { folder, count: teams.length }
+}
+
 export async function deleteRemoteTeamDocument(
   document: TeamDocument,
   config: SyncConfig

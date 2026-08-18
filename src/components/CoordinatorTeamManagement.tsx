@@ -3,6 +3,7 @@ import {
   CalendarRange,
   ChevronDown,
   ChevronUp,
+  Archive,
   Plus,
   RefreshCw,
   Trash2,
@@ -21,6 +22,8 @@ interface CoordinatorTeamManagementProps {
   onCreate: (document: TeamDocument) => Promise<void>
   onDelete: (team: TeamSummary) => Promise<void>
   onRefresh: () => void
+  onBackup: () => Promise<void>
+  canBackup: boolean
   quickAccessLinks: Partial<Record<AppMode, string>>
   onQuickAccessCopied: (mode: AppMode) => void
   renderTeamControls: (team: TeamSummary) => ReactNode
@@ -34,6 +37,8 @@ export function CoordinatorTeamManagement({
   onCreate,
   onDelete,
   onRefresh,
+  onBackup,
+  canBackup,
   quickAccessLinks,
   onQuickAccessCopied,
   renderTeamControls
@@ -72,6 +77,16 @@ export function CoordinatorTeamManagement({
           <button className="button secondary" type="button" onClick={onRefresh} disabled={loading}>
             <RefreshCw className={loading ? 'spin' : undefined} size={17} />
             Aggiorna
+          </button>
+          <button
+            className="button secondary"
+            type="button"
+            onClick={() => void onBackup()}
+            disabled={loading || !canBackup}
+            title={!canBackup ? 'Carica prima i registri da Nextcloud' : undefined}
+          >
+            <Archive size={17} />
+            Backup registri
           </button>
         </div>
       </section>
