@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react'
 import { Archive, Plus, RotateCcw, Save } from 'lucide-react'
 import type { TeamDocument } from '../domain/types'
+import { compareAthletesByName } from '../domain/document'
 import { formatAthleteName } from '../domain/athleteList'
 import { AthleteListPaste } from './AthleteListPaste'
 
@@ -19,10 +20,13 @@ export function TeamSettings({
   const [newAthlete, setNewAthlete] = useState('')
   const [saving, setSaving] = useState(false)
   const activeAthletes = useMemo(
-    () => [...draft.athletes].filter((athlete) => athlete.active).sort((a, b) => a.order - b.order),
+    () => [...draft.athletes].filter((athlete) => athlete.active).sort(compareAthletesByName),
     [draft.athletes]
   )
-  const archivedAthletes = draft.athletes.filter((athlete) => !athlete.active)
+  const archivedAthletes = useMemo(
+    () => draft.athletes.filter((athlete) => !athlete.active).sort(compareAthletesByName),
+    [draft.athletes]
+  )
 
   const update = <K extends keyof TeamDocument>(key: K, value: TeamDocument[K]) => {
     setDraft((current) => ({ ...current, [key]: value }))

@@ -210,7 +210,12 @@ export function sessionsInMonth(
 }
 
 export function athletesForReport(document: TeamDocument): Athlete[] {
-  return [...document.athletes].sort((a, b) => a.order - b.order)
+  return [...document.athletes].sort(compareAthletesByName)
+}
+
+export function compareAthletesByName(a: Athlete, b: Athlete): number {
+  return a.name.localeCompare(b.name, 'it-IT', { sensitivity: 'base' }) ||
+    a.id.localeCompare(b.id)
 }
 
 export function completedAttendancesForAthletes(

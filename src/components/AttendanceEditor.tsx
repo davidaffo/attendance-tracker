@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react'
 import { ArrowLeft, Check, Save, Trash2 } from 'lucide-react'
 import type { TeamDocument, TrainingSession } from '../domain/types'
+import { compareAthletesByName } from '../domain/document'
 
 interface AttendanceEditorProps {
   document: TeamDocument
@@ -24,7 +25,7 @@ export function AttendanceEditor({
   onClose
 }: AttendanceEditorProps) {
   const athletes = useMemo(
-    () => document.athletes.filter((athlete) => athlete.active).sort((a, b) => a.order - b.order),
+    () => document.athletes.filter((athlete) => athlete.active).sort(compareAthletesByName),
     [document.athletes]
   )
   const [date, setDate] = useState(initialSession?.date ?? localDate())
