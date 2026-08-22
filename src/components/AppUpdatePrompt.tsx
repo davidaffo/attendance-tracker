@@ -1,4 +1,12 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+  type ReactNode
+} from 'react'
 import { Download, RefreshCw } from 'lucide-react'
 import { useRegisterSW } from 'virtual:pwa-register/react'
 import {
@@ -10,7 +18,19 @@ import {
 
 const UPDATE_INTERVAL_MS = 30 * 60 * 1000
 
-export function AppUpdatePrompt() {
+interface AppUpdateContextValue {
+  checking: boolean
+  feedback: string
+  registrationAvailable: boolean
+  checkForUpdate: () => Promise<void>
+  needRefresh: boolean
+  updating: boolean
+  installUpdate: () => Promise<void>
+}
+
+const AppUpdateContext = createContext<AppUpdateContextValue | undefined>(undefined)
+
+export function AppUpdateProvider({ children }: { children: ReactNode }) {
   const [registration, setRegistration] = useState<ServiceWorkerRegistration>()
   const [checking, setChecking] = useState(false)
   const [updating, setUpdating] = useState(false)
@@ -128,6 +148,40 @@ export function AppUpdatePrompt() {
     }
   }
 
+  const checkForUpdate = useCallback(async () => {
+    if (!registration) {
+      showFeedback('Controllo aggiornamenti non ancora disponibile.')
+      return
+    }
+    await checkRegistration(registration, true)
+  }, [checkRegistration, registration, showFeedback])
+
+  return (
+    <AppUpdateContext.Provider
+      value={{
+        checking,
+        feedback,
+        registrationAvailable: Boolean(registration),
+        checkForUpdate,
+        needRefresh,
+        updating,
+        installUpdate
+      }}
+    >
+      {children}
+    </AppUpdateContext.Provider>
+  )
+}
+
+export function useAppUpdate() {
+  const context = useContext(AppUpdateContext)
+  if (!context) throw new Error('useAppUpdate deve essere usato dentro AppUpdateProvider.')
+  return context
+}
+
+export function AppUpdatePrompt() {
+  const { installUpdate, needRefresh, updating } = useAppUpdate()
+
   if (needRefresh) {
     return (
       <aside className="app-update-banner" role="alert" aria-live="assertive">
@@ -139,7 +193,7 @@ export function AppUpdatePrompt() {
           className="button light compact"
           type="button"
           disabled={updating}
-          onClick={() => void installUpdate()}
+          onClick={installUpdate}
         >
           {updating ? <RefreshCw className="spin" size={17} /> : <Download size={17} />}
           {updating ? 'Aggiorno…' : 'Aggiorna ora'}
@@ -148,18 +202,46 @@ export function AppUpdatePrompt() {
     )
   }
 
+  return null
+}
+
+export function AppUpdateSettings() {
+  const {
+    checking,
+    checkForUpdate,
+    feedback,
+    installUpdate,
+    needRefresh,
+    registrationAvailable,
+    updating
+  } = useAppUpdate()
+
   return (
-    <div className="app-update-control">
-      {feedback && <span role="status">{feedback}</span>}
+    <section className="panel settings-panel coordinator-switch app-update-settings">
+      <div>
+        <h2>Aggiornamenti app</h2>
+        <p>
+          {needRefresh
+            ? 'È disponibile una nuova versione dell’app.'
+            : 'Il controllo automatico resta attivo. Puoi anche verificare manualmente.'}
+        </p>
+        {feedback && <span className="settings-feedback" role="status">{feedback}</span>}
+      </div>
       <button
-        className="button secondary compact"
+        className={`button ${needRefresh ? 'primary' : 'secondary'}`}
         type="button"
-        disabled={checking || !registration}
-        onClick={() => registration && void checkRegistration(registration, true)}
+        disabled={checking || updating || (!registrationAvailable && !needRefresh)}
+        onClick={needRefresh ? installUpdate : checkForUpdate}
       >
-        <RefreshCw className={checking ? 'spin' : undefined} size={16} />
-        {checking ? 'Controllo…' : 'Controlla aggiornamenti'}
+        <RefreshCw className={checking || updating ? 'spin' : undefined} size={17} />
+        {updating
+          ? 'Aggiorno…'
+          : checking
+            ? 'Controllo…'
+            : needRefresh
+              ? 'Aggiorna ora'
+              : 'Controlla aggiornamenti'}
       </button>
-    </div>
+    </section>
   )
 }

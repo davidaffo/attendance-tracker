@@ -14,6 +14,7 @@ import { remoteFileName } from '../domain/defaults'
 import { testWebDavConnection } from '../services/webdav'
 import { ResetAppDataButton } from './ResetAppDataButton'
 import { RestoreBackupButton } from './RestoreBackupButton'
+import { AppUpdateSettings } from './AppUpdatePrompt'
 
 interface SyncSettingsProps {
   document: TeamDocument
@@ -293,6 +294,8 @@ export function SyncSettings({
           <ListChecks size={17} />
         </button>
       </section>}
+
+      <AppUpdateSettings />
 
       <section className="panel settings-panel coordinator-switch">
         <div>
