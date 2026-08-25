@@ -26,6 +26,7 @@ import { ResetAppDataButton } from './components/ResetAppDataButton'
 import { SharedTeamSetup } from './components/SharedTeamSetup'
 import { SyncSettings } from './components/SyncSettings'
 import { TeamSettings } from './components/TeamSettings'
+import { ThemeSelector } from './components/ThemeSelector'
 import {
   COACH_ONBOARDING_VERSION
 } from './domain/defaults'
@@ -160,6 +161,7 @@ function Welcome({
   return (
     <main className="welcome-page">
       <div className="welcome-toolbar">
+        <ThemeSelector />
         <ResetAppDataButton
           onReset={onReset}
           className="mode-control reset-control welcome-reset"

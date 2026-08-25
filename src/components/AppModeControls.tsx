@@ -1,5 +1,6 @@
 import { ArrowLeft } from 'lucide-react'
 import { ResetAppDataButton } from './ResetAppDataButton'
+import { ThemeSelector } from './ThemeSelector'
 
 interface AppModeControlsProps {
   onChooseMode: () => void
@@ -14,6 +15,7 @@ export function AppModeControls({
 }: AppModeControlsProps) {
   return (
     <div className={`app-mode-controls ${variant}`}>
+      <ThemeSelector compact />
       <ResetAppDataButton onReset={onReset} className="mode-control reset-control" />
       <button
         className="mode-control"
