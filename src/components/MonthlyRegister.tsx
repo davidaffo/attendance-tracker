@@ -178,84 +178,91 @@ function MonthMatrix({ document, sessions, athletes, onEditSession }: MatrixProp
   }
 
   return (
-    <div className="matrix-wrap panel">
-      <table className="attendance-matrix">
-        <thead>
-          <tr>
-            <th className="sticky-name">Atleta</th>
-            {sessions.map((session) => (
-              <th key={session.id}>
-                {onEditSession ? (
-                  <button onClick={() => onEditSession(session)} title="Modifica sessione">
-                    <small>{weekdayForSession(session.date)}</small>
-                    <strong>{session.date.slice(-2)}</strong>
-                  </button>
-                ) : (
-                  <span className="session-day-heading">
-                    <small>{weekdayForSession(session.date)}</small>
-                    <strong>{session.date.slice(-2)}</strong>
-                  </span>
-                )}
-              </th>
-            ))}
-            {document.statuses.map((status) => (
-              <th className="total-head" key={status.id}>
-                <span>{status.code}</span>
-                <small>n · %</small>
-              </th>
-            ))}
-          </tr>
-        </thead>
-        <tbody>
-          {athletes.map((athlete) => {
-            const totals = athleteTotals(document, athlete.id, sessions)
-            return (
-              <tr key={athlete.id}>
-                <th className="sticky-name">
-                  {athlete.name}{athlete.active ? '' : ' (archiviata)'}
+    <>
+      <MobileAthleteSummary document={document} sessions={sessions} athletes={athletes} />
+      <div className="mobile-matrix-heading">
+        <strong>Dettaglio allenamenti</strong>
+        <span>Scorri lateralmente per vedere tutte le date</span>
+      </div>
+      <div className="matrix-wrap panel">
+        <table className="attendance-matrix">
+          <thead>
+            <tr>
+              <th className="sticky-name">Atleta</th>
+              {sessions.map((session) => (
+                <th key={session.id}>
+                  {onEditSession ? (
+                    <button onClick={() => onEditSession(session)} title="Modifica sessione">
+                      <small>{weekdayForSession(session.date)}</small>
+                      <strong>{session.date.slice(-2)}</strong>
+                    </button>
+                  ) : (
+                    <span className="session-day-heading">
+                      <small>{weekdayForSession(session.date)}</small>
+                      <strong>{session.date.slice(-2)}</strong>
+                    </span>
+                  )}
                 </th>
-                {sessions.map((session) => {
-                  const status = document.statuses.find(
-                    (candidate) => candidate.id === session.attendances[athlete.id]
-                  )
-                  return (
-                    <td key={session.id}>
-                      {status ? (
-                        <span
-                          className="matrix-status"
-                          style={{ background: status.color }}
-                          title={status.label}
-                        >
-                          {status.code}
-                        </span>
-                      ) : (
-                        <span className="matrix-empty">—</span>
-                      )}
-                    </td>
-                  )
-                })}
-                {document.statuses.map((status) => {
-                  const percentage = sessions.length
-                    ? (totals[status.id] / sessions.length) * 100
-                    : 0
-                  const scaleColor = percentageScaleColor(status, percentage)
-                  return (
-                    <td
-                      className={`total-cell${scaleColor ? ' color-scale-cell' : ''}`}
-                      key={status.id}
-                      style={scaleColor ? { backgroundColor: scaleColor } : undefined}
-                    >
-                      <strong>{totals[status.id]}</strong>
-                      <span>{Math.round(percentage)}%</span>
-                    </td>
-                  )
-                })}
-              </tr>
-            )
-          })}
-        </tbody>
-      </table>
-    </div>
+              ))}
+              {document.statuses.map((status) => (
+                <th className="total-head" key={status.id}>
+                  <span>{status.code}</span>
+                  <small>n · %</small>
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {athletes.map((athlete) => {
+              const totals = athleteTotals(document, athlete.id, sessions)
+              return (
+                <tr key={athlete.id}>
+                  <th className="sticky-name">
+                    {athlete.name}{athlete.active ? '' : ' (archiviata)'}
+                  </th>
+                  {sessions.map((session) => {
+                    const status = document.statuses.find(
+                      (candidate) => candidate.id === session.attendances[athlete.id]
+                    )
+                    return (
+                      <td key={session.id}>
+                        {status ? (
+                          <span
+                            className="matrix-status"
+                            style={{ background: status.color }}
+                            title={status.label}
+                          >
+                            {status.code}
+                          </span>
+                        ) : (
+                          <span className="matrix-empty">—</span>
+                        )}
+                      </td>
+                    )
+                  })}
+                  {document.statuses.map((status) => {
+                    const percentage = sessions.length
+                      ? (totals[status.id] / sessions.length) * 100
+                      : 0
+                    const scaleColor = percentageScaleColor(status, percentage)
+                    return (
+                      <td
+                        className={`total-cell${scaleColor ? ' color-scale-cell' : ''}`}
+                        key={status.id}
+                        style={scaleColor ? { backgroundColor: scaleColor } : undefined}
+                      >
+                        <strong>{totals[status.id]}</strong>
+                        <span>{Math.round(percentage)}%</span>
+                      </td>
+                    )
+                  })}
+                </tr>
+              )
+            })}
+          </tbody>
+        </table>
+      </div>
+    </>
   )
 }
 
@@ -331,6 +338,43 @@ function SeasonOverview({
           </tbody>
         </table>
       </div>
+      <MobileAthleteSummary document={document} sessions={document.sessions} athletes={athletes} />
     </>
+  )
+}
+
+function MobileAthleteSummary({ document, sessions, athletes }: MatrixProps) {
+  return (
+    <section className="mobile-athlete-summary" aria-labelledby="athlete-summary-title">
+      <div className="mobile-summary-heading">
+        <h3 id="athlete-summary-title">Riepilogo atlete</h3>
+        <span>{sessions.length} {sessions.length === 1 ? 'allenamento' : 'allenamenti'}</span>
+      </div>
+      <div className="mobile-summary-list">
+        {athletes.map((athlete) => {
+          const totals = athleteTotals(document, athlete.id, sessions)
+          return (
+            <article className="mobile-summary-card" key={athlete.id}>
+              <strong>{athlete.name}</strong>
+              {!athlete.active && <small>Archiviata</small>}
+              <div>
+                {document.statuses.map((status) => {
+                  const percentage = sessions.length
+                    ? Math.round((totals[status.id] / sessions.length) * 100)
+                    : 0
+                  return (
+                    <span className="mobile-status-total" key={status.id}>
+                      <i style={{ background: status.color }}>{status.code}</i>
+                      <b>{totals[status.id]}</b>
+                      <small>{percentage}%</small>
+                    </span>
+                  )
+                })}
+              </div>
+            </article>
+          )
+        })}
+      </div>
+    </section>
   )
 }

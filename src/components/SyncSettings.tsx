@@ -14,6 +14,8 @@ import { remoteFileName } from '../domain/defaults'
 import { testWebDavConnection } from '../services/webdav'
 import { ResetAppDataButton } from './ResetAppDataButton'
 import { RestoreBackupButton } from './RestoreBackupButton'
+import { AppUpdateSettings } from './AppUpdatePrompt'
+import { ThemeSelector } from './ThemeSelector'
 
 interface SyncSettingsProps {
   document: TeamDocument
@@ -293,6 +295,16 @@ export function SyncSettings({
           <ListChecks size={17} />
         </button>
       </section>}
+
+      <section className="panel settings-panel coordinator-switch">
+        <div>
+          <h2>Aspetto</h2>
+          <p>Usa il tema del dispositivo oppure scegli manualmente quello chiaro o scuro.</p>
+        </div>
+        <ThemeSelector />
+      </section>
+
+      <AppUpdateSettings />
 
       <section className="panel settings-panel coordinator-switch">
         <div>
