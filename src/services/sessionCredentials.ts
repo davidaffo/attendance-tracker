@@ -34,18 +34,26 @@ export function loadSessionPassword(
   const storage = sessionStorageIfAvailable()
   if (!storage) return undefined
   try {
-    const serialized = storage.getItem(credentialKey(owner))
-    if (!serialized) return undefined
-    const credential = JSON.parse(serialized) as Partial<SessionCredential>
-    if (
-      credential.baseUrl !== normalizedBaseUrl(config.baseUrl) ||
-      credential.username !== config.username.trim() ||
-      typeof credential.appPassword !== 'string' ||
-      !credential.appPassword
-    ) {
-      return undefined
+    const owners: CredentialOwner[] = [
+      owner,
+      ...(['coach', 'coordinator', 'viewer'] as const).filter(
+        (candidate) => candidate !== owner
+      )
+    ]
+    for (const candidate of owners) {
+      const serialized = storage.getItem(credentialKey(candidate))
+      if (!serialized) continue
+      const credential = JSON.parse(serialized) as Partial<SessionCredential>
+      if (
+        credential.baseUrl === normalizedBaseUrl(config.baseUrl) &&
+        credential.username === config.username.trim() &&
+        typeof credential.appPassword === 'string' &&
+        credential.appPassword
+      ) {
+        return credential.appPassword
+      }
     }
-    return credential.appPassword
+    return undefined
   } catch {
     return undefined
   }

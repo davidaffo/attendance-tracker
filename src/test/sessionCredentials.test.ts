@@ -48,10 +48,15 @@ describe('password Nextcloud della sessione browser', () => {
     ).toBe('password-app')
   })
 
-  it('non riutilizza la password per un altro ruolo, server o account', () => {
+  it('riutilizza la password tra modalità per lo stesso server e account', () => {
     rememberSessionPassword('coordinator', config)
 
-    expect(loadSessionPassword('viewer', { ...config, appPassword: '' })).toBeUndefined()
+    expect(loadSessionPassword('viewer', { ...config, appPassword: '' })).toBe('password-app')
+  })
+
+  it('non riutilizza la password per un altro server o account', () => {
+    rememberSessionPassword('coordinator', config)
+
     expect(
       loadSessionPassword('coordinator', {
         ...config,

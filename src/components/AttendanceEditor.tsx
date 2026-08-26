@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react'
-import { ArrowLeft, Check, Save, Trash2 } from 'lucide-react'
+import { ArrowLeft, Eraser, Save, Trash2, UserCheck, UserX } from 'lucide-react'
 import type { TeamDocument, TrainingSession } from '../domain/types'
 import { compareAthletesByName } from '../domain/document'
 
@@ -36,10 +36,22 @@ export function AttendanceEditor({
   const [error, setError] = useState('')
   const completed = athletes.filter((athlete) => attendances[athlete.id]).length
 
-  const markAllPresent = () => {
-    const present = document.statuses.find((status) => status.code === 'P')?.id
-    if (!present) return
-    setAttendances(Object.fromEntries(athletes.map((athlete) => [athlete.id, present])))
+  const presentStatus = document.statuses.find((status) => status.code === 'P')
+  const absentStatus = document.statuses.find((status) => status.code === 'A')
+
+  const markAll = (statusId: string) => {
+    setAttendances((current) => ({
+      ...current,
+      ...Object.fromEntries(athletes.map((athlete) => [athlete.id, statusId]))
+    }))
+  }
+
+  const clearAll = () => {
+    setAttendances((current) => {
+      const next = { ...current }
+      for (const athlete of athletes) delete next[athlete.id]
+      return next
+    })
   }
 
   const save = async () => {
@@ -92,10 +104,30 @@ export function AttendanceEditor({
           </strong>
           <span>compilate</span>
         </div>
-        <button className="button secondary" type="button" onClick={markAllPresent}>
-          <Check size={17} />
-          Segna tutte P
-        </button>
+        <div className="editor-bulk-actions">
+          <button
+            className="button secondary"
+            type="button"
+            disabled={!presentStatus}
+            onClick={() => presentStatus && markAll(presentStatus.id)}
+          >
+            <UserCheck size={17} />
+            Tutte presenti
+          </button>
+          <button
+            className="button secondary"
+            type="button"
+            disabled={!absentStatus}
+            onClick={() => absentStatus && markAll(absentStatus.id)}
+          >
+            <UserX size={17} />
+            Tutte assenti
+          </button>
+          <button className="button secondary" type="button" onClick={clearAll}>
+            <Eraser size={17} />
+            Azzera stati
+          </button>
+        </div>
       </section>
 
       <section className="attendance-list" aria-label="Presenze atlete">

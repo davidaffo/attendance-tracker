@@ -1555,6 +1555,19 @@ h2 {
   font-size: 0.7rem;
 }
 
+.editor-bulk-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 0.55rem;
+}
+
+.editor-bulk-actions .button {
+  min-height: 42px;
+  padding: 0.6rem 0.8rem;
+  font-size: 0.76rem;
+}
+
 .attendance-list {
   width: min(1080px, calc(100% - 2rem));
   margin: 0 auto;
@@ -3598,6 +3611,15 @@ html[data-theme='dark'] code {
 
   .editor-toolbar {
     grid-template-columns: minmax(0, 1fr) auto;
+  }
+
+  .editor-bulk-actions {
+    grid-column: 1 / -1;
+    justify-content: stretch;
+  }
+
+  .editor-bulk-actions .button {
+    flex: 1 1 150px;
   }
 
   .editor-toolbar .button {
