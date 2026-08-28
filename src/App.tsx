@@ -89,7 +89,7 @@ type SyncOutcome =
   | { status: 'error'; message: string }
 
 const navigation = [
-  { id: 'home' as const, path: '/allenatore', label: 'Oggi', icon: ClipboardCheck },
+  { id: 'home' as const, path: '/allenatore', label: 'Panoramica', icon: ClipboardCheck },
   {
     id: 'register' as const,
     path: '/allenatore/registro',

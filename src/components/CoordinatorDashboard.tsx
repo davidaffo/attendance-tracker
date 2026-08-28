@@ -7,6 +7,7 @@ import {
   Link2,
   RefreshCw,
   ShieldCheck,
+  UserRound,
   Users
 } from 'lucide-react'
 import { totalsForDocument } from '../domain/document'
@@ -284,15 +285,20 @@ export function CoordinatorDashboard({
 
   useEffect(() => {
     let active = true
-    loadCoordinatorTeamCache().then((cache) => {
-      if (
-        !active ||
-        !cache ||
-        freshTeamsLoaded.current ||
-        !cacheMatchesConfig(cache, config, accessMode)
-      ) return
-      setTeams(cache.teams)
-      setMessage(cachedDataMessage(cache))
+    loadCoordinatorTeamCache().then(async (cache) => {
+      if (!active || freshTeamsLoaded.current) return
+      if (cache && cacheMatchesConfig(cache, config, accessMode)) {
+        setTeams(cache.teams)
+        setMessage(cachedDataMessage(cache))
+        return
+      }
+      if (import.meta.env.DEV && import.meta.env.VITE_DEV_DEMO_DATA !== 'false') {
+        const { developmentTeamSummaries } = await import('../dev/developmentData')
+        if (!active || freshTeamsLoaded.current) return
+        const demoTeams = developmentTeamSummaries()
+        setTeams(demoTeams)
+        setMessage(`${demoTeams.length} squadre demo caricate per lo sviluppo.`)
+      }
     })
     return () => {
       active = false
@@ -594,10 +600,6 @@ export function CoordinatorDashboard({
     (sum, team) => sum + team.document.athletes.filter((athlete) => athlete.active).length,
     0
   )
-  const statusCodes = [
-    ...new Set(teams.flatMap((team) => team.document.statuses.map((status) => status.code)))
-  ]
-
   return (
     <div className="coordinator-page" aria-busy={loading}>
       {loading && (
@@ -902,14 +904,14 @@ export function CoordinatorDashboard({
             </article>
             <article className="privacy-metric">
               <ShieldCheck size={22} />
-              <span>Riepiloghi in sola lettura</span>
+              <span>{isViewer ? 'Consultazione in sola lettura' : 'Registri sincronizzati'}</span>
             </article>
           </section>
 
           <section className="coordinator-section">
             <div className="section-heading">
               <div>
-                <h2>Riepilogo squadre</h2>
+                <h2>Squadre</h2>
               </div>
             </div>
 
@@ -924,91 +926,13 @@ export function CoordinatorDashboard({
                 </p>
               </div>
             ) : (
-              <>
-                <div className="coordinator-table-wrap">
-                  <table className="coordinator-summary-table">
-                    <thead>
-                      <tr>
-                        <th>Squadra</th>
-                        <th>Stagione</th>
-                        <th>Atlete</th>
-                        <th>Allenamenti</th>
-                        {statusCodes.map((code) => (
-                          <th key={code}>{code}</th>
-                        ))}
-                        <th />
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {teams.map(({ source, document }) => {
-                        const totals = totalsForDocument(document)
-                        const possibleAttendances =
-                          totals.sessions * document.athletes.length
-                        return (
-                          <tr key={source}>
-                            <th>
-                              <strong>{document.teamName}</strong>
-                              <span>{document.coachName}</span>
-                            </th>
-                            <td>
-                              {document.season.startYear}–{String(document.season.endYear).slice(-2)}
-                            </td>
-                            <td>{document.athletes.filter((athlete) => athlete.active).length}</td>
-                            <td>{totals.sessions}</td>
-                            {statusCodes.map((code) => {
-                              const status = document.statuses.find(
-                                (candidate) => candidate.code === code
-                              )
-                              const count = status ? totals.byStatus[status.id] ?? 0 : 0
-                              const percentage =
-                                status && possibleAttendances
-                                  ? (count / possibleAttendances) * 100
-                                  : 0
-                              const scaleColor = status
-                                ? percentageScaleColor(status, percentage)
-                                : undefined
-                              return (
-                                <td
-                                  className={scaleColor ? 'color-scale-cell' : undefined}
-                                  key={code}
-                                  style={scaleColor ? { backgroundColor: scaleColor } : undefined}
-                                >
-                                  {status ? (
-                                    <strong>{Math.round(percentage)}%</strong>
-                                  ) : (
-                                    '—'
-                                  )}
-                                </td>
-                              )
-                            })}
-                            <td>
-                              <button
-                                className="icon-button quiet"
-                                onClick={() =>
-                                  onNavigate(
-                                    `${basePath}/squadra/${encodeURIComponent(document.teamId)}`
-                                  )
-                                }
-                                aria-label={`Apri riepilogo ${document.teamName}`}
-                              >
-                                <ChevronRight size={18} />
-                              </button>
-                            </td>
-                          </tr>
-                        )
-                      })}
-                    </tbody>
-                  </table>
-                </div>
-
-                <div className="team-summary-grid">
-                  {teams.map(({ source, document }) => {
-                    const totals = totalsForDocument(document)
-                    const athletes = document.athletes.filter((athlete) => athlete.active).length
-                    const possibleAttendances =
-                      totals.sessions * document.athletes.length
-                    return (
-                      <article className="team-summary-card" key={source}>
+              <div className="team-summary-grid">
+                {teams.map(({ source, document }) => {
+                  const totals = totalsForDocument(document)
+                  const athletes = document.athletes.filter((athlete) => athlete.active).length
+                  const possibleAttendances = totals.sessions * document.athletes.length
+                  return (
+                    <article className="team-summary-card" key={source}>
                         <div className="team-card-heading">
                           <div>
                             <span>{document.organizationName}</span>
@@ -1019,6 +943,9 @@ export function CoordinatorDashboard({
                           </span>
                         </div>
                         <div className="team-card-metrics">
+                          <span>
+                            <UserRound size={16} /> {document.coachName}
+                          </span>
                           <span>
                             <Users size={16} /> {athletes} atlete
                           </span>
@@ -1052,14 +979,13 @@ export function CoordinatorDashboard({
                             )
                           }
                         >
-                          Apri riepilogo completo
+                          Apri squadra
                           <ChevronRight size={17} />
                         </button>
-                      </article>
-                    )
-                  })}
-                </div>
-              </>
+                    </article>
+                  )
+                })}
+              </div>
             )}
           </section>
         </main>

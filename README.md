@@ -14,6 +14,17 @@ npm run dev
 
 L'app viene servita normalmente su `http://localhost:5173`.
 
+Con `npm run dev`, un profilo locale vuoto viene inizializzato automaticamente
+con un registro allenatore e cinque registri demo per coordinatore e
+consultazione. I dati locali già presenti non vengono sovrascritti. Per testare
+un avvio completamente vuoto:
+
+```bash
+VITE_DEV_DEMO_DATA=false npm run dev
+```
+
+I dati demo non vengono inclusi né inizializzati nella build di produzione.
+
 ## Verifiche
 
 ```bash

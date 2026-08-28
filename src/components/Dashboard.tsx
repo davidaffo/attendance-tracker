@@ -38,7 +38,7 @@ export function Dashboard({ document, onNewSession, onEditSession }: DashboardPr
     <div className="page-content dashboard">
       <section className="hero-card">
         <div>
-          <h1>Oggi</h1>
+          <h1>Panoramica</h1>
         </div>
         <button className="button light" onClick={onNewSession}>
           <Plus size={19} />
