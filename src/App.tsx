@@ -927,6 +927,7 @@ export default function App() {
       <SharedTeamSetup
         initialConfig={syncConfig}
         initialNextcloudLink={initialNextcloudLink}
+        onRequestPassword={(config) => requestPassword('coach', config)}
         onOpen={openSharedCoachTeam}
         onBack={() => {
           if (initialNextcloudLink && !initialNextcloudMode && !document) {

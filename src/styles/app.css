@@ -582,6 +582,14 @@ h2 {
   color: var(--muted);
 }
 
+.shared-team-loading {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  margin: 0;
+  color: var(--muted);
+}
+
 .lead {
   margin-bottom: 0;
   color: var(--muted);
@@ -2527,6 +2535,51 @@ html[data-theme='dark'] .modal-card {
 html[data-theme='dark'] code {
   color: #d6e5df;
   background-color: rgba(255, 255, 255, 0.08);
+}
+
+html[data-theme='dark'] .shared-team-list > button {
+  color: var(--ink);
+  border-color: var(--line);
+  background: #141d19;
+}
+
+html[data-theme='dark'] .shared-team-list > button:hover {
+  border-color: var(--green-2);
+  background: #1d2b25;
+}
+
+html[data-theme='dark'] :is(
+  .team-management-rows,
+  .team-management-row.expanded,
+  .team-management-inline-controls .sharing-panel
+) {
+  color: var(--ink);
+  border-color: var(--line);
+  background: #141d19;
+}
+
+html[data-theme='dark'] :is(.team-management-icon, .sharing-person-icon) {
+  color: #8dd2ba;
+  background: #203a31;
+}
+
+html[data-theme='dark'] :is(
+  .team-card-metrics,
+  .sharing-add,
+  .sharing-cors-help,
+  .sharing-empty
+) {
+  border-color: var(--line);
+}
+
+html[data-theme='dark'] .season-pill {
+  color: #b8ded1;
+  border-color: #45665b;
+}
+
+html[data-theme='dark'] .sharing-cors-help code {
+  color: #efc7b8;
+  background: rgba(255, 255, 255, 0.08);
 }
 
 @media (prefers-color-scheme: dark) {
