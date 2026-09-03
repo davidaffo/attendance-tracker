@@ -35,6 +35,20 @@ export function PlannedSessionsPanel({
   const hasSchedule = Boolean(document.trainingWeekdays?.length)
 
   if (!hasSchedule) return null
+  if (!document.trainingStartDate || !document.trainingEndDate) {
+    if (compact) return null
+    return (
+      <section className="panel planned-sessions-panel">
+        <div className="planned-today">
+          <CalendarClock size={22} />
+          <div>
+            <strong>Completa il periodo degli allenamenti</strong>
+            <p>Gli avvisi restano disattivati finché non sono indicate data di inizio e fine.</p>
+          </div>
+        </div>
+      </section>
+    )
+  }
 
   return (
     <section className={`panel planned-sessions-panel${compact ? ' compact' : ''}`}>

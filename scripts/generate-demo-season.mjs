@@ -210,6 +210,8 @@ function createDocument(team) {
     updatedBy: team.coach,
     statuses,
     trainingWeekdays: team.weekdays,
+    trainingStartDate: `${startYear}-08-01`,
+    trainingEndDate: `${endYear}-07-31`,
     ignoredTrainingDates: ignoredTrainingDates(team.weekdays),
     athletes,
     sessions

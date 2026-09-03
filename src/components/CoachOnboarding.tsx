@@ -16,6 +16,7 @@ import {
 } from 'lucide-react'
 import {
   createTeamDocument,
+  defaultTrainingPeriod,
   getCurrentSeason
 } from '../domain/defaults'
 import type { SyncConfig, TeamDocument } from '../domain/types'
@@ -24,6 +25,7 @@ import { testWebDavConnection } from '../services/webdav'
 import { RestoreBackupButton } from './RestoreBackupButton'
 import { AthleteListPaste } from './AthleteListPaste'
 import { WeekdayPicker } from './WeekdayPicker'
+import { TrainingPeriodFields } from './TrainingPeriodFields'
 
 interface AthleteDraft {
   key: string
@@ -60,6 +62,16 @@ export function CoachOnboarding({
   )
   const [weekdays, setWeekdays] = useState<number[]>(
     document?.trainingWeekdays ?? []
+  )
+  const initialTrainingPeriod = useMemo(
+    () => defaultTrainingPeriod(document?.season.startYear ?? currentSeason.startYear),
+    [currentSeason.startYear, document?.season.startYear]
+  )
+  const [trainingStartDate, setTrainingStartDate] = useState(
+    document?.trainingStartDate ?? initialTrainingPeriod.startDate
+  )
+  const [trainingEndDate, setTrainingEndDate] = useState(
+    document?.trainingEndDate ?? initialTrainingPeriod.endDate
   )
   const [athletes, setAthletes] = useState<AthleteDraft[]>(
     document
@@ -123,6 +135,8 @@ export function CoachOnboarding({
         coachName,
         startYear,
         weekdays,
+        trainingStartDate: weekdays.length ? trainingStartDate : undefined,
+        trainingEndDate: weekdays.length ? trainingEndDate : undefined,
         athleteNames
       })
     }
@@ -160,6 +174,8 @@ export function CoachOnboarding({
       coachName: coachName.trim(),
       season: { startYear, endYear: startYear + 1 },
       trainingWeekdays: [...weekdays].sort(),
+      trainingStartDate: weekdays.length ? trainingStartDate : undefined,
+      trainingEndDate: weekdays.length ? trainingEndDate : undefined,
       athletes: [
         ...active,
         ...archived.filter((athlete) => !activeIdSet.has(athlete.id))
@@ -183,6 +199,20 @@ export function CoachOnboarding({
   const finish = async (withCloud: boolean) => {
     if (!identityComplete) {
       setStep(1)
+      return
+    }
+    const seasonStart = `${startYear}-08-01`
+    const seasonEnd = `${startYear + 1}-07-31`
+    if (
+      weekdays.length &&
+      (!trainingStartDate ||
+        !trainingEndDate ||
+        trainingStartDate > trainingEndDate ||
+        trainingStartDate < seasonStart ||
+        trainingEndDate > seasonEnd)
+    ) {
+      setStep(2)
+      setMessage('Inserisci un intervallo valido per il calendario degli allenamenti.')
       return
     }
     setSubmitting(true)
@@ -287,7 +317,13 @@ export function CoachOnboarding({
                       max="2100"
                       inputMode="numeric"
                       value={startYear}
-                      onChange={(event) => setStartYear(Number(event.target.value))}
+                      onChange={(event) => {
+                        const nextStartYear = Number(event.target.value)
+                        const period = defaultTrainingPeriod(nextStartYear)
+                        setStartYear(nextStartYear)
+                        setTrainingStartDate(period.startDate)
+                        setTrainingEndDate(period.endDate)
+                      }}
                       required
                     />
                     <span aria-hidden="true">–</span>
@@ -306,6 +342,15 @@ export function CoachOnboarding({
                 Seleziona i giorni abituali. Potrai modificarli dalla schermata Squadra.
               </p>
               <WeekdayPicker value={weekdays} onChange={setWeekdays} />
+              {weekdays.length > 0 && (
+                <TrainingPeriodFields
+                  startYear={startYear}
+                  startDate={trainingStartDate}
+                  endDate={trainingEndDate}
+                  onStartDateChange={setTrainingStartDate}
+                  onEndDateChange={setTrainingEndDate}
+                />
+              )}
             </section>
           )}
 

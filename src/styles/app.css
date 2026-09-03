@@ -1494,6 +1494,36 @@ h2 {
   margin-top: 0.2rem;
 }
 
+.conflict-dialog {
+  width: min(34rem, calc(100vw - 2rem));
+}
+
+.conflict-options {
+  display: grid;
+  gap: 0.45rem;
+  margin: 0.5rem 0;
+}
+
+.conflict-options .button {
+  justify-content: flex-start;
+  width: 100%;
+}
+
+.conflict-options small {
+  margin: -0.15rem 0 0.35rem 0.25rem;
+  color: var(--muted);
+}
+
+.training-period-fields {
+  margin-top: 1rem;
+}
+
+.field-help {
+  display: block;
+  margin-top: 0.45rem;
+  color: var(--muted);
+}
+
 .password-dialog .password-dialog-error {
   margin: 0;
   padding: 0.7rem 0.8rem;

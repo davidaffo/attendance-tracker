@@ -284,13 +284,18 @@ installata e su hosting statici privi di fallback, come GitHub Pages.
 
 ## Allenamenti previsti e uscite anticipate
 
-Ogni squadra può avere uno o più giorni settimanali di allenamento. La
-panoramica segnala la seduta prevista oggi e le date passate ancora prive di
-una sessione; ciascuna data può essere aperta per compilare il registro oppure
-ignorata, per esempio in caso di festività o allenamento annullato.
+Ogni squadra può avere uno o più giorni settimanali di allenamento e un
+intervallo con data di inizio e fine. La panoramica segnala la seduta prevista
+oggi e le date passate ancora prive di una sessione soltanto dentro tale
+intervallo; ciascuna data può essere aperta per compilare il registro oppure
+ignorata, per esempio in caso di festività o allenamento annullato. I vecchi
+registri senza intervallo restano leggibili, ma non generano avvisi finché le
+due date non vengono impostate. Il periodo proposto inizialmente parte dal
+lunedì dell’ultima settimana completa di agosto e termina il 30 giugno; entrambe
+le date sono modificabili.
 
 Per le squadre create e condivise dal coordinatore, soltanto il coordinatore
-può modificare i giorni settimanali. L’allenatore può comunque compilare o
+può modificare giorni e intervallo. L’allenatore può comunque compilare o
 ignorare le sessioni previste. Il flag `U` (uscita anticipata) è indipendente
 dallo stato di presenza e dispone di conteggio e percentuale propri nei
 riepiloghi mensili e stagionali.
@@ -299,6 +304,10 @@ Il coordinatore con accesso in scrittura può ignorare direttamente gli avvisi
 oppure usare `Entra come allenatore` per aprire la squadra e compilarne le
 sessioni. Le date ignorate fanno parte del registro condiviso e scompaiono
 anche per l’allenatore al successivo aggiornamento da Nextcloud.
+
+Se il file cambia su Nextcloud durante un salvataggio del coordinatore, l’app
+mostra una finestra di risoluzione: è possibile unire le modifiche, ricaricare
+la versione cloud oppure sovrascriverla esplicitamente con quella locale.
 
 Le stesse operazioni sono disponibili per i registri aperti tramite
 `Cartella locale`: se il browser concede l’accesso in scrittura, le modifiche

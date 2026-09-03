@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 import {
   COACH_ONBOARDING_VERSION,
   createTeamDocument,
+  defaultTrainingPeriod,
   isFirstCoachUse
 } from '../domain/defaults'
 import {
@@ -19,6 +20,22 @@ import {
 } from '../domain/document'
 
 describe('documento squadra', () => {
+  it('propone il periodo predefinito dall’ultima settimana completa di agosto', () => {
+    expect(defaultTrainingPeriod(2026)).toEqual({
+      startDate: '2026-08-24',
+      endDate: '2027-06-30'
+    })
+    expect(defaultTrainingPeriod(2027).startDate).toBe('2027-08-23')
+    expect(defaultTrainingPeriod(2028)).toEqual({
+      startDate: '2028-08-21',
+      endDate: '2029-06-30'
+    })
+    expect(defaultTrainingPeriod(2030)).toEqual({
+      startDate: '2030-08-19',
+      endDate: '2031-06-30'
+    })
+  })
+
   it('mostra la guida solo alla prima apertura senza registro', () => {
     expect(isFirstCoachUse(undefined, false)).toBe(true)
     expect(isFirstCoachUse(COACH_ONBOARDING_VERSION, false)).toBe(false)
@@ -145,6 +162,8 @@ describe('documento squadra', () => {
       coachName: 'Mario',
       startYear: 2026,
       weekdays: [1, 3, 4],
+      trainingStartDate: '2026-08-01',
+      trainingEndDate: '2027-07-31',
       athleteNames: ['Anna']
     })
     document = saveSession(
@@ -184,6 +203,43 @@ describe('documento squadra', () => {
     expect(plannedTrainingSummary(document, '2026-09-01').missingDates).toEqual([])
   })
 
+  it('non genera avvisi retroattivi nei vecchi registri privi di intervallo', () => {
+    const document = createTeamDocument({
+      teamName: 'U14',
+      organizationName: 'Volley Club',
+      coachName: 'Mario',
+      startYear: 2026,
+      weekdays: [1, 3],
+      athleteNames: ['Anna']
+    })
+
+    expect(plannedTrainingSummary(document, '2026-12-01')).toEqual({
+      today: '2026-12-01',
+      todayPlanned: false,
+      todayRecorded: false,
+      missingDates: []
+    })
+  })
+
+  it('limita gli avvisi alle date di inizio e fine configurate', () => {
+    const document = createTeamDocument({
+      teamName: 'U14',
+      organizationName: 'Volley Club',
+      coachName: 'Mario',
+      startYear: 2026,
+      weekdays: [1],
+      trainingStartDate: '2026-09-07',
+      trainingEndDate: '2026-09-14',
+      athleteNames: ['Anna']
+    })
+
+    expect(plannedTrainingSummary(document, '2026-09-21').missingDates).toEqual([
+      '2026-09-14',
+      '2026-09-07'
+    ])
+    expect(plannedTrainingSummary(document, '2026-09-21').todayPlanned).toBe(false)
+  })
+
   it('unisce sessioni diverse senza perderle', () => {
     const base = createTeamDocument({
       teamName: 'U14',
@@ -213,6 +269,8 @@ describe('documento squadra', () => {
       coachName: 'Mario',
       startYear: 2026,
       weekdays: [1],
+      trainingStartDate: '2026-08-01',
+      trainingEndDate: '2027-07-31',
       athleteNames: ['Anna']
     })
     const coordinator = ignorePlannedTrainingDate(base, '2026-08-03', 'Coordinatore')

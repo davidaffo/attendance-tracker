@@ -11,6 +11,11 @@ const isRecord = (value: unknown): value is Record<string, unknown> =>
   typeof value === 'object' && value !== null && !Array.isArray(value)
 
 const isString = (value: unknown): value is string => typeof value === 'string'
+const isDateString = (value: unknown): value is string => {
+  if (!isString(value) || !/^\d{4}-\d{2}-\d{2}$/.test(value)) return false
+  const parsed = new Date(`${value}T00:00:00.000Z`)
+  return !Number.isNaN(parsed.getTime()) && parsed.toISOString().slice(0, 10) === value
+}
 
 function isStatus(value: unknown): value is AttendanceStatus {
   return (
@@ -70,6 +75,8 @@ export function isTeamDocument(value: unknown): value is TeamDocument {
         value.trainingWeekdays.every(
           (weekday) => Number.isInteger(weekday) && weekday >= 0 && weekday <= 6
         ))) &&
+    (value.trainingStartDate === undefined || isDateString(value.trainingStartDate)) &&
+    (value.trainingEndDate === undefined || isDateString(value.trainingEndDate)) &&
     (value.ignoredTrainingDates === undefined ||
       (Array.isArray(value.ignoredTrainingDates) &&
         value.ignoredTrainingDates.every(
@@ -88,6 +95,8 @@ export function isTeamDocument(value: unknown): value is TeamDocument {
   const athleteIds = new Set(document.athletes.map((athlete) => athlete.id))
   const sessionIds = new Set(document.sessions.map((session) => session.id))
   const sessionDates = new Set(document.sessions.map((session) => session.date))
+  const seasonStart = `${document.season.startYear}-08-01`
+  const seasonEnd = `${document.season.endYear}-07-31`
 
   if (
     statusIds.size !== document.statuses.length ||
@@ -95,6 +104,16 @@ export function isTeamDocument(value: unknown): value is TeamDocument {
     athleteIds.size !== document.athletes.length ||
     sessionIds.size !== document.sessions.length ||
     sessionDates.size !== document.sessions.length
+  ) return false
+
+  if (
+    (document.trainingStartDate === undefined) !==
+      (document.trainingEndDate === undefined) ||
+    (document.trainingStartDate &&
+      document.trainingEndDate &&
+      (document.trainingStartDate > document.trainingEndDate ||
+        document.trainingStartDate < seasonStart ||
+        document.trainingEndDate > seasonEnd))
   ) return false
 
   if (
@@ -256,13 +275,13 @@ export function plannedTrainingSummary(
   const weekdays = new Set(document.trainingWeekdays ?? [])
   const sessions = new Set(document.sessions.map((session) => session.date))
   const ignored = new Set(document.ignoredTrainingDates ?? [])
-  const seasonStart = `${document.season.startYear}-08-01`
-  const seasonEnd = `${document.season.endYear}-07-31`
-  const lastDate = today < seasonEnd ? today : seasonEnd
+  const scheduleStart = document.trainingStartDate
+  const scheduleEnd = document.trainingEndDate
+  const lastDate = scheduleEnd && today < scheduleEnd ? today : scheduleEnd
   const missingDates: string[] = []
 
-  if (weekdays.size && lastDate >= seasonStart) {
-    const cursor = new Date(`${seasonStart}T00:00:00.000Z`)
+  if (weekdays.size && scheduleStart && lastDate && lastDate >= scheduleStart) {
+    const cursor = new Date(`${scheduleStart}T00:00:00.000Z`)
     const end = new Date(`${lastDate}T00:00:00.000Z`)
     while (cursor <= end) {
       const date = cursor.toISOString().slice(0, 10)
@@ -278,10 +297,12 @@ export function plannedTrainingSummary(
     }
   }
 
-  const todayInSeason = today >= seasonStart && today <= seasonEnd
+  const todayInSchedule = Boolean(
+    scheduleStart && scheduleEnd && today >= scheduleStart && today <= scheduleEnd
+  )
   return {
     today,
-    todayPlanned: todayInSeason && weekdays.has(new Date(`${today}T00:00:00.000Z`).getUTCDay()),
+    todayPlanned: todayInSchedule && weekdays.has(new Date(`${today}T00:00:00.000Z`).getUTCDay()),
     todayRecorded: sessions.has(today),
     missingDates: missingDates.reverse()
   }

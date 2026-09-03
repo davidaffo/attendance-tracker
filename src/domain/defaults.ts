@@ -34,6 +34,22 @@ export function getCurrentSeason(now = new Date()): { startYear: number; endYear
   return { startYear, endYear: startYear + 1 }
 }
 
+export function defaultTrainingPeriod(
+  startYear: number
+): { startDate: string; endDate: string } {
+  const lastDayOfAugust = new Date(Date.UTC(startYear, 7, 31))
+  const daysSinceSunday = lastDayOfAugust.getUTCDay()
+  const lastSundayOfAugust = new Date(lastDayOfAugust)
+  lastSundayOfAugust.setUTCDate(lastDayOfAugust.getUTCDate() - daysSinceSunday)
+  const firstDayOfLastFullWeek = new Date(lastSundayOfAugust)
+  firstDayOfLastFullWeek.setUTCDate(lastSundayOfAugust.getUTCDate() - 6)
+
+  return {
+    startDate: firstDayOfLastFullWeek.toISOString().slice(0, 10),
+    endDate: `${startYear + 1}-06-30`
+  }
+}
+
 export function slugify(value: string): string {
   return value
     .normalize('NFD')
@@ -50,6 +66,8 @@ export function createTeamDocument(input: {
   coachName: string
   startYear: number
   weekdays?: number[]
+  trainingStartDate?: string
+  trainingEndDate?: string
   athleteNames: string[]
 }): TeamDocument {
   const now = new Date().toISOString()
@@ -67,6 +85,8 @@ export function createTeamDocument(input: {
     updatedBy: input.coachName.trim(),
     statuses: DEFAULT_STATUSES.map((status) => ({ ...status })),
     trainingWeekdays: [...(input.weekdays ?? [])].sort(),
+    ...(input.trainingStartDate ? { trainingStartDate: input.trainingStartDate } : {}),
+    ...(input.trainingEndDate ? { trainingEndDate: input.trainingEndDate } : {}),
     ignoredTrainingDates: [],
     athletes: input.athleteNames
       .map(formatAthleteName)

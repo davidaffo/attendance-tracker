@@ -48,6 +48,8 @@
     4,
     6
   ],
+  "trainingStartDate": "2026-08-01",
+  "trainingEndDate": "2027-07-31",
   "ignoredTrainingDates": [
     "2026-08-01",
     "2026-08-04",

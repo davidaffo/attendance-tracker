@@ -33,6 +33,8 @@ describe('stagione dimostrativa del coordinatore', () => {
   it('include calendario, date ignorate e uscite anticipate di esempio', () => {
     for (const document of fixtures as TeamDocument[]) {
       expect(document.trainingWeekdays?.length).toBeGreaterThan(0)
+      expect(document.trainingStartDate).toBe('2026-08-01')
+      expect(document.trainingEndDate).toBe('2027-07-31')
       expect(document.ignoredTrainingDates?.length).toBeGreaterThan(0)
       expect(
         document.sessions.reduce(

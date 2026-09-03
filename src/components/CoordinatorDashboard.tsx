@@ -31,6 +31,9 @@ import {
   deleteRemoteTeamDocument,
   discoverAttendanceTrackerFolders,
   discoverRemoteTeamDocuments,
+  RemoteDocumentConflictError,
+  resolveRemoteTeamDocumentConflict,
+  type ConflictResolution,
   updateRemoteTeamDocument,
   verifyRemoteFolderWritable
 } from '../services/webdav'
@@ -55,6 +58,7 @@ import { CoordinatorTeamManagement } from './CoordinatorTeamManagement'
 import { NextcloudQuickAccessButtons } from './NextcloudQuickAccessButton'
 import { TeamSettings } from './TeamSettings'
 import { PlannedSessionsPanel } from './PlannedSessionsPanel'
+import { ConflictResolutionDialog } from './ConflictResolutionDialog'
 
 interface CoordinatorDashboardProps {
   accessMode: 'coordinator' | 'viewer'
@@ -171,6 +175,12 @@ export function CoordinatorDashboard({
   const [folderCandidates, setFolderCandidates] = useState<string[]>([])
   const [pendingConnection, setPendingConnection] = useState<SyncConfig>()
   const [rememberedHandle, setRememberedHandle] = useState<FileSystemDirectoryHandle>()
+  const [pendingConflict, setPendingConflict] = useState<{
+    team: TeamSummary
+    document: TeamDocument
+    config: SyncConfig
+    error?: string
+  }>()
   const inputRef = useRef<HTMLInputElement>(null)
   const loadedOnce = useRef(false)
   const freshTeamsLoaded = useRef(false)
@@ -579,9 +589,9 @@ export function CoordinatorDashboard({
 
     setLoading(true)
     setMessage('')
+    let readyConnection: SyncConfig | undefined
     try {
       let updated: TeamDocument
-      let readyConnection: SyncConfig | undefined
       if (team.fileHandle) {
         updated = await writeTeamDocumentToFile(team.fileHandle, document)
       } else if (isDevelopmentDemoTeam(team)) {
@@ -617,8 +627,48 @@ export function CoordinatorDashboard({
       )
       setMessage(`${updated.teamName}: modifiche salvate.`)
     } catch (error) {
+      if (error instanceof RemoteDocumentConflictError && readyConnection) {
+        setPendingConflict({ team, document, config: readyConnection })
+        setMessage('Il registro è cambiato su Nextcloud: scegli come risolvere il conflitto.')
+        throw new Error('Salvataggio in attesa della risoluzione del conflitto.')
+      }
       setMessage(error instanceof Error ? error.message : 'Modifica non riuscita.')
       throw error
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const resolveConflict = async (resolution: ConflictResolution) => {
+    if (!pendingConflict) return
+    setLoading(true)
+    setPendingConflict((current) => current ? { ...current, error: undefined } : current)
+    try {
+      const updated = await resolveRemoteTeamDocumentConflict(
+        pendingConflict.document,
+        pendingConflict.config,
+        resolution
+      )
+      const nextTeams = teams.map((candidate) =>
+        candidate.source === pendingConflict.team.source &&
+        candidate.document.teamId === pendingConflict.team.document.teamId
+          ? { ...candidate, document: updated }
+          : candidate
+      )
+      await rememberTeams(nextTeams, 'nextcloud', 'Nextcloud', pendingConflict.config)
+      setPendingConflict(undefined)
+      setMessage(
+        resolution === 'remote'
+          ? `${updated.teamName}: caricata la versione cloud.`
+          : `${updated.teamName}: conflitto risolto e modifiche salvate.`
+      )
+    } catch (error) {
+      setPendingConflict((current) => current
+        ? {
+            ...current,
+            error: error instanceof Error ? error.message : 'Risoluzione non riuscita.'
+          }
+        : current)
     } finally {
       setLoading(false)
     }
@@ -1151,6 +1201,15 @@ export function CoordinatorDashboard({
             )}
           </section>
         </main>
+      )}
+      {pendingConflict && (
+        <ConflictResolutionDialog
+          teamName={pendingConflict.team.document.teamName}
+          busy={loading}
+          error={pendingConflict.error}
+          onResolve={(resolution) => void resolveConflict(resolution)}
+          onClose={() => setPendingConflict(undefined)}
+        />
       )}
     </div>
   )

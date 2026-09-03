@@ -5,6 +5,8 @@ import { compareAthletesByName } from '../domain/document'
 import { formatAthleteName } from '../domain/athleteList'
 import { AthleteListPaste } from './AthleteListPaste'
 import { WeekdayPicker } from './WeekdayPicker'
+import { TrainingPeriodFields } from './TrainingPeriodFields'
+import { defaultTrainingPeriod } from '../domain/defaults'
 
 interface TeamSettingsProps {
   document: TeamDocument
@@ -12,18 +14,36 @@ interface TeamSettingsProps {
   managedByCoordinator?: boolean
 }
 
+function withScheduleDefaults(value: TeamDocument, enabled: boolean): TeamDocument {
+  if (
+    !enabled ||
+    !value.trainingWeekdays?.length ||
+    (value.trainingStartDate && value.trainingEndDate)
+  ) {
+    return value
+  }
+  const period = defaultTrainingPeriod(value.season.startYear)
+  return {
+    ...value,
+    trainingStartDate: period.startDate,
+    trainingEndDate: period.endDate
+  }
+}
+
 export function TeamSettings({
   document,
   onUpdate,
   managedByCoordinator = false
 }: TeamSettingsProps) {
-  const [draft, setDraft] = useState(document)
+  const [draft, setDraft] = useState(() =>
+    withScheduleDefaults(document, !managedByCoordinator)
+  )
   const [newAthlete, setNewAthlete] = useState('')
   const [saving, setSaving] = useState(false)
   const [message, setMessage] = useState('')
   useEffect(() => {
-    setDraft(document)
-  }, [document])
+    setDraft(withScheduleDefaults(document, !managedByCoordinator))
+  }, [document, managedByCoordinator])
   const activeAthletes = useMemo(
     () => [...draft.athletes].filter((athlete) => athlete.active).sort(compareAthletesByName),
     [draft.athletes]
@@ -98,9 +118,35 @@ export function TeamSettings({
     setSaving(true)
     setMessage('')
     try {
+      const seasonStart = `${draft.season.startYear}-08-01`
+      const seasonEnd = `${draft.season.endYear}-07-31`
+      if (
+        !managedByCoordinator &&
+        draft.trainingWeekdays?.length &&
+        (!draft.trainingStartDate ||
+          !draft.trainingEndDate ||
+          draft.trainingStartDate > draft.trainingEndDate ||
+          draft.trainingStartDate < seasonStart ||
+          draft.trainingEndDate > seasonEnd)
+      ) {
+        throw new Error('Inserisci un intervallo valido per il calendario degli allenamenti.')
+      }
       const now = new Date().toISOString()
+      const selectedWeekdays = new Set(draft.trainingWeekdays ?? [])
+      const ignoredTrainingDates = managedByCoordinator
+        ? draft.ignoredTrainingDates
+        : (draft.ignoredTrainingDates ?? []).filter((date) =>
+            Boolean(
+              draft.trainingStartDate &&
+              draft.trainingEndDate &&
+              date >= draft.trainingStartDate &&
+              date <= draft.trainingEndDate &&
+              selectedWeekdays.has(new Date(`${date}T00:00:00.000Z`).getUTCDay())
+            )
+          )
       const updated = {
         ...draft,
+        ignoredTrainingDates,
         revision: document.revision + 1,
         updatedAt: now,
         updatedBy: draft.coachName
@@ -182,7 +228,17 @@ export function TeamSettings({
                 value={draft.season.startYear}
                 onChange={(event) => {
                   const startYear = Number(event.target.value)
-                  update('season', { startYear, endYear: startYear + 1 })
+                  const period = defaultTrainingPeriod(startYear)
+                  setDraft((current) => ({
+                    ...current,
+                    season: { startYear, endYear: startYear + 1 },
+                    ...(current.trainingWeekdays?.length
+                      ? {
+                          trainingStartDate: period.startDate,
+                          trainingEndDate: period.endDate
+                        }
+                      : {})
+                  }))
                 }}
               />
               <span aria-hidden="true">–</span>
@@ -208,8 +264,36 @@ export function TeamSettings({
         <WeekdayPicker
           value={draft.trainingWeekdays ?? []}
           disabled={managedByCoordinator}
-          onChange={(weekdays) => update('trainingWeekdays', weekdays)}
+          onChange={(weekdays) => {
+            setDraft((current) => {
+              if (!weekdays.length || (current.trainingStartDate && current.trainingEndDate)) {
+                return { ...current, trainingWeekdays: weekdays }
+              }
+              const period = defaultTrainingPeriod(current.season.startYear)
+              return {
+                ...current,
+                trainingWeekdays: weekdays,
+                trainingStartDate: period.startDate,
+                trainingEndDate: period.endDate
+              }
+            })
+          }}
         />
+        {(draft.trainingWeekdays?.length ?? 0) > 0 && (
+          <>
+            <TrainingPeriodFields
+              startYear={draft.season.startYear}
+              startDate={draft.trainingStartDate ?? ''}
+              endDate={draft.trainingEndDate ?? ''}
+              disabled={managedByCoordinator}
+              onStartDateChange={(date) => update('trainingStartDate', date)}
+              onEndDateChange={(date) => update('trainingEndDate', date)}
+            />
+            <small className="field-help">
+              Gli avvisi vengono calcolati soltanto fra queste due date.
+            </small>
+          </>
+        )}
       </section>
 
       {message && <p className="form-message">{message}</p>}

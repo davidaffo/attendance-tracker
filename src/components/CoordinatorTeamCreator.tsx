@@ -6,11 +6,16 @@ import {
   type KeyboardEvent
 } from 'react'
 import { ArrowLeft, CloudUpload, Plus, Trash2 } from 'lucide-react'
-import { createTeamDocument, getCurrentSeason } from '../domain/defaults'
+import {
+  createTeamDocument,
+  defaultTrainingPeriod,
+  getCurrentSeason
+} from '../domain/defaults'
 import { formatAthleteName } from '../domain/athleteList'
 import type { TeamDocument } from '../domain/types'
 import { AthleteListPaste } from './AthleteListPaste'
 import { WeekdayPicker } from './WeekdayPicker'
+import { TrainingPeriodFields } from './TrainingPeriodFields'
 
 interface CoordinatorTeamCreatorProps {
   onCreate: (document: TeamDocument) => Promise<void>
@@ -29,6 +34,12 @@ export function CoordinatorTeamCreator({
   const [coachName, setCoachName] = useState('')
   const [startYear, setStartYear] = useState(currentSeason.startYear)
   const [weekdays, setWeekdays] = useState<number[]>([])
+  const initialTrainingPeriod = useMemo(
+    () => defaultTrainingPeriod(currentSeason.startYear),
+    [currentSeason.startYear]
+  )
+  const [trainingStartDate, setTrainingStartDate] = useState(initialTrainingPeriod.startDate)
+  const [trainingEndDate, setTrainingEndDate] = useState(initialTrainingPeriod.endDate)
   const [athletes, setAthletes] = useState<string[]>([''])
   const [submitting, setSubmitting] = useState(false)
   const [message, setMessage] = useState('')
@@ -58,6 +69,13 @@ export function CoordinatorTeamCreator({
 
   const submit = async (event: FormEvent) => {
     event.preventDefault()
+    if (
+      weekdays.length &&
+      (!trainingStartDate || !trainingEndDate || trainingStartDate > trainingEndDate)
+    ) {
+      setMessage('Inserisci un intervallo valido per il calendario degli allenamenti.')
+      return
+    }
     setSubmitting(true)
     setMessage('')
     try {
@@ -68,6 +86,8 @@ export function CoordinatorTeamCreator({
           coachName,
           startYear,
           weekdays,
+          trainingStartDate: weekdays.length ? trainingStartDate : undefined,
+          trainingEndDate: weekdays.length ? trainingEndDate : undefined,
           athleteNames: athletes
         })
       )
@@ -130,7 +150,13 @@ export function CoordinatorTeamCreator({
                 max="2100"
                 inputMode="numeric"
                 value={startYear}
-                onChange={(event) => setStartYear(Number(event.target.value))}
+                onChange={(event) => {
+                  const nextStartYear = Number(event.target.value)
+                  const period = defaultTrainingPeriod(nextStartYear)
+                  setStartYear(nextStartYear)
+                  setTrainingStartDate(period.startDate)
+                  setTrainingEndDate(period.endDate)
+                }}
                 required
               />
               <span aria-hidden="true">–</span>
@@ -142,6 +168,15 @@ export function CoordinatorTeamCreator({
         <div className="field block-field">
           <span>Giorni di allenamento</span>
           <WeekdayPicker value={weekdays} onChange={setWeekdays} />
+          {weekdays.length > 0 && (
+            <TrainingPeriodFields
+              startYear={startYear}
+              startDate={trainingStartDate}
+              endDate={trainingEndDate}
+              onStartDateChange={setTrainingStartDate}
+              onEndDateChange={setTrainingEndDate}
+            />
+          )}
           <small>Il calendario potrà essere modificato soltanto dal coordinatore.</small>
         </div>
 

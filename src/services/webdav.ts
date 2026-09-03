@@ -15,6 +15,20 @@ interface RemoteFile {
   exists: boolean
 }
 
+export class RemoteDocumentConflictError extends Error {
+  readonly localDocument: TeamDocument
+  readonly remoteDocument: TeamDocument
+
+  constructor(localDocument: TeamDocument, remoteDocument: TeamDocument) {
+    super('Il registro è stato modificato da un altro utente.')
+    this.name = 'RemoteDocumentConflictError'
+    this.localDocument = localDocument
+    this.remoteDocument = remoteDocument
+  }
+}
+
+export type ConflictResolution = 'merge' | 'local' | 'remote'
+
 export interface SyncResult {
   document: TeamDocument
   meta: LocalSyncMeta
@@ -485,8 +499,38 @@ export async function updateRemoteTeamDocument(
   const nextDocument = documentsAreEqual(remote.document, document)
     ? document
     : mergeDocuments(document, remote.document)
-  await writeRemote(config, nextDocument, remote.etag)
-  return nextDocument
+  try {
+    await writeRemote(config, nextDocument, remote.etag)
+    return nextDocument
+  } catch (error) {
+    if (!(error instanceof Error) || error.message !== 'CONFLICT') throw error
+    const latest = await readRemote(config, document)
+    if (!latest.document) throw new Error('Conflitto remoto non risolvibile.')
+    throw new RemoteDocumentConflictError(document, latest.document)
+  }
+}
+
+export async function resolveRemoteTeamDocumentConflict(
+  local: TeamDocument,
+  config: SyncConfig,
+  resolution: ConflictResolution
+): Promise<TeamDocument> {
+  const latest = await readRemote(config, local)
+  if (!latest.document) {
+    throw new Error('Il registro remoto non è più disponibile.')
+  }
+  if (resolution === 'remote') return latest.document
+
+  const document = resolution === 'merge'
+    ? mergeDocuments(local, latest.document)
+    : {
+        ...local,
+        revision: Math.max(local.revision, latest.document.revision) + 1,
+        updatedAt: new Date().toISOString()
+      }
+  const confirmed = await writeAndVerifyWithoutCondition(config, document)
+  if (!confirmed.document) throw new Error('Il registro remoto è vuoto dopo il salvataggio.')
+  return confirmed.document
 }
 
 function backupFolderName(config: SyncConfig): string {

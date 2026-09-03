@@ -10,8 +10,11 @@ import {
   documentUrl,
   normalizeEtag,
   remoteFolderFromDocumentUrl,
+  RemoteDocumentConflictError,
+  resolveRemoteTeamDocumentConflict,
   synchronizeDocument,
   testNextcloudCredentials,
+  updateRemoteTeamDocument,
   verifyRemoteFolderWritable
 } from '../services/webdav'
 
@@ -340,6 +343,46 @@ describe('creazione dei registri del coordinatore', () => {
     appPassword: 'password-app',
     remoteFolder: 'attendance-tracker'
   }
+
+  it('espone al coordinatore un conflitto avvenuto durante il salvataggio', async () => {
+    const latest = { ...document, revision: 2, updatedAt: '2026-09-03T12:00:00.000Z' }
+    const etagResponse = (etag: string) =>
+      new Response(
+        `<?xml version="1.0"?><d:multistatus xmlns:d="DAV:"><d:response><d:propstat><d:prop><d:getetag>&quot;${etag}&quot;</d:getetag></d:prop></d:propstat></d:response></d:multistatus>`,
+        { status: 207 }
+      )
+    vi.stubGlobal('fetch', vi.fn<typeof fetch>()
+      .mockResolvedValueOnce(etagResponse('etag-1'))
+      .mockResolvedValueOnce(new Response(serializeTeamDocument(document), { status: 200 }))
+      .mockResolvedValueOnce(new Response('', { status: 412 }))
+      .mockResolvedValueOnce(etagResponse('etag-2'))
+      .mockResolvedValueOnce(new Response(serializeTeamDocument(latest), { status: 200 })))
+
+    await expect(updateRemoteTeamDocument({
+      ...document,
+      trainingWeekdays: [1, 3],
+      trainingStartDate: '2026-09-03',
+      trainingEndDate: '2027-07-31',
+      updatedAt: '2026-09-03T12:01:00.000Z'
+    }, connection)).rejects.toBeInstanceOf(RemoteDocumentConflictError)
+  })
+
+  it('può risolvere il conflitto mantenendo la versione cloud', async () => {
+    const latest = { ...document, coachName: 'Versione cloud', revision: 3 }
+    const etagResponse = new Response(
+      '<?xml version="1.0"?><d:multistatus xmlns:d="DAV:"><d:response><d:propstat><d:prop><d:getetag>&quot;etag-3&quot;</d:getetag></d:prop></d:propstat></d:response></d:multistatus>',
+      { status: 207 }
+    )
+    const fetchMock = vi.fn<typeof fetch>()
+      .mockResolvedValueOnce(etagResponse)
+      .mockResolvedValueOnce(new Response(serializeTeamDocument(latest), { status: 200 }))
+    vi.stubGlobal('fetch', fetchMock)
+
+    const resolved = await resolveRemoteTeamDocumentConflict(document, connection, 'remote')
+
+    expect(resolved.coachName).toBe('Versione cloud')
+    expect(fetchMock).toHaveBeenCalledTimes(2)
+  })
 
   it('verifica i permessi creando e rimuovendo un file temporaneo', async () => {
     const fetchMock = vi
