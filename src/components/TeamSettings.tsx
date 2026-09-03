@@ -17,7 +17,6 @@ interface TeamSettingsProps {
 function withScheduleDefaults(value: TeamDocument, enabled: boolean): TeamDocument {
   if (
     !enabled ||
-    !value.trainingWeekdays?.length ||
     (value.trainingStartDate && value.trainingEndDate)
   ) {
     return value
@@ -122,7 +121,6 @@ export function TeamSettings({
       const seasonEnd = `${draft.season.endYear}-07-31`
       if (
         !managedByCoordinator &&
-        draft.trainingWeekdays?.length &&
         (!draft.trainingStartDate ||
           !draft.trainingEndDate ||
           draft.trainingStartDate > draft.trainingEndDate ||
@@ -232,12 +230,8 @@ export function TeamSettings({
                   setDraft((current) => ({
                     ...current,
                     season: { startYear, endYear: startYear + 1 },
-                    ...(current.trainingWeekdays?.length
-                      ? {
-                          trainingStartDate: period.startDate,
-                          trainingEndDate: period.endDate
-                        }
-                      : {})
+                    trainingStartDate: period.startDate,
+                    trainingEndDate: period.endDate
                   }))
                 }}
               />
@@ -279,21 +273,17 @@ export function TeamSettings({
             })
           }}
         />
-        {(draft.trainingWeekdays?.length ?? 0) > 0 && (
-          <>
-            <TrainingPeriodFields
-              startYear={draft.season.startYear}
-              startDate={draft.trainingStartDate ?? ''}
-              endDate={draft.trainingEndDate ?? ''}
-              disabled={managedByCoordinator}
-              onStartDateChange={(date) => update('trainingStartDate', date)}
-              onEndDateChange={(date) => update('trainingEndDate', date)}
-            />
-            <small className="field-help">
-              Gli avvisi vengono calcolati soltanto fra queste due date.
-            </small>
-          </>
-        )}
+        <TrainingPeriodFields
+          startYear={draft.season.startYear}
+          startDate={draft.trainingStartDate ?? ''}
+          endDate={draft.trainingEndDate ?? ''}
+          disabled={managedByCoordinator}
+          onStartDateChange={(date) => update('trainingStartDate', date)}
+          onEndDateChange={(date) => update('trainingEndDate', date)}
+        />
+        <small className="field-help">
+          Gli avvisi vengono calcolati soltanto fra queste due date.
+        </small>
       </section>
 
       {message && <p className="form-message">{message}</p>}

@@ -86,8 +86,8 @@ export function CoordinatorTeamCreator({
           coachName,
           startYear,
           weekdays,
-          trainingStartDate: weekdays.length ? trainingStartDate : undefined,
-          trainingEndDate: weekdays.length ? trainingEndDate : undefined,
+          trainingStartDate,
+          trainingEndDate,
           athleteNames: athletes
         })
       )
@@ -168,15 +168,13 @@ export function CoordinatorTeamCreator({
         <div className="field block-field">
           <span>Giorni di allenamento</span>
           <WeekdayPicker value={weekdays} onChange={setWeekdays} />
-          {weekdays.length > 0 && (
-            <TrainingPeriodFields
-              startYear={startYear}
-              startDate={trainingStartDate}
-              endDate={trainingEndDate}
-              onStartDateChange={setTrainingStartDate}
-              onEndDateChange={setTrainingEndDate}
-            />
-          )}
+          <TrainingPeriodFields
+            startYear={startYear}
+            startDate={trainingStartDate}
+            endDate={trainingEndDate}
+            onStartDateChange={setTrainingStartDate}
+            onEndDateChange={setTrainingEndDate}
+          />
           <small>Il calendario potrà essere modificato soltanto dal coordinatore.</small>
         </div>
 

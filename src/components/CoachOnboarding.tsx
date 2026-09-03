@@ -135,8 +135,8 @@ export function CoachOnboarding({
         coachName,
         startYear,
         weekdays,
-        trainingStartDate: weekdays.length ? trainingStartDate : undefined,
-        trainingEndDate: weekdays.length ? trainingEndDate : undefined,
+        trainingStartDate,
+        trainingEndDate,
         athleteNames
       })
     }
@@ -174,8 +174,8 @@ export function CoachOnboarding({
       coachName: coachName.trim(),
       season: { startYear, endYear: startYear + 1 },
       trainingWeekdays: [...weekdays].sort(),
-      trainingStartDate: weekdays.length ? trainingStartDate : undefined,
-      trainingEndDate: weekdays.length ? trainingEndDate : undefined,
+      trainingStartDate,
+      trainingEndDate,
       athletes: [
         ...active,
         ...archived.filter((athlete) => !activeIdSet.has(athlete.id))
@@ -204,12 +204,11 @@ export function CoachOnboarding({
     const seasonStart = `${startYear}-08-01`
     const seasonEnd = `${startYear + 1}-07-31`
     if (
-      weekdays.length &&
-      (!trainingStartDate ||
+      !trainingStartDate ||
         !trainingEndDate ||
         trainingStartDate > trainingEndDate ||
         trainingStartDate < seasonStart ||
-        trainingEndDate > seasonEnd)
+        trainingEndDate > seasonEnd
     ) {
       setStep(2)
       setMessage('Inserisci un intervallo valido per il calendario degli allenamenti.')
@@ -342,15 +341,13 @@ export function CoachOnboarding({
                 Seleziona i giorni abituali. Potrai modificarli dalla schermata Squadra.
               </p>
               <WeekdayPicker value={weekdays} onChange={setWeekdays} />
-              {weekdays.length > 0 && (
-                <TrainingPeriodFields
-                  startYear={startYear}
-                  startDate={trainingStartDate}
-                  endDate={trainingEndDate}
-                  onStartDateChange={setTrainingStartDate}
-                  onEndDateChange={setTrainingEndDate}
-                />
-              )}
+              <TrainingPeriodFields
+                startYear={startYear}
+                startDate={trainingStartDate}
+                endDate={trainingEndDate}
+                onStartDateChange={setTrainingStartDate}
+                onEndDateChange={setTrainingEndDate}
+              />
             </section>
           )}
 
