@@ -506,6 +506,16 @@ export async function updateRemoteTeamDocument(
     if (!(error instanceof Error) || error.message !== 'CONFLICT') throw error
     const latest = await readRemote(config, document)
     if (!latest.document) throw new Error('Conflitto remoto non risolvibile.')
+    if (documentsAreEqual(latest.document, remote.document)) {
+      const confirmed = await writeAndVerifyWithoutCondition(config, nextDocument)
+      if (!confirmed.document) {
+        throw new Error('Il registro remoto è vuoto dopo il salvataggio.')
+      }
+      return confirmed.document
+    }
+    if (documentsAreEqual(latest.document, nextDocument)) {
+      return latest.document
+    }
     throw new RemoteDocumentConflictError(document, latest.document)
   }
 }

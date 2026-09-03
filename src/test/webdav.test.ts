@@ -363,8 +363,45 @@ describe('creazione dei registri del coordinatore', () => {
       trainingWeekdays: [1, 3],
       trainingStartDate: '2026-09-03',
       trainingEndDate: '2027-07-31',
-      updatedAt: '2026-09-03T12:01:00.000Z'
+      updatedAt: '2030-09-03T12:01:00.000Z'
     }, connection)).rejects.toBeInstanceOf(RemoteDocumentConflictError)
+  })
+
+  it('non segnala un falso conflitto se Nextcloud rifiuta If-Match senza modifiche remote', async () => {
+    const edited = {
+      ...document,
+      trainingWeekdays: [1, 3],
+      trainingStartDate: '2026-08-24',
+      trainingEndDate: '2027-06-30',
+      revision: document.revision + 1,
+      updatedAt: '2030-09-03T12:01:00.000Z'
+    }
+    const etagResponse = (etag: string) =>
+      new Response(
+        `<?xml version="1.0"?><d:multistatus xmlns:d="DAV:"><d:response><d:propstat><d:prop><d:getetag>&quot;${etag}&quot;</d:getetag></d:prop></d:propstat></d:response></d:multistatus>`,
+        { status: 207 }
+      )
+    let uploaded = ''
+    const fetchMock = vi.fn<typeof fetch>()
+      .mockResolvedValueOnce(etagResponse('etag-1'))
+      .mockResolvedValueOnce(new Response(serializeTeamDocument(document), { status: 200 }))
+      .mockResolvedValueOnce(new Response('', { status: 412 }))
+      .mockResolvedValueOnce(etagResponse('etag-1'))
+      .mockResolvedValueOnce(new Response(serializeTeamDocument(document), { status: 200 }))
+      .mockImplementationOnce(async (_input, init) => {
+        expect(new Headers(init?.headers).has('If-Match')).toBe(false)
+        uploaded = String(init?.body)
+        return new Response(null, { status: 204, headers: { ETag: '"etag-2"' } })
+      })
+      .mockResolvedValueOnce(etagResponse('etag-2'))
+      .mockImplementationOnce(async () => new Response(uploaded, { status: 200 }))
+    vi.stubGlobal('fetch', fetchMock)
+
+    const saved = await updateRemoteTeamDocument(edited, connection)
+
+    expect(saved.trainingStartDate).toBe('2026-08-24')
+    expect(saved.trainingEndDate).toBe('2027-06-30')
+    expect(fetchMock).toHaveBeenCalledTimes(8)
   })
 
   it('può risolvere il conflitto mantenendo la versione cloud', async () => {
