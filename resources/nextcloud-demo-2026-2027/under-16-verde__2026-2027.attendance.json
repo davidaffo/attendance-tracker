@@ -48,6 +48,28 @@
     3,
     5
   ],
+  "ignoredTrainingDates": [
+    "2026-08-03",
+    "2026-08-05",
+    "2026-08-07",
+    "2026-08-10",
+    "2026-08-12",
+    "2026-08-14",
+    "2026-12-25",
+    "2026-12-28",
+    "2026-12-30",
+    "2027-01-01",
+    "2027-01-04",
+    "2027-01-06",
+    "2027-04-02",
+    "2027-04-05",
+    "2027-07-19",
+    "2027-07-21",
+    "2027-07-23",
+    "2027-07-26",
+    "2027-07-28",
+    "2027-07-30"
+  ],
   "athletes": [
     {
       "id": "906682cc-f89d-4f63-a8a2-56591da173dc",
@@ -175,6 +197,9 @@
         "68545bf4-83f7-4581-a9b3-29f89883f18f": "present",
         "b98c0140-8299-4116-bba3-7791d69ef7eb": "present"
       },
+      "earlyDepartures": [
+        "e71eedd9-7b45-4437-a679-f755da378eb9"
+      ],
       "createdAt": "2026-08-17T20:30:00.000Z",
       "updatedAt": "2026-08-17T20:30:00.000Z",
       "updatedBy": "Chiara Santoro"
@@ -221,6 +246,9 @@
         "68545bf4-83f7-4581-a9b3-29f89883f18f": "absent",
         "b98c0140-8299-4116-bba3-7791d69ef7eb": "late"
       },
+      "earlyDepartures": [
+        "b98c0140-8299-4116-bba3-7791d69ef7eb"
+      ],
       "createdAt": "2026-08-21T20:30:00.000Z",
       "updatedAt": "2026-08-21T20:30:00.000Z",
       "updatedBy": "Chiara Santoro"
@@ -405,6 +433,9 @@
         "68545bf4-83f7-4581-a9b3-29f89883f18f": "present",
         "b98c0140-8299-4116-bba3-7791d69ef7eb": "present"
       },
+      "earlyDepartures": [
+        "b964a746-714e-4ef4-b161-cf93e03973cb"
+      ],
       "createdAt": "2026-09-09T20:30:00.000Z",
       "updatedAt": "2026-09-09T20:30:00.000Z",
       "updatedBy": "Chiara Santoro"
@@ -497,6 +528,11 @@
         "68545bf4-83f7-4581-a9b3-29f89883f18f": "present",
         "b98c0140-8299-4116-bba3-7791d69ef7eb": "present"
       },
+      "earlyDepartures": [
+        "f2dd7b29-a1c1-4b43-8cb0-cc65bcd9e53a",
+        "eafd3bfb-6fa3-4a37-8807-a7865f02b29d",
+        "68545bf4-83f7-4581-a9b3-29f89883f18f"
+      ],
       "createdAt": "2026-09-18T20:30:00.000Z",
       "updatedAt": "2026-09-18T20:30:00.000Z",
       "updatedBy": "Chiara Santoro"
@@ -520,6 +556,11 @@
         "68545bf4-83f7-4581-a9b3-29f89883f18f": "absent",
         "b98c0140-8299-4116-bba3-7791d69ef7eb": "present"
       },
+      "earlyDepartures": [
+        "a318ea56-beaa-4242-ae4f-6fe73c447c90",
+        "31456a24-d45a-488f-96c6-ed01fdc1d587",
+        "807f90f8-c8b7-4c31-a83e-94640f86e018"
+      ],
       "createdAt": "2026-09-21T20:30:00.000Z",
       "updatedAt": "2026-09-21T20:30:00.000Z",
       "updatedBy": "Chiara Santoro"
@@ -612,6 +653,9 @@
         "68545bf4-83f7-4581-a9b3-29f89883f18f": "present",
         "b98c0140-8299-4116-bba3-7791d69ef7eb": "absent"
       },
+      "earlyDepartures": [
+        "625958de-e8cd-48bf-ba63-1465e5eea02e"
+      ],
       "createdAt": "2026-09-30T20:30:00.000Z",
       "updatedAt": "2026-09-30T20:30:00.000Z",
       "updatedBy": "Chiara Santoro"
@@ -658,6 +702,9 @@
         "68545bf4-83f7-4581-a9b3-29f89883f18f": "present",
         "b98c0140-8299-4116-bba3-7791d69ef7eb": "present"
       },
+      "earlyDepartures": [
+        "1fbe7145-832b-48fc-8ca1-c96bece70079"
+      ],
       "createdAt": "2026-10-05T20:30:00.000Z",
       "updatedAt": "2026-10-05T20:30:00.000Z",
       "updatedBy": "Chiara Santoro"
@@ -727,6 +774,9 @@
         "68545bf4-83f7-4581-a9b3-29f89883f18f": "present",
         "b98c0140-8299-4116-bba3-7791d69ef7eb": "present"
       },
+      "earlyDepartures": [
+        "807f90f8-c8b7-4c31-a83e-94640f86e018"
+      ],
       "createdAt": "2026-10-12T20:30:00.000Z",
       "updatedAt": "2026-10-12T20:30:00.000Z",
       "updatedBy": "Chiara Santoro"
@@ -750,6 +800,9 @@
         "68545bf4-83f7-4581-a9b3-29f89883f18f": "present",
         "b98c0140-8299-4116-bba3-7791d69ef7eb": "present"
       },
+      "earlyDepartures": [
+        "b964a746-714e-4ef4-b161-cf93e03973cb"
+      ],
       "createdAt": "2026-10-14T20:30:00.000Z",
       "updatedAt": "2026-10-14T20:30:00.000Z",
       "updatedBy": "Chiara Santoro"
@@ -1055,6 +1108,9 @@
         "f124224a-ef8f-41fb-b748-af51654feb41": "present",
         "b98c0140-8299-4116-bba3-7791d69ef7eb": "absent"
       },
+      "earlyDepartures": [
+        "f2dd7b29-a1c1-4b43-8cb0-cc65bcd9e53a"
+      ],
       "createdAt": "2026-11-13T20:30:00.000Z",
       "updatedAt": "2026-11-13T20:30:00.000Z",
       "updatedBy": "Chiara Santoro"
@@ -1079,6 +1135,9 @@
         "f124224a-ef8f-41fb-b748-af51654feb41": "present",
         "b98c0140-8299-4116-bba3-7791d69ef7eb": "present"
       },
+      "earlyDepartures": [
+        "1fbe7145-832b-48fc-8ca1-c96bece70079"
+      ],
       "createdAt": "2026-11-16T20:30:00.000Z",
       "updatedAt": "2026-11-16T20:30:00.000Z",
       "updatedBy": "Chiara Santoro"
@@ -1103,6 +1162,9 @@
         "f124224a-ef8f-41fb-b748-af51654feb41": "present",
         "b98c0140-8299-4116-bba3-7791d69ef7eb": "present"
       },
+      "earlyDepartures": [
+        "807f90f8-c8b7-4c31-a83e-94640f86e018"
+      ],
       "createdAt": "2026-11-18T20:30:00.000Z",
       "updatedAt": "2026-11-18T20:30:00.000Z",
       "updatedBy": "Chiara Santoro"
@@ -1295,6 +1357,9 @@
         "f124224a-ef8f-41fb-b748-af51654feb41": "present",
         "b98c0140-8299-4116-bba3-7791d69ef7eb": "present"
       },
+      "earlyDepartures": [
+        "f124224a-ef8f-41fb-b748-af51654feb41"
+      ],
       "createdAt": "2026-12-07T20:30:00.000Z",
       "updatedAt": "2026-12-07T20:30:00.000Z",
       "updatedBy": "Chiara Santoro"
@@ -1319,6 +1384,9 @@
         "f124224a-ef8f-41fb-b748-af51654feb41": "present",
         "b98c0140-8299-4116-bba3-7791d69ef7eb": "late"
       },
+      "earlyDepartures": [
+        "68545bf4-83f7-4581-a9b3-29f89883f18f"
+      ],
       "createdAt": "2026-12-09T20:30:00.000Z",
       "updatedAt": "2026-12-09T20:30:00.000Z",
       "updatedBy": "Chiara Santoro"
@@ -1367,6 +1435,10 @@
         "f124224a-ef8f-41fb-b748-af51654feb41": "present",
         "b98c0140-8299-4116-bba3-7791d69ef7eb": "present"
       },
+      "earlyDepartures": [
+        "23568e91-bb63-4831-8d74-be777456df37",
+        "807f90f8-c8b7-4c31-a83e-94640f86e018"
+      ],
       "createdAt": "2026-12-14T20:30:00.000Z",
       "updatedAt": "2026-12-14T20:30:00.000Z",
       "updatedBy": "Chiara Santoro"
@@ -1391,6 +1463,9 @@
         "f124224a-ef8f-41fb-b748-af51654feb41": "present",
         "b98c0140-8299-4116-bba3-7791d69ef7eb": "present"
       },
+      "earlyDepartures": [
+        "906682cc-f89d-4f63-a8a2-56591da173dc"
+      ],
       "createdAt": "2026-12-16T20:30:00.000Z",
       "updatedAt": "2026-12-16T20:30:00.000Z",
       "updatedBy": "Chiara Santoro"
@@ -1487,6 +1562,9 @@
         "f124224a-ef8f-41fb-b748-af51654feb41": "present",
         "b98c0140-8299-4116-bba3-7791d69ef7eb": "present"
       },
+      "earlyDepartures": [
+        "018e2894-def9-4c6f-8b7c-7cb80cb8708a"
+      ],
       "createdAt": "2027-01-08T20:30:00.000Z",
       "updatedAt": "2027-01-08T20:30:00.000Z",
       "updatedBy": "Chiara Santoro"
@@ -1511,6 +1589,9 @@
         "f124224a-ef8f-41fb-b748-af51654feb41": "absent",
         "b98c0140-8299-4116-bba3-7791d69ef7eb": "present"
       },
+      "earlyDepartures": [
+        "b964a746-714e-4ef4-b161-cf93e03973cb"
+      ],
       "createdAt": "2027-01-11T20:30:00.000Z",
       "updatedAt": "2027-01-11T20:30:00.000Z",
       "updatedBy": "Chiara Santoro"
@@ -1535,6 +1616,9 @@
         "f124224a-ef8f-41fb-b748-af51654feb41": "present",
         "b98c0140-8299-4116-bba3-7791d69ef7eb": "present"
       },
+      "earlyDepartures": [
+        "68545bf4-83f7-4581-a9b3-29f89883f18f"
+      ],
       "createdAt": "2027-01-13T20:30:00.000Z",
       "updatedAt": "2027-01-13T20:30:00.000Z",
       "updatedBy": "Chiara Santoro"
@@ -1583,6 +1667,9 @@
         "f124224a-ef8f-41fb-b748-af51654feb41": "present",
         "b98c0140-8299-4116-bba3-7791d69ef7eb": "absent"
       },
+      "earlyDepartures": [
+        "f2dd7b29-a1c1-4b43-8cb0-cc65bcd9e53a"
+      ],
       "createdAt": "2027-01-18T20:30:00.000Z",
       "updatedAt": "2027-01-18T20:30:00.000Z",
       "updatedBy": "Chiara Santoro"
@@ -1631,6 +1718,9 @@
         "f124224a-ef8f-41fb-b748-af51654feb41": "present",
         "b98c0140-8299-4116-bba3-7791d69ef7eb": "present"
       },
+      "earlyDepartures": [
+        "807f90f8-c8b7-4c31-a83e-94640f86e018"
+      ],
       "createdAt": "2027-01-22T20:30:00.000Z",
       "updatedAt": "2027-01-22T20:30:00.000Z",
       "updatedBy": "Chiara Santoro"
@@ -1847,6 +1937,9 @@
         "f124224a-ef8f-41fb-b748-af51654feb41": "late",
         "b98c0140-8299-4116-bba3-7791d69ef7eb": "absent"
       },
+      "earlyDepartures": [
+        "906682cc-f89d-4f63-a8a2-56591da173dc"
+      ],
       "createdAt": "2027-02-12T20:30:00.000Z",
       "updatedAt": "2027-02-12T20:30:00.000Z",
       "updatedBy": "Chiara Santoro"
@@ -2015,6 +2108,9 @@
         "f124224a-ef8f-41fb-b748-af51654feb41": "absent",
         "b98c0140-8299-4116-bba3-7791d69ef7eb": "present"
       },
+      "earlyDepartures": [
+        "31456a24-d45a-488f-96c6-ed01fdc1d587"
+      ],
       "createdAt": "2027-03-01T20:30:00.000Z",
       "updatedAt": "2027-03-01T20:30:00.000Z",
       "updatedBy": "Chiara Santoro"
@@ -2111,6 +2207,9 @@
         "f124224a-ef8f-41fb-b748-af51654feb41": "present",
         "b98c0140-8299-4116-bba3-7791d69ef7eb": "absent"
       },
+      "earlyDepartures": [
+        "018e2894-def9-4c6f-8b7c-7cb80cb8708a"
+      ],
       "createdAt": "2027-03-10T20:30:00.000Z",
       "updatedAt": "2027-03-10T20:30:00.000Z",
       "updatedBy": "Chiara Santoro"
@@ -2207,6 +2306,10 @@
         "f124224a-ef8f-41fb-b748-af51654feb41": "present",
         "b98c0140-8299-4116-bba3-7791d69ef7eb": "present"
       },
+      "earlyDepartures": [
+        "b964a746-714e-4ef4-b161-cf93e03973cb",
+        "e71eedd9-7b45-4437-a679-f755da378eb9"
+      ],
       "createdAt": "2027-03-19T20:30:00.000Z",
       "updatedAt": "2027-03-19T20:30:00.000Z",
       "updatedBy": "Chiara Santoro"
@@ -2279,6 +2382,10 @@
         "f124224a-ef8f-41fb-b748-af51654feb41": "present",
         "b98c0140-8299-4116-bba3-7791d69ef7eb": "present"
       },
+      "earlyDepartures": [
+        "f2dd7b29-a1c1-4b43-8cb0-cc65bcd9e53a",
+        "31456a24-d45a-488f-96c6-ed01fdc1d587"
+      ],
       "createdAt": "2027-03-26T20:30:00.000Z",
       "updatedAt": "2027-03-26T20:30:00.000Z",
       "updatedBy": "Chiara Santoro"
@@ -2303,6 +2410,9 @@
         "f124224a-ef8f-41fb-b748-af51654feb41": "present",
         "b98c0140-8299-4116-bba3-7791d69ef7eb": "present"
       },
+      "earlyDepartures": [
+        "a318ea56-beaa-4242-ae4f-6fe73c447c90"
+      ],
       "createdAt": "2027-03-29T20:30:00.000Z",
       "updatedAt": "2027-03-29T20:30:00.000Z",
       "updatedBy": "Chiara Santoro"
@@ -2327,6 +2437,9 @@
         "f124224a-ef8f-41fb-b748-af51654feb41": "present",
         "b98c0140-8299-4116-bba3-7791d69ef7eb": "present"
       },
+      "earlyDepartures": [
+        "eafd3bfb-6fa3-4a37-8807-a7865f02b29d"
+      ],
       "createdAt": "2027-03-31T20:30:00.000Z",
       "updatedAt": "2027-03-31T20:30:00.000Z",
       "updatedBy": "Chiara Santoro"
@@ -2375,6 +2488,9 @@
         "f124224a-ef8f-41fb-b748-af51654feb41": "present",
         "b98c0140-8299-4116-bba3-7791d69ef7eb": "present"
       },
+      "earlyDepartures": [
+        "f124224a-ef8f-41fb-b748-af51654feb41"
+      ],
       "createdAt": "2027-04-09T20:30:00.000Z",
       "updatedAt": "2027-04-09T20:30:00.000Z",
       "updatedBy": "Chiara Santoro"
@@ -2399,6 +2515,10 @@
         "f124224a-ef8f-41fb-b748-af51654feb41": "present",
         "b98c0140-8299-4116-bba3-7791d69ef7eb": "present"
       },
+      "earlyDepartures": [
+        "906682cc-f89d-4f63-a8a2-56591da173dc",
+        "68545bf4-83f7-4581-a9b3-29f89883f18f"
+      ],
       "createdAt": "2027-04-12T20:30:00.000Z",
       "updatedAt": "2027-04-12T20:30:00.000Z",
       "updatedBy": "Chiara Santoro"
@@ -2447,6 +2567,9 @@
         "f124224a-ef8f-41fb-b748-af51654feb41": "present",
         "b98c0140-8299-4116-bba3-7791d69ef7eb": "present"
       },
+      "earlyDepartures": [
+        "807f90f8-c8b7-4c31-a83e-94640f86e018"
+      ],
       "createdAt": "2027-04-16T20:30:00.000Z",
       "updatedAt": "2027-04-16T20:30:00.000Z",
       "updatedBy": "Chiara Santoro"
@@ -2591,6 +2714,9 @@
         "f124224a-ef8f-41fb-b748-af51654feb41": "present",
         "b98c0140-8299-4116-bba3-7791d69ef7eb": "present"
       },
+      "earlyDepartures": [
+        "f2dd7b29-a1c1-4b43-8cb0-cc65bcd9e53a"
+      ],
       "createdAt": "2027-04-30T20:30:00.000Z",
       "updatedAt": "2027-04-30T20:30:00.000Z",
       "updatedBy": "Chiara Santoro"
@@ -2663,6 +2789,10 @@
         "f124224a-ef8f-41fb-b748-af51654feb41": "present",
         "b98c0140-8299-4116-bba3-7791d69ef7eb": "present"
       },
+      "earlyDepartures": [
+        "f2dd7b29-a1c1-4b43-8cb0-cc65bcd9e53a",
+        "018e2894-def9-4c6f-8b7c-7cb80cb8708a"
+      ],
       "createdAt": "2027-05-07T20:30:00.000Z",
       "updatedAt": "2027-05-07T20:30:00.000Z",
       "updatedBy": "Chiara Santoro"
@@ -2687,6 +2817,9 @@
         "f124224a-ef8f-41fb-b748-af51654feb41": "present",
         "b98c0140-8299-4116-bba3-7791d69ef7eb": "present"
       },
+      "earlyDepartures": [
+        "f2dd7b29-a1c1-4b43-8cb0-cc65bcd9e53a"
+      ],
       "createdAt": "2027-05-10T20:30:00.000Z",
       "updatedAt": "2027-05-10T20:30:00.000Z",
       "updatedBy": "Chiara Santoro"
@@ -2735,6 +2868,9 @@
         "f124224a-ef8f-41fb-b748-af51654feb41": "present",
         "b98c0140-8299-4116-bba3-7791d69ef7eb": "present"
       },
+      "earlyDepartures": [
+        "31456a24-d45a-488f-96c6-ed01fdc1d587"
+      ],
       "createdAt": "2027-05-14T20:30:00.000Z",
       "updatedAt": "2027-05-14T20:30:00.000Z",
       "updatedBy": "Chiara Santoro"
@@ -2759,6 +2895,10 @@
         "f124224a-ef8f-41fb-b748-af51654feb41": "present",
         "b98c0140-8299-4116-bba3-7791d69ef7eb": "volley"
       },
+      "earlyDepartures": [
+        "e71eedd9-7b45-4437-a679-f755da378eb9",
+        "b98c0140-8299-4116-bba3-7791d69ef7eb"
+      ],
       "createdAt": "2027-05-17T20:30:00.000Z",
       "updatedAt": "2027-05-17T20:30:00.000Z",
       "updatedBy": "Chiara Santoro"
@@ -2903,6 +3043,9 @@
         "f124224a-ef8f-41fb-b748-af51654feb41": "present",
         "b98c0140-8299-4116-bba3-7791d69ef7eb": "present"
       },
+      "earlyDepartures": [
+        "b98c0140-8299-4116-bba3-7791d69ef7eb"
+      ],
       "createdAt": "2027-05-31T20:30:00.000Z",
       "updatedAt": "2027-05-31T20:30:00.000Z",
       "updatedBy": "Chiara Santoro"
@@ -2927,6 +3070,9 @@
         "f124224a-ef8f-41fb-b748-af51654feb41": "present",
         "b98c0140-8299-4116-bba3-7791d69ef7eb": "present"
       },
+      "earlyDepartures": [
+        "b98c0140-8299-4116-bba3-7791d69ef7eb"
+      ],
       "createdAt": "2027-06-02T20:30:00.000Z",
       "updatedAt": "2027-06-02T20:30:00.000Z",
       "updatedBy": "Chiara Santoro"
@@ -3071,6 +3217,10 @@
         "f124224a-ef8f-41fb-b748-af51654feb41": "present",
         "b98c0140-8299-4116-bba3-7791d69ef7eb": "present"
       },
+      "earlyDepartures": [
+        "1fbe7145-832b-48fc-8ca1-c96bece70079",
+        "eafd3bfb-6fa3-4a37-8807-a7865f02b29d"
+      ],
       "createdAt": "2027-06-16T20:30:00.000Z",
       "updatedAt": "2027-06-16T20:30:00.000Z",
       "updatedBy": "Chiara Santoro"
@@ -3143,6 +3293,9 @@
         "f124224a-ef8f-41fb-b748-af51654feb41": "present",
         "b98c0140-8299-4116-bba3-7791d69ef7eb": "present"
       },
+      "earlyDepartures": [
+        "807f90f8-c8b7-4c31-a83e-94640f86e018"
+      ],
       "createdAt": "2027-06-23T20:30:00.000Z",
       "updatedAt": "2027-06-23T20:30:00.000Z",
       "updatedBy": "Chiara Santoro"
@@ -3239,6 +3392,9 @@
         "f124224a-ef8f-41fb-b748-af51654feb41": "present",
         "b98c0140-8299-4116-bba3-7791d69ef7eb": "present"
       },
+      "earlyDepartures": [
+        "eafd3bfb-6fa3-4a37-8807-a7865f02b29d"
+      ],
       "createdAt": "2027-07-02T20:30:00.000Z",
       "updatedAt": "2027-07-02T20:30:00.000Z",
       "updatedBy": "Chiara Santoro"
@@ -3287,6 +3443,9 @@
         "f124224a-ef8f-41fb-b748-af51654feb41": "absent",
         "b98c0140-8299-4116-bba3-7791d69ef7eb": "present"
       },
+      "earlyDepartures": [
+        "b98c0140-8299-4116-bba3-7791d69ef7eb"
+      ],
       "createdAt": "2027-07-07T20:30:00.000Z",
       "updatedAt": "2027-07-07T20:30:00.000Z",
       "updatedBy": "Chiara Santoro"
@@ -3380,6 +3539,9 @@
         "68545bf4-83f7-4581-a9b3-29f89883f18f": "present",
         "f124224a-ef8f-41fb-b748-af51654feb41": "present"
       },
+      "earlyDepartures": [
+        "31456a24-d45a-488f-96c6-ed01fdc1d587"
+      ],
       "createdAt": "2027-07-16T20:30:00.000Z",
       "updatedAt": "2027-07-16T20:30:00.000Z",
       "updatedBy": "Chiara Santoro"

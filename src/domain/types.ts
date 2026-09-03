@@ -10,7 +10,10 @@ export type SyncIndicator =
 
 export type AppMode = 'coach' | 'coordinator' | 'viewer'
 
-export type CoachDocumentOrigin = 'self-managed' | 'coordinator-managed'
+export type CoachDocumentOrigin =
+  | 'self-managed'
+  | 'coordinator-managed'
+  | 'coordinator-local'
 
 export interface AttendanceStatus {
   id: string
@@ -32,6 +35,7 @@ export interface TrainingSession {
   id: string
   date: string
   attendances: Record<string, string>
+  earlyDepartures?: string[]
   createdAt: string
   updatedAt: string
   updatedBy?: string
@@ -53,6 +57,8 @@ export interface TeamDocument {
   updatedAt: string
   updatedBy: string
   statuses: AttendanceStatus[]
+  trainingWeekdays?: number[]
+  ignoredTrainingDates?: string[]
   athletes: Athlete[]
   sessions: TrainingSession[]
 }
@@ -78,6 +84,7 @@ export interface TeamSummary {
   source: string
   document: TeamDocument
   remoteFolder?: string
+  fileHandle?: FileSystemFileHandle
 }
 
 export interface CoordinatorTeamCache {
@@ -92,4 +99,5 @@ export interface CoordinatorTeamCache {
 export interface TeamTotals {
   sessions: number
   byStatus: Record<string, number>
+  earlyDepartures: number
 }

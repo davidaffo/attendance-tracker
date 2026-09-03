@@ -4,6 +4,7 @@ import {
   ChevronDown,
   ChevronUp,
   Archive,
+  ClipboardCheck,
   Plus,
   RefreshCw,
   Trash2,
@@ -26,6 +27,8 @@ interface CoordinatorTeamManagementProps {
   canBackup: boolean
   quickAccessLinks: Partial<Record<AppMode, string>>
   onQuickAccessCopied: (mode: AppMode) => void
+  onOpenAsCoach: (team: TeamSummary) => Promise<void>
+  canOpenAsCoach: (team: TeamSummary) => boolean
   renderTeamControls: (team: TeamSummary) => ReactNode
 }
 
@@ -41,6 +44,8 @@ export function CoordinatorTeamManagement({
   canBackup,
   quickAccessLinks,
   onQuickAccessCopied,
+  onOpenAsCoach,
+  canOpenAsCoach,
   renderTeamControls
 }: CoordinatorTeamManagementProps) {
   const [creating, setCreating] = useState(false)
@@ -142,6 +147,17 @@ export function CoordinatorTeamManagement({
                     {document.athletes.filter((athlete) => athlete.active).length} atlete
                   </span>
                   <div className="team-management-row-actions">
+                    {canOpenAsCoach(team) && (
+                      <button
+                        className="button secondary compact"
+                        type="button"
+                        disabled={loading}
+                        onClick={() => void onOpenAsCoach(team)}
+                      >
+                        <ClipboardCheck size={16} />
+                        Entra come allenatore
+                      </button>
+                    )}
                     <button
                       className="button secondary compact"
                       type="button"

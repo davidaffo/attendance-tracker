@@ -2,6 +2,7 @@ import { useEffect, useRef, useState, type ChangeEvent, type FormEvent } from 'r
 import {
   ArrowLeft,
   ChevronRight,
+  ClipboardCheck,
   Cloud,
   FolderOpen,
   Link2,
@@ -10,7 +11,7 @@ import {
   UserRound,
   Users
 } from 'lucide-react'
-import { totalsForDocument } from '../domain/document'
+import { ignorePlannedTrainingDate, totalsForDocument } from '../domain/document'
 import type {
   AppMode,
   CoordinatorTeamCache,
@@ -21,7 +22,8 @@ import type {
 import {
   parseSelectedFiles,
   pickAndScanDirectory,
-  scanDirectoryHandle
+  scanDirectoryHandle,
+  writeTeamDocumentToFile
 } from '../services/localFiles'
 import {
   createRemoteTeamDocument,
@@ -52,6 +54,7 @@ import { NextcloudSharingPanel } from './NextcloudSharingPanel'
 import { CoordinatorTeamManagement } from './CoordinatorTeamManagement'
 import { NextcloudQuickAccessButtons } from './NextcloudQuickAccessButton'
 import { TeamSettings } from './TeamSettings'
+import { PlannedSessionsPanel } from './PlannedSessionsPanel'
 
 interface CoordinatorDashboardProps {
   accessMode: 'coordinator' | 'viewer'
@@ -66,6 +69,11 @@ interface CoordinatorDashboardProps {
   onPersistConnectionDetails: (config: SyncConfig) => Promise<void>
   onRequestPassword: (config: SyncConfig) => Promise<string | undefined>
   onAuthenticated: (config: SyncConfig) => void
+  onOpenAsCoach: (
+    team: TeamSummary,
+    config: SyncConfig | undefined,
+    sessionDate?: string
+  ) => Promise<void>
   onForgetPassword: () => void
   onResetAllData: () => Promise<void>
 }
@@ -103,6 +111,18 @@ function cacheMatchesConfig(
   return Boolean(config && cache.connectionKey === connectionKey(config))
 }
 
+function isDevelopmentDemoTeam(team: TeamSummary): boolean {
+  return import.meta.env.DEV && team.source.startsWith('demo/')
+}
+
+function canWriteTeam(team: TeamSummary): boolean {
+  return Boolean(
+    team.remoteFolder !== undefined ||
+    team.fileHandle ||
+    isDevelopmentDemoTeam(team)
+  )
+}
+
 export function CoordinatorDashboard({
   accessMode,
   onChooseMode,
@@ -116,6 +136,7 @@ export function CoordinatorDashboard({
   onPersistConnectionDetails,
   onRequestPassword,
   onAuthenticated,
+  onOpenAsCoach,
   onForgetPassword,
   onResetAllData
 }: CoordinatorDashboardProps) {
@@ -342,12 +363,12 @@ export function CoordinatorDashboard({
       setRememberedHandle(handle)
       if (cache && cache.source !== 'directory') return
       const permission = await handle.queryPermission({ mode: 'read' })
-      if (permission === 'granted' && !config?.appPassword) {
+      if (permission === 'granted') {
         const found = await scanDirectoryHandle(handle)
         if (!active) return
         await rememberTeams(found, 'directory', `cartella ${handle.name}`)
         setMessage(`${found.length} squadre caricate dalla cartella ${handle.name}.`)
-      } else if (!config?.appPassword) {
+      } else {
         setMessage(`Cartella ${handle.name} ricordata: conferma l’accesso per aggiornarla.`)
       }
     })
@@ -472,6 +493,54 @@ export function CoordinatorDashboard({
     }
   }
 
+  const ignoreTeamTrainingDate = async (team: TeamSummary, date: string) => {
+    try {
+      await updateTeam(
+        team,
+        ignorePlannedTrainingDate(team.document, date, team.document.coachName)
+      )
+    } catch {
+      // updateTeam mostra già il dettaglio dell'errore nel pannello coordinatore.
+    }
+  }
+
+  const openTeamAsCoach = async (team: TeamSummary, sessionDate?: string) => {
+    if (!canWriteTeam(team)) {
+      setMessage(
+        'Questo file è stato selezionato senza accesso alla cartella e non può essere modificato.'
+      )
+      return
+    }
+    if (team.remoteFolder === undefined) {
+      await onOpenAsCoach(team, undefined, sessionDate)
+      return
+    }
+    setLoading(true)
+    setMessage('')
+    try {
+      let readyConnection = { ...draft, remoteFolder: team.remoteFolder }
+      if (!readyConnection.baseUrl || !readyConnection.username) {
+        throw new Error('Configura prima il collegamento Nextcloud del coordinatore.')
+      }
+      if (!readyConnection.appPassword) {
+        const password = await onRequestPassword(readyConnection)
+        if (!password) return
+        readyConnection = { ...readyConnection, appPassword: password }
+        setDraft(readyConnection)
+      }
+      onAuthenticated(readyConnection)
+      await onOpenAsCoach(team, readyConnection, sessionDate)
+    } catch (error) {
+      setMessage(
+        error instanceof Error
+          ? error.message
+          : 'Non è stato possibile entrare nella squadra come allenatore.'
+      )
+    } finally {
+      setLoading(false)
+    }
+  }
+
   const backupTeams = async () => {
     if (teams.length === 0 || teams.some((team) => team.remoteFolder === undefined)) {
       setMessage('Carica prima i registri da Nextcloud per creare il backup.')
@@ -502,32 +571,50 @@ export function CoordinatorDashboard({
   }
 
   const updateTeam = async (team: TeamSummary, document: TeamDocument) => {
-    if (team.remoteFolder === undefined) {
-      throw new Error('La modifica è disponibile soltanto per registri Nextcloud.')
+    if (!canWriteTeam(team)) {
+      throw new Error(
+        'Il file è in sola lettura. Seleziona la cartella locale per consentire le modifiche.'
+      )
     }
 
     setLoading(true)
     setMessage('')
     try {
-      let readyConnection = { ...draft, remoteFolder: team.remoteFolder }
-      if (!readyConnection.baseUrl || !readyConnection.username) {
-        throw new Error('Configura prima il collegamento Nextcloud del coordinatore.')
+      let updated: TeamDocument
+      let readyConnection: SyncConfig | undefined
+      if (team.fileHandle) {
+        updated = await writeTeamDocumentToFile(team.fileHandle, document)
+      } else if (isDevelopmentDemoTeam(team)) {
+        updated = document
+      } else {
+        readyConnection = { ...draft, remoteFolder: team.remoteFolder ?? '' }
+        if (!readyConnection.baseUrl || !readyConnection.username) {
+          throw new Error('Configura prima il collegamento Nextcloud del coordinatore.')
+        }
+        if (!readyConnection.appPassword) {
+          const password = await onRequestPassword(readyConnection)
+          if (!password) throw new Error('Modifica annullata: password non inserita.')
+          readyConnection = { ...readyConnection, appPassword: password }
+          setDraft(readyConnection)
+          await onSaveConfig(readyConnection)
+        }
+        updated = await updateRemoteTeamDocument(document, readyConnection)
       }
-      if (!readyConnection.appPassword) {
-        const password = await onRequestPassword(readyConnection)
-        if (!password) return
-        readyConnection = { ...readyConnection, appPassword: password }
-        setDraft(readyConnection)
-        await onSaveConfig(readyConnection)
-      }
-
-      const updated = await updateRemoteTeamDocument(document, readyConnection)
       const nextTeams = teams.map((candidate) =>
         candidate.source === team.source && candidate.document.teamId === team.document.teamId
           ? { ...candidate, document: updated }
           : candidate
       )
-      await rememberTeams(nextTeams, 'nextcloud', 'Nextcloud', readyConnection)
+      await rememberTeams(
+        nextTeams,
+        readyConnection ? 'nextcloud' : team.fileHandle ? 'directory' : 'files',
+        readyConnection
+          ? 'Nextcloud'
+          : team.fileHandle
+            ? `cartella ${rememberedHandle?.name ?? 'locale'}`
+            : 'registri demo di sviluppo',
+        readyConnection
+      )
       setMessage(`${updated.teamName}: modifiche salvate.`)
     } catch (error) {
       setMessage(error instanceof Error ? error.message : 'Modifica non riuscita.')
@@ -643,6 +730,8 @@ export function CoordinatorDashboard({
           canBackup={teams.length > 0 && teams.every((team) => team.remoteFolder !== undefined)}
           quickAccessLinks={quickAccessLinks}
           onQuickAccessCopied={quickAccessCopied}
+          onOpenAsCoach={(team) => openTeamAsCoach(team)}
+          canOpenAsCoach={canWriteTeam}
           renderTeamControls={(team) => (
             <>
               {team.remoteFolder !== undefined && (
@@ -668,12 +757,25 @@ export function CoordinatorDashboard({
                   }}
                 />
               )}
-              {team.remoteFolder !== undefined && (
+              {canWriteTeam(team) && (
                 <TeamSettings
                   document={team.document}
                   onUpdate={(updated) => updateTeam(team, updated)}
                 />
               )}
+              <PlannedSessionsPanel
+                document={team.document}
+                onAdd={
+                  canWriteTeam(team)
+                    ? (date) => void openTeamAsCoach(team, date)
+                    : undefined
+                }
+                onIgnore={
+                  canWriteTeam(team)
+                    ? (date) => ignoreTeamTrainingDate(team, date)
+                    : undefined
+                }
+              />
               <section className="coordinator-report-shell team-management-report">
                 <MonthlyRegister document={team.document} />
               </section>
@@ -682,15 +784,27 @@ export function CoordinatorDashboard({
         />
       ) : selectedTeam ? (
         <main className="coordinator-main coordinator-detail">
-          <button
-            className="button ghost report-back"
-            onClick={() =>
-              onNavigate(isViewer ? basePath : '/coordinatore/gestione-squadre')
-            }
-          >
-            <ArrowLeft size={17} />
-            Torna ai registri
-          </button>
+          <div className="coordinator-detail-actions">
+            <button
+              className="button ghost report-back"
+              onClick={() =>
+                onNavigate(isViewer ? basePath : '/coordinatore/gestione-squadre')
+              }
+            >
+              <ArrowLeft size={17} />
+              Torna ai registri
+            </button>
+            {!isViewer && canWriteTeam(selectedTeam) && (
+              <button
+                className="button primary"
+                type="button"
+                onClick={() => void openTeamAsCoach(selectedTeam)}
+              >
+                <ClipboardCheck size={17} />
+                Entra come allenatore
+              </button>
+            )}
+          </div>
           {message && <div className="coordinator-message">{message}</div>}
           {!isViewer && selectedTeam.remoteFolder !== undefined && (
             <NextcloudSharingPanel
@@ -713,12 +827,25 @@ export function CoordinatorDashboard({
               }}
             />
           )}
-          {!isViewer && selectedTeam.remoteFolder !== undefined && (
+          {!isViewer && canWriteTeam(selectedTeam) && (
             <TeamSettings
               document={selectedTeam.document}
               onUpdate={(updated) => updateTeam(selectedTeam, updated)}
             />
           )}
+          <PlannedSessionsPanel
+            document={selectedTeam.document}
+            onAdd={
+              !isViewer && canWriteTeam(selectedTeam)
+                ? (date) => void openTeamAsCoach(selectedTeam, date)
+                : undefined
+            }
+            onIgnore={
+              !isViewer && canWriteTeam(selectedTeam)
+                ? (date) => ignoreTeamTrainingDate(selectedTeam, date)
+                : undefined
+            }
+          />
           <section className="coordinator-report-shell">
             <MonthlyRegister document={selectedTeam.document} />
           </section>
@@ -927,7 +1054,8 @@ export function CoordinatorDashboard({
               </div>
             ) : (
               <div className="team-summary-grid">
-                {teams.map(({ source, document }) => {
+                {teams.map((team) => {
+                  const { source, document } = team
                   const totals = totalsForDocument(document)
                   const athletes = document.athletes.filter((athlete) => athlete.active).length
                   const possibleAttendances = totals.sessions * document.athletes.length
@@ -970,18 +1098,52 @@ export function CoordinatorDashboard({
                               </span>
                             )
                           })}
+                          <span title={`Uscite anticipate: ${totals.earlyDepartures}`}>
+                            <i className="early-departure-badge">U</i>
+                            <b>
+                              {possibleAttendances
+                                ? Math.round((totals.earlyDepartures / possibleAttendances) * 100)
+                                : 0}%
+                            </b>
+                          </span>
                         </div>
-                        <button
-                          className="button team-report-button"
-                          onClick={() =>
-                            onNavigate(
-                              `${basePath}/squadra/${encodeURIComponent(document.teamId)}`
-                            )
+                        <PlannedSessionsPanel
+                          document={document}
+                          compact
+                          onIgnore={
+                            !isViewer && canWriteTeam(team)
+                              ? (date) => ignoreTeamTrainingDate(team, date)
+                              : undefined
                           }
-                        >
-                          Apri squadra
-                          <ChevronRight size={17} />
-                        </button>
+                          onAdd={
+                            !isViewer && canWriteTeam(team)
+                              ? (date) => void openTeamAsCoach(team, date)
+                              : undefined
+                          }
+                        />
+                        <div className="team-card-actions">
+                          <button
+                            className="button team-report-button"
+                            onClick={() =>
+                              onNavigate(
+                                `${basePath}/squadra/${encodeURIComponent(document.teamId)}`
+                              )
+                            }
+                          >
+                            Apri squadra
+                            <ChevronRight size={17} />
+                          </button>
+                          {!isViewer && canWriteTeam(team) && (
+                            <button
+                              className="button secondary"
+                              type="button"
+                              onClick={() => void openTeamAsCoach(team)}
+                            >
+                              <ClipboardCheck size={17} />
+                              Entra come allenatore
+                            </button>
+                          )}
+                        </div>
                     </article>
                   )
                 })}

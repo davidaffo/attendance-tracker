@@ -17,6 +17,7 @@ interface AttendanceDatabase extends DBSchema {
       | 'coordinator-sync-config'
       | 'viewer-sync-config'
       | 'coordinator-directory-handle'
+      | 'coach-file-handle'
       | 'coordinator-team-cache'
       | 'coach-onboarding-version'
       | 'coach-document-origin'
@@ -32,6 +33,7 @@ interface AttendanceDatabase extends DBSchema {
       | CoachDocumentOrigin
       | number
       | CoordinatorTeamCache
+      | FileSystemFileHandle
       | FileSystemDirectoryHandle
   }
 }
@@ -111,6 +113,20 @@ export async function storeCoordinatorDirectoryHandle(
   handle: FileSystemDirectoryHandle
 ): Promise<void> {
   await (await database).put('state', handle, 'coordinator-directory-handle')
+}
+
+export async function loadCoachFileHandle(): Promise<FileSystemFileHandle | undefined> {
+  return (await database).get('state', 'coach-file-handle') as Promise<
+    FileSystemFileHandle | undefined
+  >
+}
+
+export async function storeCoachFileHandle(handle: FileSystemFileHandle): Promise<void> {
+  await (await database).put('state', handle, 'coach-file-handle')
+}
+
+export async function removeCoachFileHandle(): Promise<void> {
+  await (await database).delete('state', 'coach-file-handle')
 }
 
 export async function loadCoordinatorTeamCache(): Promise<

@@ -48,6 +48,29 @@
     4,
     6
   ],
+  "ignoredTrainingDates": [
+    "2026-08-01",
+    "2026-08-04",
+    "2026-08-06",
+    "2026-08-08",
+    "2026-08-11",
+    "2026-08-13",
+    "2026-08-15",
+    "2026-12-24",
+    "2026-12-26",
+    "2026-12-29",
+    "2026-12-31",
+    "2027-01-02",
+    "2027-01-05",
+    "2027-04-03",
+    "2027-07-17",
+    "2027-07-20",
+    "2027-07-22",
+    "2027-07-24",
+    "2027-07-27",
+    "2027-07-29",
+    "2027-07-31"
+  ],
   "athletes": [
     {
       "id": "2415ed31-9afb-4dde-90af-91a74e9974d5",
@@ -260,6 +283,9 @@
         "f89564c8-8dfd-4ffe-93e4-d113ae6be8b4": "present",
         "8f89f50e-08b1-4dc8-bf7a-1e8d45b5e8f6": "present"
       },
+      "earlyDepartures": [
+        "3fd5d15e-e88c-4001-aa63-afc775f671b5"
+      ],
       "createdAt": "2026-08-27T20:30:00.000Z",
       "updatedAt": "2026-08-27T20:30:00.000Z",
       "updatedBy": "Lorenzo Fontana"
@@ -283,6 +309,9 @@
         "f89564c8-8dfd-4ffe-93e4-d113ae6be8b4": "present",
         "8f89f50e-08b1-4dc8-bf7a-1e8d45b5e8f6": "volley"
       },
+      "earlyDepartures": [
+        "3fd5d15e-e88c-4001-aa63-afc775f671b5"
+      ],
       "createdAt": "2026-08-29T20:30:00.000Z",
       "updatedAt": "2026-08-29T20:30:00.000Z",
       "updatedBy": "Lorenzo Fontana"
@@ -306,6 +335,9 @@
         "f89564c8-8dfd-4ffe-93e4-d113ae6be8b4": "present",
         "8f89f50e-08b1-4dc8-bf7a-1e8d45b5e8f6": "present"
       },
+      "earlyDepartures": [
+        "a80ba703-b3a5-4a9d-9d0d-cd26419924a2"
+      ],
       "createdAt": "2026-09-01T20:30:00.000Z",
       "updatedAt": "2026-09-01T20:30:00.000Z",
       "updatedBy": "Lorenzo Fontana"
@@ -329,6 +361,9 @@
         "f89564c8-8dfd-4ffe-93e4-d113ae6be8b4": "present",
         "8f89f50e-08b1-4dc8-bf7a-1e8d45b5e8f6": "present"
       },
+      "earlyDepartures": [
+        "61b514b5-81a8-42a8-9988-06ba33e99a98"
+      ],
       "createdAt": "2026-09-03T20:30:00.000Z",
       "updatedAt": "2026-09-03T20:30:00.000Z",
       "updatedBy": "Lorenzo Fontana"
@@ -375,6 +410,10 @@
         "f89564c8-8dfd-4ffe-93e4-d113ae6be8b4": "late",
         "8f89f50e-08b1-4dc8-bf7a-1e8d45b5e8f6": "present"
       },
+      "earlyDepartures": [
+        "2415ed31-9afb-4dde-90af-91a74e9974d5",
+        "f89564c8-8dfd-4ffe-93e4-d113ae6be8b4"
+      ],
       "createdAt": "2026-09-08T20:30:00.000Z",
       "updatedAt": "2026-09-08T20:30:00.000Z",
       "updatedBy": "Lorenzo Fontana"
@@ -421,6 +460,9 @@
         "f89564c8-8dfd-4ffe-93e4-d113ae6be8b4": "present",
         "8f89f50e-08b1-4dc8-bf7a-1e8d45b5e8f6": "present"
       },
+      "earlyDepartures": [
+        "0bc19135-8618-446b-8078-0d28e3b9eef7"
+      ],
       "createdAt": "2026-09-12T20:30:00.000Z",
       "updatedAt": "2026-09-12T20:30:00.000Z",
       "updatedBy": "Lorenzo Fontana"
@@ -536,6 +578,9 @@
         "f89564c8-8dfd-4ffe-93e4-d113ae6be8b4": "present",
         "8f89f50e-08b1-4dc8-bf7a-1e8d45b5e8f6": "present"
       },
+      "earlyDepartures": [
+        "3fd5d15e-e88c-4001-aa63-afc775f671b5"
+      ],
       "createdAt": "2026-09-24T20:30:00.000Z",
       "updatedAt": "2026-09-24T20:30:00.000Z",
       "updatedBy": "Lorenzo Fontana"
@@ -605,6 +650,9 @@
         "f89564c8-8dfd-4ffe-93e4-d113ae6be8b4": "absent",
         "8f89f50e-08b1-4dc8-bf7a-1e8d45b5e8f6": "absent"
       },
+      "earlyDepartures": [
+        "f969757b-3d7f-4e6e-8751-abdf660c95be"
+      ],
       "createdAt": "2026-10-01T20:30:00.000Z",
       "updatedAt": "2026-10-01T20:30:00.000Z",
       "updatedBy": "Lorenzo Fontana"
@@ -628,6 +676,9 @@
         "f89564c8-8dfd-4ffe-93e4-d113ae6be8b4": "present",
         "8f89f50e-08b1-4dc8-bf7a-1e8d45b5e8f6": "present"
       },
+      "earlyDepartures": [
+        "959caf4c-5710-4024-bbc7-3139819a9f5a"
+      ],
       "createdAt": "2026-10-03T20:30:00.000Z",
       "updatedAt": "2026-10-03T20:30:00.000Z",
       "updatedBy": "Lorenzo Fontana"
@@ -651,6 +702,9 @@
         "f89564c8-8dfd-4ffe-93e4-d113ae6be8b4": "present",
         "8f89f50e-08b1-4dc8-bf7a-1e8d45b5e8f6": "late"
       },
+      "earlyDepartures": [
+        "9ade93b6-f118-40f3-81b1-f6d316d8eb1b"
+      ],
       "createdAt": "2026-10-06T20:30:00.000Z",
       "updatedAt": "2026-10-06T20:30:00.000Z",
       "updatedBy": "Lorenzo Fontana"
@@ -697,6 +751,9 @@
         "f89564c8-8dfd-4ffe-93e4-d113ae6be8b4": "present",
         "8f89f50e-08b1-4dc8-bf7a-1e8d45b5e8f6": "present"
       },
+      "earlyDepartures": [
+        "3fd5d15e-e88c-4001-aa63-afc775f671b5"
+      ],
       "createdAt": "2026-10-10T20:30:00.000Z",
       "updatedAt": "2026-10-10T20:30:00.000Z",
       "updatedBy": "Lorenzo Fontana"
@@ -720,6 +777,9 @@
         "f89564c8-8dfd-4ffe-93e4-d113ae6be8b4": "present",
         "8f89f50e-08b1-4dc8-bf7a-1e8d45b5e8f6": "present"
       },
+      "earlyDepartures": [
+        "61b514b5-81a8-42a8-9988-06ba33e99a98"
+      ],
       "createdAt": "2026-10-13T20:30:00.000Z",
       "updatedAt": "2026-10-13T20:30:00.000Z",
       "updatedBy": "Lorenzo Fontana"
@@ -766,6 +826,9 @@
         "f89564c8-8dfd-4ffe-93e4-d113ae6be8b4": "present",
         "8f89f50e-08b1-4dc8-bf7a-1e8d45b5e8f6": "present"
       },
+      "earlyDepartures": [
+        "8f89f50e-08b1-4dc8-bf7a-1e8d45b5e8f6"
+      ],
       "createdAt": "2026-10-17T20:30:00.000Z",
       "updatedAt": "2026-10-17T20:30:00.000Z",
       "updatedBy": "Lorenzo Fontana"
@@ -789,6 +852,9 @@
         "f89564c8-8dfd-4ffe-93e4-d113ae6be8b4": "present",
         "8f89f50e-08b1-4dc8-bf7a-1e8d45b5e8f6": "volley"
       },
+      "earlyDepartures": [
+        "9ade93b6-f118-40f3-81b1-f6d316d8eb1b"
+      ],
       "createdAt": "2026-10-20T20:30:00.000Z",
       "updatedAt": "2026-10-20T20:30:00.000Z",
       "updatedBy": "Lorenzo Fontana"
@@ -835,6 +901,9 @@
         "f89564c8-8dfd-4ffe-93e4-d113ae6be8b4": "present",
         "8f89f50e-08b1-4dc8-bf7a-1e8d45b5e8f6": "present"
       },
+      "earlyDepartures": [
+        "0bc19135-8618-446b-8078-0d28e3b9eef7"
+      ],
       "createdAt": "2026-10-24T20:30:00.000Z",
       "updatedAt": "2026-10-24T20:30:00.000Z",
       "updatedBy": "Lorenzo Fontana"
@@ -881,6 +950,9 @@
         "f89564c8-8dfd-4ffe-93e4-d113ae6be8b4": "present",
         "8f89f50e-08b1-4dc8-bf7a-1e8d45b5e8f6": "present"
       },
+      "earlyDepartures": [
+        "0721def6-442b-4106-aa80-84bce941bd96"
+      ],
       "createdAt": "2026-10-29T20:30:00.000Z",
       "updatedAt": "2026-10-29T20:30:00.000Z",
       "updatedBy": "Lorenzo Fontana"
@@ -1019,6 +1091,9 @@
         "f89564c8-8dfd-4ffe-93e4-d113ae6be8b4": "present",
         "8f89f50e-08b1-4dc8-bf7a-1e8d45b5e8f6": "injured"
       },
+      "earlyDepartures": [
+        "0721def6-442b-4106-aa80-84bce941bd96"
+      ],
       "createdAt": "2026-11-12T20:30:00.000Z",
       "updatedAt": "2026-11-12T20:30:00.000Z",
       "updatedBy": "Lorenzo Fontana"
@@ -1157,6 +1232,10 @@
         "f89564c8-8dfd-4ffe-93e4-d113ae6be8b4": "present",
         "8f89f50e-08b1-4dc8-bf7a-1e8d45b5e8f6": "present"
       },
+      "earlyDepartures": [
+        "61b514b5-81a8-42a8-9988-06ba33e99a98",
+        "f969757b-3d7f-4e6e-8751-abdf660c95be"
+      ],
       "createdAt": "2026-11-26T20:30:00.000Z",
       "updatedAt": "2026-11-26T20:30:00.000Z",
       "updatedBy": "Lorenzo Fontana"
@@ -1226,6 +1305,9 @@
         "f89564c8-8dfd-4ffe-93e4-d113ae6be8b4": "present",
         "8f89f50e-08b1-4dc8-bf7a-1e8d45b5e8f6": "injured"
       },
+      "earlyDepartures": [
+        "0721def6-442b-4106-aa80-84bce941bd96"
+      ],
       "createdAt": "2026-12-03T20:30:00.000Z",
       "updatedAt": "2026-12-03T20:30:00.000Z",
       "updatedBy": "Lorenzo Fontana"
@@ -1249,6 +1331,9 @@
         "f89564c8-8dfd-4ffe-93e4-d113ae6be8b4": "present",
         "8f89f50e-08b1-4dc8-bf7a-1e8d45b5e8f6": "present"
       },
+      "earlyDepartures": [
+        "0721def6-442b-4106-aa80-84bce941bd96"
+      ],
       "createdAt": "2026-12-05T20:30:00.000Z",
       "updatedAt": "2026-12-05T20:30:00.000Z",
       "updatedBy": "Lorenzo Fontana"
@@ -1272,6 +1357,9 @@
         "f89564c8-8dfd-4ffe-93e4-d113ae6be8b4": "present",
         "8f89f50e-08b1-4dc8-bf7a-1e8d45b5e8f6": "present"
       },
+      "earlyDepartures": [
+        "959caf4c-5710-4024-bbc7-3139819a9f5a"
+      ],
       "createdAt": "2026-12-08T20:30:00.000Z",
       "updatedAt": "2026-12-08T20:30:00.000Z",
       "updatedBy": "Lorenzo Fontana"
@@ -1318,6 +1406,9 @@
         "f89564c8-8dfd-4ffe-93e4-d113ae6be8b4": "present",
         "8f89f50e-08b1-4dc8-bf7a-1e8d45b5e8f6": "present"
       },
+      "earlyDepartures": [
+        "0bc19135-8618-446b-8078-0d28e3b9eef7"
+      ],
       "createdAt": "2026-12-12T20:30:00.000Z",
       "updatedAt": "2026-12-12T20:30:00.000Z",
       "updatedBy": "Lorenzo Fontana"
@@ -1410,6 +1501,9 @@
         "f89564c8-8dfd-4ffe-93e4-d113ae6be8b4": "present",
         "8f89f50e-08b1-4dc8-bf7a-1e8d45b5e8f6": "volley"
       },
+      "earlyDepartures": [
+        "2415ed31-9afb-4dde-90af-91a74e9974d5"
+      ],
       "createdAt": "2026-12-22T20:30:00.000Z",
       "updatedAt": "2026-12-22T20:30:00.000Z",
       "updatedBy": "Lorenzo Fontana"
@@ -1502,6 +1596,10 @@
         "f89564c8-8dfd-4ffe-93e4-d113ae6be8b4": "present",
         "8f89f50e-08b1-4dc8-bf7a-1e8d45b5e8f6": "present"
       },
+      "earlyDepartures": [
+        "61b514b5-81a8-42a8-9988-06ba33e99a98",
+        "a80ba703-b3a5-4a9d-9d0d-cd26419924a2"
+      ],
       "createdAt": "2027-01-14T20:30:00.000Z",
       "updatedAt": "2027-01-14T20:30:00.000Z",
       "updatedBy": "Lorenzo Fontana"
@@ -1640,6 +1738,9 @@
         "f89564c8-8dfd-4ffe-93e4-d113ae6be8b4": "present",
         "8f89f50e-08b1-4dc8-bf7a-1e8d45b5e8f6": "injured"
       },
+      "earlyDepartures": [
+        "67de2317-30b3-4b45-ac29-00ed8084e5e7"
+      ],
       "createdAt": "2027-01-28T20:30:00.000Z",
       "updatedAt": "2027-01-28T20:30:00.000Z",
       "updatedBy": "Lorenzo Fontana"
@@ -1755,6 +1856,9 @@
         "f89564c8-8dfd-4ffe-93e4-d113ae6be8b4": "present",
         "8f89f50e-08b1-4dc8-bf7a-1e8d45b5e8f6": "present"
       },
+      "earlyDepartures": [
+        "959caf4c-5710-4024-bbc7-3139819a9f5a"
+      ],
       "createdAt": "2027-02-09T20:30:00.000Z",
       "updatedAt": "2027-02-09T20:30:00.000Z",
       "updatedBy": "Lorenzo Fontana"
@@ -1801,6 +1905,9 @@
         "f89564c8-8dfd-4ffe-93e4-d113ae6be8b4": "present",
         "8f89f50e-08b1-4dc8-bf7a-1e8d45b5e8f6": "present"
       },
+      "earlyDepartures": [
+        "8f89f50e-08b1-4dc8-bf7a-1e8d45b5e8f6"
+      ],
       "createdAt": "2027-02-13T20:30:00.000Z",
       "updatedAt": "2027-02-13T20:30:00.000Z",
       "updatedBy": "Lorenzo Fontana"
@@ -1985,6 +2092,9 @@
         "f89564c8-8dfd-4ffe-93e4-d113ae6be8b4": "present",
         "8f89f50e-08b1-4dc8-bf7a-1e8d45b5e8f6": "present"
       },
+      "earlyDepartures": [
+        "61b514b5-81a8-42a8-9988-06ba33e99a98"
+      ],
       "createdAt": "2027-03-04T20:30:00.000Z",
       "updatedAt": "2027-03-04T20:30:00.000Z",
       "updatedBy": "Lorenzo Fontana"
@@ -2077,6 +2187,9 @@
         "f89564c8-8dfd-4ffe-93e4-d113ae6be8b4": "late",
         "8f89f50e-08b1-4dc8-bf7a-1e8d45b5e8f6": "present"
       },
+      "earlyDepartures": [
+        "0bc19135-8618-446b-8078-0d28e3b9eef7"
+      ],
       "createdAt": "2027-03-13T20:30:00.000Z",
       "updatedAt": "2027-03-13T20:30:00.000Z",
       "updatedBy": "Lorenzo Fontana"
@@ -2100,6 +2213,9 @@
         "f89564c8-8dfd-4ffe-93e4-d113ae6be8b4": "present",
         "8f89f50e-08b1-4dc8-bf7a-1e8d45b5e8f6": "late"
       },
+      "earlyDepartures": [
+        "8f89f50e-08b1-4dc8-bf7a-1e8d45b5e8f6"
+      ],
       "createdAt": "2027-03-16T20:30:00.000Z",
       "updatedAt": "2027-03-16T20:30:00.000Z",
       "updatedBy": "Lorenzo Fontana"
@@ -2169,6 +2285,9 @@
         "f89564c8-8dfd-4ffe-93e4-d113ae6be8b4": "present",
         "8f89f50e-08b1-4dc8-bf7a-1e8d45b5e8f6": "present"
       },
+      "earlyDepartures": [
+        "959caf4c-5710-4024-bbc7-3139819a9f5a"
+      ],
       "createdAt": "2027-03-23T20:30:00.000Z",
       "updatedAt": "2027-03-23T20:30:00.000Z",
       "updatedBy": "Lorenzo Fontana"
@@ -2238,6 +2357,9 @@
         "f89564c8-8dfd-4ffe-93e4-d113ae6be8b4": "present",
         "8f89f50e-08b1-4dc8-bf7a-1e8d45b5e8f6": "present"
       },
+      "earlyDepartures": [
+        "9f88d698-e8fe-4308-868e-fd0508326edf"
+      ],
       "createdAt": "2027-03-30T20:30:00.000Z",
       "updatedAt": "2027-03-30T20:30:00.000Z",
       "updatedBy": "Lorenzo Fontana"
@@ -2330,6 +2452,11 @@
         "f89564c8-8dfd-4ffe-93e4-d113ae6be8b4": "present",
         "8f89f50e-08b1-4dc8-bf7a-1e8d45b5e8f6": "late"
       },
+      "earlyDepartures": [
+        "61b514b5-81a8-42a8-9988-06ba33e99a98",
+        "3fd5d15e-e88c-4001-aa63-afc775f671b5",
+        "f89564c8-8dfd-4ffe-93e4-d113ae6be8b4"
+      ],
       "createdAt": "2027-04-10T20:30:00.000Z",
       "updatedAt": "2027-04-10T20:30:00.000Z",
       "updatedBy": "Lorenzo Fontana"
@@ -2445,6 +2572,9 @@
         "f89564c8-8dfd-4ffe-93e4-d113ae6be8b4": "present",
         "8f89f50e-08b1-4dc8-bf7a-1e8d45b5e8f6": "present"
       },
+      "earlyDepartures": [
+        "67de2317-30b3-4b45-ac29-00ed8084e5e7"
+      ],
       "createdAt": "2027-04-22T20:30:00.000Z",
       "updatedAt": "2027-04-22T20:30:00.000Z",
       "updatedBy": "Lorenzo Fontana"
@@ -2537,6 +2667,9 @@
         "f89564c8-8dfd-4ffe-93e4-d113ae6be8b4": "present",
         "8f89f50e-08b1-4dc8-bf7a-1e8d45b5e8f6": "present"
       },
+      "earlyDepartures": [
+        "9f88d698-e8fe-4308-868e-fd0508326edf"
+      ],
       "createdAt": "2027-05-01T20:30:00.000Z",
       "updatedAt": "2027-05-01T20:30:00.000Z",
       "updatedBy": "Lorenzo Fontana"
@@ -2560,6 +2693,9 @@
         "f89564c8-8dfd-4ffe-93e4-d113ae6be8b4": "volley",
         "8f89f50e-08b1-4dc8-bf7a-1e8d45b5e8f6": "late"
       },
+      "earlyDepartures": [
+        "a80ba703-b3a5-4a9d-9d0d-cd26419924a2"
+      ],
       "createdAt": "2027-05-04T20:30:00.000Z",
       "updatedAt": "2027-05-04T20:30:00.000Z",
       "updatedBy": "Lorenzo Fontana"
@@ -2583,6 +2719,11 @@
         "f89564c8-8dfd-4ffe-93e4-d113ae6be8b4": "present",
         "8f89f50e-08b1-4dc8-bf7a-1e8d45b5e8f6": "present"
       },
+      "earlyDepartures": [
+        "9f88d698-e8fe-4308-868e-fd0508326edf",
+        "959caf4c-5710-4024-bbc7-3139819a9f5a",
+        "f89564c8-8dfd-4ffe-93e4-d113ae6be8b4"
+      ],
       "createdAt": "2027-05-06T20:30:00.000Z",
       "updatedAt": "2027-05-06T20:30:00.000Z",
       "updatedBy": "Lorenzo Fontana"
@@ -2606,6 +2747,11 @@
         "f89564c8-8dfd-4ffe-93e4-d113ae6be8b4": "present",
         "8f89f50e-08b1-4dc8-bf7a-1e8d45b5e8f6": "volley"
       },
+      "earlyDepartures": [
+        "9ade93b6-f118-40f3-81b1-f6d316d8eb1b",
+        "f969757b-3d7f-4e6e-8751-abdf660c95be",
+        "a80ba703-b3a5-4a9d-9d0d-cd26419924a2"
+      ],
       "createdAt": "2027-05-08T20:30:00.000Z",
       "updatedAt": "2027-05-08T20:30:00.000Z",
       "updatedBy": "Lorenzo Fontana"
@@ -2652,6 +2798,9 @@
         "f89564c8-8dfd-4ffe-93e4-d113ae6be8b4": "present",
         "8f89f50e-08b1-4dc8-bf7a-1e8d45b5e8f6": "volley"
       },
+      "earlyDepartures": [
+        "9ade93b6-f118-40f3-81b1-f6d316d8eb1b"
+      ],
       "createdAt": "2027-05-13T20:30:00.000Z",
       "updatedAt": "2027-05-13T20:30:00.000Z",
       "updatedBy": "Lorenzo Fontana"
@@ -2698,6 +2847,9 @@
         "f89564c8-8dfd-4ffe-93e4-d113ae6be8b4": "present",
         "8f89f50e-08b1-4dc8-bf7a-1e8d45b5e8f6": "absent"
       },
+      "earlyDepartures": [
+        "3fd5d15e-e88c-4001-aa63-afc775f671b5"
+      ],
       "createdAt": "2027-05-18T20:30:00.000Z",
       "updatedAt": "2027-05-18T20:30:00.000Z",
       "updatedBy": "Lorenzo Fontana"
@@ -2767,6 +2919,9 @@
         "f89564c8-8dfd-4ffe-93e4-d113ae6be8b4": "present",
         "8f89f50e-08b1-4dc8-bf7a-1e8d45b5e8f6": "present"
       },
+      "earlyDepartures": [
+        "0bc19135-8618-446b-8078-0d28e3b9eef7"
+      ],
       "createdAt": "2027-05-25T20:30:00.000Z",
       "updatedAt": "2027-05-25T20:30:00.000Z",
       "updatedBy": "Lorenzo Fontana"
@@ -2790,6 +2945,10 @@
         "f89564c8-8dfd-4ffe-93e4-d113ae6be8b4": "present",
         "8f89f50e-08b1-4dc8-bf7a-1e8d45b5e8f6": "present"
       },
+      "earlyDepartures": [
+        "d9163f22-a770-46d4-888a-c3bd657e8eae",
+        "f89564c8-8dfd-4ffe-93e4-d113ae6be8b4"
+      ],
       "createdAt": "2027-05-27T20:30:00.000Z",
       "updatedAt": "2027-05-27T20:30:00.000Z",
       "updatedBy": "Lorenzo Fontana"
@@ -2951,6 +3110,9 @@
         "f89564c8-8dfd-4ffe-93e4-d113ae6be8b4": "present",
         "8f89f50e-08b1-4dc8-bf7a-1e8d45b5e8f6": "present"
       },
+      "earlyDepartures": [
+        "d9163f22-a770-46d4-888a-c3bd657e8eae"
+      ],
       "createdAt": "2027-06-12T20:30:00.000Z",
       "updatedAt": "2027-06-12T20:30:00.000Z",
       "updatedBy": "Lorenzo Fontana"
@@ -2974,6 +3136,10 @@
         "f89564c8-8dfd-4ffe-93e4-d113ae6be8b4": "present",
         "8f89f50e-08b1-4dc8-bf7a-1e8d45b5e8f6": "present"
       },
+      "earlyDepartures": [
+        "959caf4c-5710-4024-bbc7-3139819a9f5a",
+        "67de2317-30b3-4b45-ac29-00ed8084e5e7"
+      ],
       "createdAt": "2027-06-15T20:30:00.000Z",
       "updatedAt": "2027-06-15T20:30:00.000Z",
       "updatedBy": "Lorenzo Fontana"
@@ -3089,6 +3255,10 @@
         "f89564c8-8dfd-4ffe-93e4-d113ae6be8b4": "present",
         "8f89f50e-08b1-4dc8-bf7a-1e8d45b5e8f6": "present"
       },
+      "earlyDepartures": [
+        "f969757b-3d7f-4e6e-8751-abdf660c95be",
+        "0bc19135-8618-446b-8078-0d28e3b9eef7"
+      ],
       "createdAt": "2027-06-26T20:30:00.000Z",
       "updatedAt": "2027-06-26T20:30:00.000Z",
       "updatedBy": "Lorenzo Fontana"
@@ -3135,6 +3305,9 @@
         "f89564c8-8dfd-4ffe-93e4-d113ae6be8b4": "present",
         "8f89f50e-08b1-4dc8-bf7a-1e8d45b5e8f6": "present"
       },
+      "earlyDepartures": [
+        "3fd5d15e-e88c-4001-aa63-afc775f671b5"
+      ],
       "createdAt": "2027-07-01T20:30:00.000Z",
       "updatedAt": "2027-07-01T20:30:00.000Z",
       "updatedBy": "Lorenzo Fontana"
@@ -3158,6 +3331,9 @@
         "f89564c8-8dfd-4ffe-93e4-d113ae6be8b4": "present",
         "8f89f50e-08b1-4dc8-bf7a-1e8d45b5e8f6": "present"
       },
+      "earlyDepartures": [
+        "9ade93b6-f118-40f3-81b1-f6d316d8eb1b"
+      ],
       "createdAt": "2027-07-03T20:30:00.000Z",
       "updatedAt": "2027-07-03T20:30:00.000Z",
       "updatedBy": "Lorenzo Fontana"
@@ -3204,6 +3380,9 @@
         "f89564c8-8dfd-4ffe-93e4-d113ae6be8b4": "present",
         "8f89f50e-08b1-4dc8-bf7a-1e8d45b5e8f6": "present"
       },
+      "earlyDepartures": [
+        "0721def6-442b-4106-aa80-84bce941bd96"
+      ],
       "createdAt": "2027-07-08T20:30:00.000Z",
       "updatedAt": "2027-07-08T20:30:00.000Z",
       "updatedBy": "Lorenzo Fontana"
@@ -3250,6 +3429,9 @@
         "f89564c8-8dfd-4ffe-93e4-d113ae6be8b4": "absent",
         "8f89f50e-08b1-4dc8-bf7a-1e8d45b5e8f6": "present"
       },
+      "earlyDepartures": [
+        "67de2317-30b3-4b45-ac29-00ed8084e5e7"
+      ],
       "createdAt": "2027-07-13T20:30:00.000Z",
       "updatedAt": "2027-07-13T20:30:00.000Z",
       "updatedBy": "Lorenzo Fontana"

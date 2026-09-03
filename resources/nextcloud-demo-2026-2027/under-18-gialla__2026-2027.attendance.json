@@ -48,6 +48,27 @@
     4,
     5
   ],
+  "ignoredTrainingDates": [
+    "2026-08-04",
+    "2026-08-06",
+    "2026-08-07",
+    "2026-08-11",
+    "2026-08-13",
+    "2026-08-14",
+    "2026-12-24",
+    "2026-12-25",
+    "2026-12-29",
+    "2026-12-31",
+    "2027-01-01",
+    "2027-01-05",
+    "2027-04-02",
+    "2027-07-20",
+    "2027-07-22",
+    "2027-07-23",
+    "2027-07-27",
+    "2027-07-29",
+    "2027-07-30"
+  ],
   "athletes": [
     {
       "id": "5a1275ab-6cf6-4340-8c22-65be56369e44",
@@ -210,6 +231,9 @@
         "be729f42-25fa-475b-be69-05c42c1392d2": "present",
         "6710b68e-ea05-4e46-899e-8d9fa436d6de": "present"
       },
+      "earlyDepartures": [
+        "be729f42-25fa-475b-be69-05c42c1392d2"
+      ],
       "createdAt": "2026-08-20T20:30:00.000Z",
       "updatedAt": "2026-08-20T20:30:00.000Z",
       "updatedBy": "Andrea Messina"
@@ -285,6 +309,9 @@
         "be729f42-25fa-475b-be69-05c42c1392d2": "absent",
         "6710b68e-ea05-4e46-899e-8d9fa436d6de": "present"
       },
+      "earlyDepartures": [
+        "364717cc-ec8d-484c-bfaa-dbcfe3e56cf9"
+      ],
       "createdAt": "2026-08-27T20:30:00.000Z",
       "updatedAt": "2026-08-27T20:30:00.000Z",
       "updatedBy": "Andrea Messina"
@@ -310,6 +337,9 @@
         "be729f42-25fa-475b-be69-05c42c1392d2": "absent",
         "6710b68e-ea05-4e46-899e-8d9fa436d6de": "absent"
       },
+      "earlyDepartures": [
+        "0b5e2239-0993-4add-82d2-8586f1fe289f"
+      ],
       "createdAt": "2026-08-28T20:30:00.000Z",
       "updatedAt": "2026-08-28T20:30:00.000Z",
       "updatedBy": "Andrea Messina"
@@ -435,6 +465,9 @@
         "be729f42-25fa-475b-be69-05c42c1392d2": "present",
         "6710b68e-ea05-4e46-899e-8d9fa436d6de": "present"
       },
+      "earlyDepartures": [
+        "fd355842-fbb3-4098-8833-444128908df9"
+      ],
       "createdAt": "2026-09-10T20:30:00.000Z",
       "updatedAt": "2026-09-10T20:30:00.000Z",
       "updatedBy": "Andrea Messina"
@@ -460,6 +493,10 @@
         "be729f42-25fa-475b-be69-05c42c1392d2": "volley",
         "6710b68e-ea05-4e46-899e-8d9fa436d6de": "present"
       },
+      "earlyDepartures": [
+        "17897e79-0726-43e9-88ef-ff0813185f45",
+        "8faa691a-e66e-4454-93ef-553ff2e5485c"
+      ],
       "createdAt": "2026-09-11T20:30:00.000Z",
       "updatedAt": "2026-09-11T20:30:00.000Z",
       "updatedBy": "Andrea Messina"
@@ -610,6 +647,9 @@
         "be729f42-25fa-475b-be69-05c42c1392d2": "present",
         "6710b68e-ea05-4e46-899e-8d9fa436d6de": "present"
       },
+      "earlyDepartures": [
+        "be729f42-25fa-475b-be69-05c42c1392d2"
+      ],
       "createdAt": "2026-09-25T20:30:00.000Z",
       "updatedAt": "2026-09-25T20:30:00.000Z",
       "updatedBy": "Andrea Messina"
@@ -635,6 +675,9 @@
         "be729f42-25fa-475b-be69-05c42c1392d2": "present",
         "6710b68e-ea05-4e46-899e-8d9fa436d6de": "present"
       },
+      "earlyDepartures": [
+        "7b86da0b-7152-4afd-9285-4bd50dee1bea"
+      ],
       "createdAt": "2026-09-29T20:30:00.000Z",
       "updatedAt": "2026-09-29T20:30:00.000Z",
       "updatedBy": "Andrea Messina"
@@ -810,6 +853,9 @@
         "be729f42-25fa-475b-be69-05c42c1392d2": "absent",
         "6710b68e-ea05-4e46-899e-8d9fa436d6de": "present"
       },
+      "earlyDepartures": [
+        "5af24f25-cdcb-4f92-82f2-96a0d359c4f3"
+      ],
       "createdAt": "2026-10-15T20:30:00.000Z",
       "updatedAt": "2026-10-15T20:30:00.000Z",
       "updatedBy": "Andrea Messina"
@@ -985,6 +1031,9 @@
         "be729f42-25fa-475b-be69-05c42c1392d2": "present",
         "6710b68e-ea05-4e46-899e-8d9fa436d6de": "present"
       },
+      "earlyDepartures": [
+        "fd355842-fbb3-4098-8833-444128908df9"
+      ],
       "createdAt": "2026-10-30T20:30:00.000Z",
       "updatedAt": "2026-10-30T20:30:00.000Z",
       "updatedBy": "Andrea Messina"
@@ -1010,6 +1059,9 @@
         "be729f42-25fa-475b-be69-05c42c1392d2": "volley",
         "6710b68e-ea05-4e46-899e-8d9fa436d6de": "present"
       },
+      "earlyDepartures": [
+        "dd6c6647-9708-4254-81ae-5db837d566c6"
+      ],
       "createdAt": "2026-11-03T20:30:00.000Z",
       "updatedAt": "2026-11-03T20:30:00.000Z",
       "updatedBy": "Andrea Messina"
@@ -1035,6 +1087,9 @@
         "be729f42-25fa-475b-be69-05c42c1392d2": "present",
         "6710b68e-ea05-4e46-899e-8d9fa436d6de": "present"
       },
+      "earlyDepartures": [
+        "cfea091b-3b76-4538-b0e7-2a1330dbc9cc"
+      ],
       "createdAt": "2026-11-05T20:30:00.000Z",
       "updatedAt": "2026-11-05T20:30:00.000Z",
       "updatedBy": "Andrea Messina"
@@ -1135,6 +1190,9 @@
         "be729f42-25fa-475b-be69-05c42c1392d2": "present",
         "6710b68e-ea05-4e46-899e-8d9fa436d6de": "present"
       },
+      "earlyDepartures": [
+        "0b5e2239-0993-4add-82d2-8586f1fe289f"
+      ],
       "createdAt": "2026-11-13T20:30:00.000Z",
       "updatedAt": "2026-11-13T20:30:00.000Z",
       "updatedBy": "Andrea Messina"
@@ -1160,6 +1218,9 @@
         "be729f42-25fa-475b-be69-05c42c1392d2": "present",
         "6710b68e-ea05-4e46-899e-8d9fa436d6de": "present"
       },
+      "earlyDepartures": [
+        "5af24f25-cdcb-4f92-82f2-96a0d359c4f3"
+      ],
       "createdAt": "2026-11-17T20:30:00.000Z",
       "updatedAt": "2026-11-17T20:30:00.000Z",
       "updatedBy": "Andrea Messina"
@@ -1285,6 +1346,9 @@
         "be729f42-25fa-475b-be69-05c42c1392d2": "present",
         "6710b68e-ea05-4e46-899e-8d9fa436d6de": "present"
       },
+      "earlyDepartures": [
+        "6710b68e-ea05-4e46-899e-8d9fa436d6de"
+      ],
       "createdAt": "2026-11-27T20:30:00.000Z",
       "updatedAt": "2026-11-27T20:30:00.000Z",
       "updatedBy": "Andrea Messina"
@@ -1335,6 +1399,9 @@
         "be729f42-25fa-475b-be69-05c42c1392d2": "present",
         "6710b68e-ea05-4e46-899e-8d9fa436d6de": "present"
       },
+      "earlyDepartures": [
+        "364717cc-ec8d-484c-bfaa-dbcfe3e56cf9"
+      ],
       "createdAt": "2026-12-03T20:30:00.000Z",
       "updatedAt": "2026-12-03T20:30:00.000Z",
       "updatedBy": "Andrea Messina"
@@ -1360,6 +1427,9 @@
         "be729f42-25fa-475b-be69-05c42c1392d2": "present",
         "6710b68e-ea05-4e46-899e-8d9fa436d6de": "present"
       },
+      "earlyDepartures": [
+        "8faa691a-e66e-4454-93ef-553ff2e5485c"
+      ],
       "createdAt": "2026-12-04T20:30:00.000Z",
       "updatedAt": "2026-12-04T20:30:00.000Z",
       "updatedBy": "Andrea Messina"
@@ -1410,6 +1480,9 @@
         "be729f42-25fa-475b-be69-05c42c1392d2": "absent",
         "6710b68e-ea05-4e46-899e-8d9fa436d6de": "present"
       },
+      "earlyDepartures": [
+        "8faa691a-e66e-4454-93ef-553ff2e5485c"
+      ],
       "createdAt": "2026-12-10T20:30:00.000Z",
       "updatedAt": "2026-12-10T20:30:00.000Z",
       "updatedBy": "Andrea Messina"
@@ -1485,6 +1558,9 @@
         "be729f42-25fa-475b-be69-05c42c1392d2": "absent",
         "6710b68e-ea05-4e46-899e-8d9fa436d6de": "present"
       },
+      "earlyDepartures": [
+        "7b86da0b-7152-4afd-9285-4bd50dee1bea"
+      ],
       "createdAt": "2026-12-17T20:30:00.000Z",
       "updatedAt": "2026-12-17T20:30:00.000Z",
       "updatedBy": "Andrea Messina"
@@ -1510,6 +1586,9 @@
         "be729f42-25fa-475b-be69-05c42c1392d2": "present",
         "6710b68e-ea05-4e46-899e-8d9fa436d6de": "present"
       },
+      "earlyDepartures": [
+        "fd355842-fbb3-4098-8833-444128908df9"
+      ],
       "createdAt": "2026-12-18T20:30:00.000Z",
       "updatedAt": "2026-12-18T20:30:00.000Z",
       "updatedBy": "Andrea Messina"
@@ -1585,6 +1664,9 @@
         "be729f42-25fa-475b-be69-05c42c1392d2": "absent",
         "6710b68e-ea05-4e46-899e-8d9fa436d6de": "volley"
       },
+      "earlyDepartures": [
+        "5a1275ab-6cf6-4340-8c22-65be56369e44"
+      ],
       "createdAt": "2027-01-08T20:30:00.000Z",
       "updatedAt": "2027-01-08T20:30:00.000Z",
       "updatedBy": "Andrea Messina"
@@ -1710,6 +1792,9 @@
         "be729f42-25fa-475b-be69-05c42c1392d2": "injured",
         "6710b68e-ea05-4e46-899e-8d9fa436d6de": "present"
       },
+      "earlyDepartures": [
+        "5af24f25-cdcb-4f92-82f2-96a0d359c4f3"
+      ],
       "createdAt": "2027-01-21T20:30:00.000Z",
       "updatedAt": "2027-01-21T20:30:00.000Z",
       "updatedBy": "Andrea Messina"
@@ -1760,6 +1845,9 @@
         "be729f42-25fa-475b-be69-05c42c1392d2": "present",
         "6710b68e-ea05-4e46-899e-8d9fa436d6de": "present"
       },
+      "earlyDepartures": [
+        "97f00238-3d56-42d5-b20c-a451172065b4"
+      ],
       "createdAt": "2027-01-26T20:30:00.000Z",
       "updatedAt": "2027-01-26T20:30:00.000Z",
       "updatedBy": "Andrea Messina"
@@ -2010,6 +2098,9 @@
         "be729f42-25fa-475b-be69-05c42c1392d2": "present",
         "6710b68e-ea05-4e46-899e-8d9fa436d6de": "present"
       },
+      "earlyDepartures": [
+        "5af24f25-cdcb-4f92-82f2-96a0d359c4f3"
+      ],
       "createdAt": "2027-02-18T20:30:00.000Z",
       "updatedAt": "2027-02-18T20:30:00.000Z",
       "updatedBy": "Andrea Messina"
@@ -2060,6 +2151,9 @@
         "be729f42-25fa-475b-be69-05c42c1392d2": "present",
         "6710b68e-ea05-4e46-899e-8d9fa436d6de": "present"
       },
+      "earlyDepartures": [
+        "cfea091b-3b76-4538-b0e7-2a1330dbc9cc"
+      ],
       "createdAt": "2027-02-23T20:30:00.000Z",
       "updatedAt": "2027-02-23T20:30:00.000Z",
       "updatedBy": "Andrea Messina"
@@ -2134,6 +2228,9 @@
         "dd6c6647-9708-4254-81ae-5db837d566c6": "present",
         "be729f42-25fa-475b-be69-05c42c1392d2": "present"
       },
+      "earlyDepartures": [
+        "0b3c1a40-0afc-4d73-9a38-e75f817f2955"
+      ],
       "createdAt": "2027-03-02T20:30:00.000Z",
       "updatedAt": "2027-03-02T20:30:00.000Z",
       "updatedBy": "Andrea Messina"
@@ -2206,6 +2303,9 @@
         "dd6c6647-9708-4254-81ae-5db837d566c6": "present",
         "be729f42-25fa-475b-be69-05c42c1392d2": "volley"
       },
+      "earlyDepartures": [
+        "0b5e2239-0993-4add-82d2-8586f1fe289f"
+      ],
       "createdAt": "2027-03-09T20:30:00.000Z",
       "updatedAt": "2027-03-09T20:30:00.000Z",
       "updatedBy": "Andrea Messina"
@@ -2278,6 +2378,9 @@
         "dd6c6647-9708-4254-81ae-5db837d566c6": "present",
         "be729f42-25fa-475b-be69-05c42c1392d2": "present"
       },
+      "earlyDepartures": [
+        "0b5e2239-0993-4add-82d2-8586f1fe289f"
+      ],
       "createdAt": "2027-03-16T20:30:00.000Z",
       "updatedAt": "2027-03-16T20:30:00.000Z",
       "updatedBy": "Andrea Messina"
@@ -2326,6 +2429,11 @@
         "dd6c6647-9708-4254-81ae-5db837d566c6": "present",
         "be729f42-25fa-475b-be69-05c42c1392d2": "present"
       },
+      "earlyDepartures": [
+        "5af24f25-cdcb-4f92-82f2-96a0d359c4f3",
+        "fd355842-fbb3-4098-8833-444128908df9",
+        "97f00238-3d56-42d5-b20c-a451172065b4"
+      ],
       "createdAt": "2027-03-19T20:30:00.000Z",
       "updatedAt": "2027-03-19T20:30:00.000Z",
       "updatedBy": "Andrea Messina"
@@ -2350,6 +2458,9 @@
         "dd6c6647-9708-4254-81ae-5db837d566c6": "absent",
         "be729f42-25fa-475b-be69-05c42c1392d2": "late"
       },
+      "earlyDepartures": [
+        "cfea091b-3b76-4538-b0e7-2a1330dbc9cc"
+      ],
       "createdAt": "2027-03-23T20:30:00.000Z",
       "updatedAt": "2027-03-23T20:30:00.000Z",
       "updatedBy": "Andrea Messina"
@@ -2566,6 +2677,9 @@
         "dd6c6647-9708-4254-81ae-5db837d566c6": "present",
         "be729f42-25fa-475b-be69-05c42c1392d2": "present"
       },
+      "earlyDepartures": [
+        "364717cc-ec8d-484c-bfaa-dbcfe3e56cf9"
+      ],
       "createdAt": "2027-04-15T20:30:00.000Z",
       "updatedAt": "2027-04-15T20:30:00.000Z",
       "updatedBy": "Andrea Messina"
@@ -2590,6 +2704,9 @@
         "dd6c6647-9708-4254-81ae-5db837d566c6": "present",
         "be729f42-25fa-475b-be69-05c42c1392d2": "absent"
       },
+      "earlyDepartures": [
+        "364717cc-ec8d-484c-bfaa-dbcfe3e56cf9"
+      ],
       "createdAt": "2027-04-16T20:30:00.000Z",
       "updatedAt": "2027-04-16T20:30:00.000Z",
       "updatedBy": "Andrea Messina"
@@ -2614,6 +2731,9 @@
         "dd6c6647-9708-4254-81ae-5db837d566c6": "volley",
         "be729f42-25fa-475b-be69-05c42c1392d2": "present"
       },
+      "earlyDepartures": [
+        "08719deb-949a-4087-8e4d-9323d192096c"
+      ],
       "createdAt": "2027-04-20T20:30:00.000Z",
       "updatedAt": "2027-04-20T20:30:00.000Z",
       "updatedBy": "Andrea Messina"
@@ -2662,6 +2782,10 @@
         "dd6c6647-9708-4254-81ae-5db837d566c6": "present",
         "be729f42-25fa-475b-be69-05c42c1392d2": "present"
       },
+      "earlyDepartures": [
+        "cfea091b-3b76-4538-b0e7-2a1330dbc9cc",
+        "8faa691a-e66e-4454-93ef-553ff2e5485c"
+      ],
       "createdAt": "2027-04-23T20:30:00.000Z",
       "updatedAt": "2027-04-23T20:30:00.000Z",
       "updatedBy": "Andrea Messina"
@@ -2710,6 +2834,9 @@
         "dd6c6647-9708-4254-81ae-5db837d566c6": "present",
         "be729f42-25fa-475b-be69-05c42c1392d2": "present"
       },
+      "earlyDepartures": [
+        "5af24f25-cdcb-4f92-82f2-96a0d359c4f3"
+      ],
       "createdAt": "2027-04-29T20:30:00.000Z",
       "updatedAt": "2027-04-29T20:30:00.000Z",
       "updatedBy": "Andrea Messina"
@@ -2782,6 +2909,9 @@
         "dd6c6647-9708-4254-81ae-5db837d566c6": "present",
         "be729f42-25fa-475b-be69-05c42c1392d2": "present"
       },
+      "earlyDepartures": [
+        "0b3c1a40-0afc-4d73-9a38-e75f817f2955"
+      ],
       "createdAt": "2027-05-06T20:30:00.000Z",
       "updatedAt": "2027-05-06T20:30:00.000Z",
       "updatedBy": "Andrea Messina"
@@ -2806,6 +2936,9 @@
         "dd6c6647-9708-4254-81ae-5db837d566c6": "present",
         "be729f42-25fa-475b-be69-05c42c1392d2": "present"
       },
+      "earlyDepartures": [
+        "364717cc-ec8d-484c-bfaa-dbcfe3e56cf9"
+      ],
       "createdAt": "2027-05-07T20:30:00.000Z",
       "updatedAt": "2027-05-07T20:30:00.000Z",
       "updatedBy": "Andrea Messina"
@@ -2926,6 +3059,9 @@
         "dd6c6647-9708-4254-81ae-5db837d566c6": "present",
         "be729f42-25fa-475b-be69-05c42c1392d2": "present"
       },
+      "earlyDepartures": [
+        "7b86da0b-7152-4afd-9285-4bd50dee1bea"
+      ],
       "createdAt": "2027-05-20T20:30:00.000Z",
       "updatedAt": "2027-05-20T20:30:00.000Z",
       "updatedBy": "Andrea Messina"
@@ -3070,6 +3206,9 @@
         "dd6c6647-9708-4254-81ae-5db837d566c6": "present",
         "be729f42-25fa-475b-be69-05c42c1392d2": "present"
       },
+      "earlyDepartures": [
+        "fd355842-fbb3-4098-8833-444128908df9"
+      ],
       "createdAt": "2027-06-03T20:30:00.000Z",
       "updatedAt": "2027-06-03T20:30:00.000Z",
       "updatedBy": "Andrea Messina"
@@ -3142,6 +3281,9 @@
         "dd6c6647-9708-4254-81ae-5db837d566c6": "present",
         "be729f42-25fa-475b-be69-05c42c1392d2": "present"
       },
+      "earlyDepartures": [
+        "0b3c1a40-0afc-4d73-9a38-e75f817f2955"
+      ],
       "createdAt": "2027-06-10T20:30:00.000Z",
       "updatedAt": "2027-06-10T20:30:00.000Z",
       "updatedBy": "Andrea Messina"
@@ -3238,6 +3380,10 @@
         "dd6c6647-9708-4254-81ae-5db837d566c6": "present",
         "be729f42-25fa-475b-be69-05c42c1392d2": "late"
       },
+      "earlyDepartures": [
+        "5af24f25-cdcb-4f92-82f2-96a0d359c4f3",
+        "3386bc21-a625-42af-85f1-627736cea4e6"
+      ],
       "createdAt": "2027-06-18T20:30:00.000Z",
       "updatedAt": "2027-06-18T20:30:00.000Z",
       "updatedBy": "Andrea Messina"
@@ -3262,6 +3408,9 @@
         "dd6c6647-9708-4254-81ae-5db837d566c6": "present",
         "be729f42-25fa-475b-be69-05c42c1392d2": "present"
       },
+      "earlyDepartures": [
+        "7b86da0b-7152-4afd-9285-4bd50dee1bea"
+      ],
       "createdAt": "2027-06-22T20:30:00.000Z",
       "updatedAt": "2027-06-22T20:30:00.000Z",
       "updatedBy": "Andrea Messina"
@@ -3286,6 +3435,9 @@
         "dd6c6647-9708-4254-81ae-5db837d566c6": "present",
         "be729f42-25fa-475b-be69-05c42c1392d2": "present"
       },
+      "earlyDepartures": [
+        "364717cc-ec8d-484c-bfaa-dbcfe3e56cf9"
+      ],
       "createdAt": "2027-06-24T20:30:00.000Z",
       "updatedAt": "2027-06-24T20:30:00.000Z",
       "updatedBy": "Andrea Messina"
@@ -3310,6 +3462,9 @@
         "dd6c6647-9708-4254-81ae-5db837d566c6": "present",
         "be729f42-25fa-475b-be69-05c42c1392d2": "volley"
       },
+      "earlyDepartures": [
+        "5a1275ab-6cf6-4340-8c22-65be56369e44"
+      ],
       "createdAt": "2027-06-25T20:30:00.000Z",
       "updatedAt": "2027-06-25T20:30:00.000Z",
       "updatedBy": "Andrea Messina"
@@ -3430,6 +3585,9 @@
         "dd6c6647-9708-4254-81ae-5db837d566c6": "present",
         "be729f42-25fa-475b-be69-05c42c1392d2": "present"
       },
+      "earlyDepartures": [
+        "08719deb-949a-4087-8e4d-9323d192096c"
+      ],
       "createdAt": "2027-07-08T20:30:00.000Z",
       "updatedAt": "2027-07-08T20:30:00.000Z",
       "updatedBy": "Andrea Messina"
@@ -3502,6 +3660,9 @@
         "dd6c6647-9708-4254-81ae-5db837d566c6": "late",
         "be729f42-25fa-475b-be69-05c42c1392d2": "absent"
       },
+      "earlyDepartures": [
+        "97f00238-3d56-42d5-b20c-a451172065b4"
+      ],
       "createdAt": "2027-07-15T20:30:00.000Z",
       "updatedAt": "2027-07-15T20:30:00.000Z",
       "updatedBy": "Andrea Messina"

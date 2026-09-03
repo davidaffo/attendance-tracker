@@ -6,7 +6,7 @@ import under16 from '../../resources/nextcloud-demo-2026-2027/under-16-verde__20
 import under18 from '../../resources/nextcloud-demo-2026-2027/under-18-gialla__2026-2027.attendance.json'
 import { isTeamDocument, parseTeamDocument, sessionsInMonth } from '../domain/document'
 import type { TeamDocument } from '../domain/types'
-import { parseSelectedFiles } from '../services/localFiles'
+import { parseSelectedFiles, writeTeamDocumentToFile } from '../services/localFiles'
 
 const fixtures: unknown[] = [serieD, under12, under14, under16, under18]
 
@@ -27,6 +27,19 @@ describe('stagione dimostrativa del coordinatore', () => {
           `${document.teamName}: mese ${offset + 1}`
         ).toBeGreaterThan(0)
       }
+    }
+  })
+
+  it('include calendario, date ignorate e uscite anticipate di esempio', () => {
+    for (const document of fixtures as TeamDocument[]) {
+      expect(document.trainingWeekdays?.length).toBeGreaterThan(0)
+      expect(document.ignoredTrainingDates?.length).toBeGreaterThan(0)
+      expect(
+        document.sessions.reduce(
+          (total, session) => total + (session.earlyDepartures?.length ?? 0),
+          0
+        )
+      ).toBeGreaterThan(0)
     }
   })
 
@@ -75,5 +88,32 @@ describe('stagione dimostrativa del coordinatore', () => {
       'Under 18 Gialla'
     ])
     expect(result.every((team) => isTeamDocument(parseTeamDocument(JSON.stringify(team.document))))).toBe(true)
+  })
+
+  it('salva le modifiche del coordinatore nel file locale autorizzato', async () => {
+    const current = structuredClone(under14) as TeamDocument
+    const updated: TeamDocument = {
+      ...current,
+      coachName: 'Allenatrice Aggiornata',
+      revision: current.revision + 1,
+      updatedAt: '2028-01-01T12:00:00.000Z'
+    }
+    let written = ''
+    const handle = {
+      queryPermission: async () => 'granted',
+      requestPermission: async () => 'granted',
+      getFile: async () => ({ text: async () => JSON.stringify(current) }),
+      createWritable: async () => ({
+        write: async (contents: string) => {
+          written = contents
+        },
+        close: async () => undefined
+      })
+    } as unknown as FileSystemFileHandle
+
+    const saved = await writeTeamDocumentToFile(handle, updated)
+
+    expect(saved.coachName).toBe('Allenatrice Aggiornata')
+    expect(parseTeamDocument(written).coachName).toBe('Allenatrice Aggiornata')
   })
 })

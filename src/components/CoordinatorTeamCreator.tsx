@@ -10,6 +10,7 @@ import { createTeamDocument, getCurrentSeason } from '../domain/defaults'
 import { formatAthleteName } from '../domain/athleteList'
 import type { TeamDocument } from '../domain/types'
 import { AthleteListPaste } from './AthleteListPaste'
+import { WeekdayPicker } from './WeekdayPicker'
 
 interface CoordinatorTeamCreatorProps {
   onCreate: (document: TeamDocument) => Promise<void>
@@ -27,6 +28,7 @@ export function CoordinatorTeamCreator({
   const [teamName, setTeamName] = useState('')
   const [coachName, setCoachName] = useState('')
   const [startYear, setStartYear] = useState(currentSeason.startYear)
+  const [weekdays, setWeekdays] = useState<number[]>([])
   const [athletes, setAthletes] = useState<string[]>([''])
   const [submitting, setSubmitting] = useState(false)
   const [message, setMessage] = useState('')
@@ -65,6 +67,7 @@ export function CoordinatorTeamCreator({
           teamName,
           coachName,
           startYear,
+          weekdays,
           athleteNames: athletes
         })
       )
@@ -134,6 +137,12 @@ export function CoordinatorTeamCreator({
               <output>{Number.isFinite(startYear) ? startYear + 1 : '—'}</output>
             </div>
           </label>
+        </div>
+
+        <div className="field block-field">
+          <span>Giorni di allenamento</span>
+          <WeekdayPicker value={weekdays} onChange={setWeekdays} />
+          <small>Il calendario potrà essere modificato soltanto dal coordinatore.</small>
         </div>
 
         <fieldset className="fieldset">

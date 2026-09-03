@@ -7,4 +7,5 @@ Contiene 5 squadre e dati interamente sintetici, generati da
 Per provarla: aprire la modalità **Coordinatore**, scegliere **Cartella locale**
 e selezionare questa directory. Ogni squadra ha sedute in tutti i dodici mesi;
 sono presenti anche un ingresso tardivo, due archiviazioni con storico e una
-seduta finale parzialmente compilata.
+seduta finale parzialmente compilata. I registri includono giorni pianificati,
+pause stagionali ignorate e alcune uscite anticipate.

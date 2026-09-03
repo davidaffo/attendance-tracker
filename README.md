@@ -282,6 +282,29 @@ delle squadre).
 Indietro, Avanti, apertura diretta e ricaricamento funzionano anche nella PWA
 installata e su hosting statici privi di fallback, come GitHub Pages.
 
+## Allenamenti previsti e uscite anticipate
+
+Ogni squadra può avere uno o più giorni settimanali di allenamento. La
+panoramica segnala la seduta prevista oggi e le date passate ancora prive di
+una sessione; ciascuna data può essere aperta per compilare il registro oppure
+ignorata, per esempio in caso di festività o allenamento annullato.
+
+Per le squadre create e condivise dal coordinatore, soltanto il coordinatore
+può modificare i giorni settimanali. L’allenatore può comunque compilare o
+ignorare le sessioni previste. Il flag `U` (uscita anticipata) è indipendente
+dallo stato di presenza e dispone di conteggio e percentuale propri nei
+riepiloghi mensili e stagionali.
+
+Il coordinatore con accesso in scrittura può ignorare direttamente gli avvisi
+oppure usare `Entra come allenatore` per aprire la squadra e compilarne le
+sessioni. Le date ignorate fanno parte del registro condiviso e scompaiono
+anche per l’allenatore al successivo aggiornamento da Nextcloud.
+
+Le stesse operazioni sono disponibili per i registri aperti tramite
+`Cartella locale`: se il browser concede l’accesso in scrittura, le modifiche
+vengono salvate direttamente nel file `.attendance.json`. Il selettore manuale
+di file usato come ripiego nei browser non compatibili resta in sola lettura.
+
 ## Pubblicazione su GitHub Pages
 
 Il repository è predisposto per pubblicare automaticamente

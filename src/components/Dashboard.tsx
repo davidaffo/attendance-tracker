@@ -3,13 +3,16 @@ import type { TeamDocument, TrainingSession } from '../domain/types'
 import {
   athleteTotals,
   completedAttendancesForAthletes,
+  earlyDepartureCountForAthlete,
   sessionsInMonth
 } from '../domain/document'
+import { PlannedSessionsPanel } from './PlannedSessionsPanel'
 
 interface DashboardProps {
   document: TeamDocument
-  onNewSession: () => void
+  onNewSession: (date?: string) => void
   onEditSession: (session: TrainingSession) => void
+  onIgnorePlannedSession: (date: string) => Promise<void>
 }
 
 const monthFormatter = new Intl.DateTimeFormat('it-IT', { month: 'long', year: 'numeric' })
@@ -19,7 +22,12 @@ const dateFormatter = new Intl.DateTimeFormat('it-IT', {
   month: 'short'
 })
 
-export function Dashboard({ document, onNewSession, onEditSession }: DashboardProps) {
+export function Dashboard({
+  document,
+  onNewSession,
+  onEditSession,
+  onIgnorePlannedSession
+}: DashboardProps) {
   const now = new Date()
   const monthSessions = sessionsInMonth(document, now.getFullYear(), now.getMonth())
   const recent = [...document.sessions].sort((a, b) => b.date.localeCompare(a.date)).slice(0, 4)
@@ -33,6 +41,11 @@ export function Dashboard({ document, onNewSession, onEditSession }: DashboardPr
     : 0
   const possible = activeAthletes.length * monthSessions.length
   const presenceRate = possible ? Math.round((presentCount / possible) * 100) : 0
+  const earlyDepartures = activeAthletes.reduce(
+    (total, athlete) => total + earlyDepartureCountForAthlete(document, athlete.id, monthSessions),
+    0
+  )
+  const earlyDepartureRate = possible ? Math.round((earlyDepartures / possible) * 100) : 0
 
   return (
     <div className="page-content dashboard">
@@ -40,11 +53,17 @@ export function Dashboard({ document, onNewSession, onEditSession }: DashboardPr
         <div>
           <h1>Panoramica</h1>
         </div>
-        <button className="button light" onClick={onNewSession}>
+        <button className="button light" onClick={() => onNewSession()}>
           <Plus size={19} />
           Nuova sessione
         </button>
       </section>
+
+      <PlannedSessionsPanel
+        document={document}
+        onAdd={onNewSession}
+        onIgnore={onIgnorePlannedSession}
+      />
 
       <div className="section-heading">
         <div>
@@ -67,6 +86,11 @@ export function Dashboard({ document, onNewSession, onEditSession }: DashboardPr
           <span className="metric-code">P</span>
           <strong>{presenceRate}%</strong>
           <span>Presenze del mese</span>
+        </article>
+        <article className="metric-card">
+          <span className="metric-code">U</span>
+          <strong>{earlyDepartureRate}%</strong>
+          <span>Uscite anticipate del mese</span>
         </article>
       </section>
 

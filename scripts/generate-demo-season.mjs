@@ -122,6 +122,21 @@ function trainingDates(weekdays) {
   return dates
 }
 
+function ignoredTrainingDates(weekdays) {
+  const dates = []
+  const recordedDates = new Set(trainingDates(weekdays))
+  for (
+    let date = new Date(`${startYear}-08-01T12:00:00.000Z`);
+    date <= new Date(`${endYear}-07-31T12:00:00.000Z`);
+    date.setUTCDate(date.getUTCDate() + 1)
+  ) {
+    if (weekdays.includes(date.getUTCDay()) && !recordedDates.has(isoDate(date))) {
+      dates.push(isoDate(date))
+    }
+  }
+  return dates
+}
+
 function attendanceFor(teamId, athleteId, date) {
   const score = scoreFor(`${teamId}:${athleteId}:${date}`) % 100
   if (score < 82) return 'present'
@@ -149,6 +164,7 @@ function createDocument(team) {
   const dates = trainingDates(team.weekdays)
   const sessions = dates.map((date, sessionIndex) => {
     const attendances = {}
+    const earlyDepartures = []
     for (const [athleteIndex, athlete] of athletes.entries()) {
       if (athleteIndex === team.joinedLateIndex && date < `${startYear}-11-02`) continue
       if (athleteIndex === team.archivedIndex && date >= `${endYear}-03-01`) continue
@@ -159,7 +175,15 @@ function createDocument(team) {
         scoreFor(`${team.id}:incomplete:${athlete.id}`) % 4 === 0
       ) continue
 
-      attendances[athlete.id] = attendanceFor(team.id, athlete.id, date)
+      const attendance = attendanceFor(team.id, athlete.id, date)
+      attendances[athlete.id] = attendance
+      if (
+        attendance !== 'absent' &&
+        attendance !== 'injured' &&
+        scoreFor(`${team.id}:early-departure:${athlete.id}:${date}`) % 37 === 0
+      ) {
+        earlyDepartures.push(athlete.id)
+      }
     }
 
     const timestamp = `${date}T20:30:00.000Z`
@@ -167,6 +191,7 @@ function createDocument(team) {
       id: uuidFor(`${team.id}:session:${date}`),
       date,
       attendances,
+      ...(earlyDepartures.length ? { earlyDepartures } : {}),
       createdAt: timestamp,
       updatedAt: timestamp,
       updatedBy: team.coach
@@ -184,6 +209,8 @@ function createDocument(team) {
     updatedAt: generatedAt,
     updatedBy: team.coach,
     statuses,
+    trainingWeekdays: team.weekdays,
+    ignoredTrainingDates: ignoredTrainingDates(team.weekdays),
     athletes,
     sessions
   }
@@ -205,7 +232,8 @@ Contiene ${teams.length} squadre e dati interamente sintetici, generati da
 Per provarla: aprire la modalità **Coordinatore**, scegliere **Cartella locale**
 e selezionare questa directory. Ogni squadra ha sedute in tutti i dodici mesi;
 sono presenti anche un ingresso tardivo, due archiviazioni con storico e una
-seduta finale parzialmente compilata.
+seduta finale parzialmente compilata. I registri includono giorni pianificati,
+pause stagionali ignorate e alcune uscite anticipate.
 `
 await writeFile(path.join(root, 'README.md'), readme)
 

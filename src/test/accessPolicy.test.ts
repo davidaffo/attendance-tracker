@@ -15,6 +15,7 @@ describe('politiche di accesso ai registri', () => {
   it('attiva la sincronizzazione in background per ogni origine del registro', () => {
     expect(allowsCoachBackgroundSync('coordinator-managed')).toBe(true)
     expect(allowsCoachBackgroundSync('self-managed')).toBe(true)
+    expect(allowsCoachBackgroundSync('coordinator-local')).toBe(false)
   })
 
   it('considera soltanto i dati salvati per la modalità attiva', () => {

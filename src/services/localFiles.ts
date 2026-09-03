@@ -1,4 +1,8 @@
-import { parseTeamDocument } from '../domain/document'
+import {
+  mergeDocuments,
+  parseTeamDocument,
+  serializeTeamDocument
+} from '../domain/document'
 import { isBackupPath } from '../domain/backup'
 import type { TeamSummary } from '../domain/types'
 
@@ -18,7 +22,11 @@ async function scanHandle(
 
     try {
       const file = await entry.getFile()
-      output.push({ source: path, document: parseTeamDocument(await file.text()) })
+      output.push({
+        source: path,
+        document: parseTeamDocument(await file.text()),
+        fileHandle: entry
+      })
     } catch (error) {
       console.warn(`File ignorato: ${path}`, error)
     }
@@ -40,8 +48,33 @@ export async function pickAndScanDirectory(): Promise<{
   if (!window.showDirectoryPicker) {
     throw new Error('Questo browser non consente di scegliere una cartella locale.')
   }
-  const handle = await window.showDirectoryPicker()
+  const handle = await window.showDirectoryPicker({ mode: 'readwrite' })
   return { handle, teams: await scanDirectoryHandle(handle) }
+}
+
+export async function writeTeamDocumentToFile(
+  handle: FileSystemFileHandle,
+  document: TeamSummary['document']
+): Promise<TeamSummary['document']> {
+  let permission = await handle.queryPermission({ mode: 'readwrite' })
+  if (permission !== 'granted') {
+    permission = await handle.requestPermission({ mode: 'readwrite' })
+  }
+  if (permission !== 'granted') {
+    throw new Error('Il browser non ha il permesso di modificare questo file locale.')
+  }
+
+  const current = parseTeamDocument(await (await handle.getFile()).text())
+  const next = serializeTeamDocument(current) === serializeTeamDocument(document)
+    ? document
+    : mergeDocuments(document, current)
+  const writable = await handle.createWritable()
+  try {
+    await writable.write(serializeTeamDocument(next))
+  } finally {
+    await writable.close()
+  }
+  return next
 }
 
 export async function parseSelectedFiles(files: FileList): Promise<TeamSummary[]> {

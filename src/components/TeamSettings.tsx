@@ -4,6 +4,7 @@ import type { TeamDocument } from '../domain/types'
 import { compareAthletesByName } from '../domain/document'
 import { formatAthleteName } from '../domain/athleteList'
 import { AthleteListPaste } from './AthleteListPaste'
+import { WeekdayPicker } from './WeekdayPicker'
 
 interface TeamSettingsProps {
   document: TeamDocument
@@ -191,6 +192,24 @@ export function TeamSettings({
         </div>
         )}
 
+      </section>
+
+      <section className="panel settings-panel">
+        <div className="panel-heading">
+          <div>
+            <h2>Giorni di allenamento</h2>
+            <p className="section-copy">
+              {managedByCoordinator
+                ? 'Il calendario settimanale è gestito dal coordinatore.'
+                : 'Serve per segnalare gli allenamenti previsti e quelli non ancora registrati.'}
+            </p>
+          </div>
+        </div>
+        <WeekdayPicker
+          value={draft.trainingWeekdays ?? []}
+          disabled={managedByCoordinator}
+          onChange={(weekdays) => update('trainingWeekdays', weekdays)}
+        />
       </section>
 
       {message && <p className="form-message">{message}</p>}

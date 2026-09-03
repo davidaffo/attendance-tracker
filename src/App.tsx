@@ -34,7 +34,7 @@ import {
   allowsCoachBackgroundSync,
   hasStoredSetupForMode
 } from './domain/accessPolicy'
-import { deleteSession, saveSession } from './domain/document'
+import { deleteSession, ignorePlannedTrainingDate, saveSession } from './domain/document'
 import {
   metaForManualSync,
   metaForRestoredBackup,
@@ -56,6 +56,7 @@ import {
   synchronizeDocument,
   testNextcloudCredentials
 } from './services/webdav'
+import { writeTeamDocumentToFile } from './services/localFiles'
 import {
   clearSessionPasswords,
   forgetSessionPassword,
@@ -66,6 +67,7 @@ import {
 import {
   clearLocalData,
   loadAppMode,
+  loadCoachFileHandle,
   loadCoachDocumentOrigin,
   loadCoordinatorSyncConfig,
   loadViewerSyncConfig,
@@ -73,9 +75,12 @@ import {
   loadSyncConfig,
   loadSyncMeta,
   removeLegacyEncryptedCredentials,
+  removeCoachFileHandle,
+  removeSyncConfig,
   storeAppMode,
   storeCoachOnboardingVersion,
   storeCoachDocumentOrigin,
+  storeCoachFileHandle,
   storeCoordinatorSyncConfig,
   storeViewerSyncConfig,
   storeDocument,
@@ -115,6 +120,11 @@ function currentRoutePath(): string {
     ? window.location.hash.slice(1)
     : '/'
   return normalizePath(routeWithQuery.split('?')[0])
+}
+
+function currentRouteSearchParams(): URLSearchParams {
+  const query = window.location.hash.split('?')[1] ?? ''
+  return new URLSearchParams(query)
 }
 
 function routeHref(path: string): string {
@@ -224,6 +234,7 @@ export default function App() {
   const configRef = useRef<SyncConfig | undefined>(undefined)
   const metaRef = useRef<LocalSyncMeta>({ dirty: false })
   const coachDocumentOriginRef = useRef<CoachDocumentOrigin | undefined>(undefined)
+  const coachFileHandleRef = useRef<FileSystemFileHandle | undefined>(undefined)
   const syncPromiseRef = useRef<Promise<SyncOutcome> | undefined>(undefined)
   const resettingRef = useRef(false)
   const passwordRequestRef = useRef<{
@@ -400,6 +411,7 @@ export default function App() {
       loadViewerSyncConfig(),
       loadSyncMeta(),
       loadCoachDocumentOrigin(),
+      loadCoachFileHandle(),
       removeLegacyEncryptedCredentials()
     ]).then(
       ([
@@ -409,7 +421,8 @@ export default function App() {
         storedCoordinatorConfig,
         storedViewerConfig,
         storedMeta,
-        storedDocumentOrigin
+        storedDocumentOrigin,
+        storedCoachFileHandle
       ]) => {
         if (!active) return
         applyDocument(storedDocument)
@@ -417,6 +430,7 @@ export default function App() {
         const resolvedDocumentOrigin =
           storedDocumentOrigin ?? (storedDocument ? 'self-managed' : undefined)
         applyCoachDocumentOrigin(resolvedDocumentOrigin)
+        coachFileHandleRef.current = storedCoachFileHandle
         setCoordinatorSyncConfig(storedCoordinatorConfig)
         const legacyReadOnlyConfig =
           storedMode === 'coordinator' &&
@@ -556,13 +570,23 @@ export default function App() {
   }
 
   const commitDocument = async (next: TeamDocument, syncNow = true) => {
-    const nextMeta = { ...metaRef.current, dirty: true, lastError: undefined }
-    await Promise.all([storeDocument(next), storeSyncMeta(nextMeta)])
-    applyDocument(next)
+    const localFileHandle = coachFileHandleRef.current
+    const localCoordinatorDocument =
+      coachDocumentOriginRef.current === 'coordinator-local'
+    const documentToStore = localFileHandle
+      ? await writeTeamDocumentToFile(localFileHandle, next)
+      : next
+    const nextMeta = {
+      ...metaRef.current,
+      dirty: !(localFileHandle || localCoordinatorDocument),
+      lastError: undefined
+    }
+    await Promise.all([storeDocument(documentToStore), storeSyncMeta(nextMeta)])
+    applyDocument(documentToStore)
     applyMeta(nextMeta)
     setSyncIndicator(configRef.current ? 'pending' : 'local')
     if (syncNow && configRef.current && navigator.onLine) {
-      void performSync(next, nextMeta, configRef.current)
+      void performSync(documentToStore, nextMeta, configRef.current)
     }
   }
 
@@ -583,6 +607,8 @@ export default function App() {
     }
     await storeCoachOnboardingVersion(COACH_ONBOARDING_VERSION)
     await storeCoachDocumentOrigin('self-managed')
+    await removeCoachFileHandle()
+    coachFileHandleRef.current = undefined
     applyCoachDocumentOrigin('self-managed')
     navigate(reopening ? '/allenatore/impostazioni' : '/allenatore', {
       replace: true
@@ -614,6 +640,8 @@ export default function App() {
       storeCoachOnboardingVersion(COACH_ONBOARDING_VERSION),
       storeCoachDocumentOrigin('self-managed')
     ])
+    await removeCoachFileHandle()
+    coachFileHandleRef.current = undefined
     applyDocument(restoredDocument)
     applyMeta(restoredMeta)
     applyCoachDocumentOrigin('self-managed')
@@ -632,7 +660,7 @@ export default function App() {
   }
 
   const handleSessionSave = async (
-    input: Pick<TrainingSession, 'id' | 'date' | 'attendances'>
+    input: Pick<TrainingSession, 'id' | 'date' | 'attendances' | 'earlyDepartures'>
   ) => {
     if (!document) return
     const otherOnDate = document.sessions.find(
@@ -647,10 +675,20 @@ export default function App() {
     await commitDocument(deleteSession(document, sessionId, document.coachName))
   }
 
+  const handleIgnorePlannedSession = async (date: string) => {
+    if (!document) return
+    await commitDocument(
+      ignorePlannedTrainingDate(document, date, document.coachName)
+    )
+  }
+
   const saveConfig = async (config: SyncConfig) => {
     await storeSyncConfig(config)
     applyConfig(config)
-    if (coachDocumentOriginRef.current === 'coordinator-managed') return
+    if (
+      coachDocumentOriginRef.current === 'coordinator-managed' ||
+      coachDocumentOriginRef.current === 'coordinator-local'
+    ) return
     if (documentRef.current) {
       if (syncPromiseRef.current) await syncPromiseRef.current
       applyConfig(config)
@@ -686,7 +724,8 @@ export default function App() {
 
   const openSharedCoachTeam = async (
     team: { document: TeamDocument },
-    config: SyncConfig
+    config: SyncConfig,
+    destination = '/allenatore'
   ) => {
     const currentDocument = documentRef.current
     if (
@@ -715,12 +754,65 @@ export default function App() {
       storeCoachOnboardingVersion(COACH_ONBOARDING_VERSION),
       storeCoachDocumentOrigin('coordinator-managed')
     ])
+    await removeCoachFileHandle()
+    coachFileHandleRef.current = undefined
     applyDocument(result.document)
     applyConfig(config)
     applyMeta(result.meta)
     applyCoachDocumentOrigin('coordinator-managed')
     setSyncIndicator('synced')
-    navigate('/allenatore', { replace: true })
+    navigate(destination, { replace: true })
+  }
+
+  const openCoordinatorTeamAsCoach = async (
+    team: TeamSummary,
+    config: SyncConfig | undefined,
+    sessionDate?: string
+  ) => {
+    const destination = sessionDate
+      ? `/allenatore/sessione/nuova?${new URLSearchParams({ date: sessionDate }).toString()}`
+      : '/allenatore'
+    if (config) {
+      await openSharedCoachTeam(team, config, destination)
+    } else {
+      const currentDocument = documentRef.current
+      if (
+        currentDocument &&
+        (currentDocument.teamId !== team.document.teamId ||
+          currentDocument.season.startYear !== team.document.season.startYear) &&
+        metaRef.current.dirty
+      ) {
+        const outcome = await performSync(
+          currentDocument,
+          metaRef.current,
+          configRef.current
+        )
+        if (outcome.status !== 'synced' && metaRef.current.dirty) {
+          throw new Error(
+            'La squadra attuale contiene modifiche non sincronizzate. Sincronizzale prima di cambiare squadra.'
+          )
+        }
+      }
+      const localMeta: LocalSyncMeta = { dirty: false }
+      await Promise.all([
+        storeDocument(team.document),
+        storeSyncMeta(localMeta),
+        storeCoachOnboardingVersion(COACH_ONBOARDING_VERSION),
+        storeCoachDocumentOrigin('coordinator-local'),
+        removeSyncConfig(),
+        team.fileHandle
+          ? storeCoachFileHandle(team.fileHandle)
+          : removeCoachFileHandle()
+      ])
+      coachFileHandleRef.current = team.fileHandle
+      applyDocument(team.document)
+      applyConfig(undefined)
+      applyMeta(localMeta)
+      applyCoachDocumentOrigin('coordinator-local')
+      setSyncIndicator('local')
+      navigate(destination, { replace: true })
+    }
+    await storeAppMode('coach')
   }
 
   const loadCoachTeamChoices = async () => {
@@ -901,6 +993,7 @@ export default function App() {
         onAuthenticated={(config) =>
           rememberSessionPassword(viewerMode ? 'viewer' : 'coordinator', config)
         }
+        onOpenAsCoach={openCoordinatorTeamAsCoach}
         onForgetPassword={() =>
           forgetSessionPassword(viewerMode ? 'viewer' : 'coordinator')
         }
@@ -1010,6 +1103,11 @@ export default function App() {
       <AttendanceEditor
         document={document}
         initialSession={initialSession}
+        initialDate={
+          sessionSegment === 'nuova'
+            ? currentRouteSearchParams().get('date') ?? undefined
+            : undefined
+        }
         onSave={handleSessionSave}
         onDelete={handleSessionDelete}
         onClose={closeEditor}
@@ -1021,6 +1119,11 @@ export default function App() {
 
   const SyncIcon =
     syncIndicator === 'syncing' ? LoaderCircle : syncIndicator === 'pending' ? CloudOff : Cloud
+  const canSwitchManagedCoachTeam =
+    coachDocumentOrigin === 'coordinator-managed' && Boolean(syncConfig)
+  const managedByCoordinator =
+    coachDocumentOrigin === 'coordinator-managed' ||
+    coachDocumentOrigin === 'coordinator-local'
 
   return renderPage(
     <div className="app-shell">
@@ -1042,7 +1145,7 @@ export default function App() {
             </a>
           ))}
         </nav>
-        {coachDocumentOrigin === 'coordinator-managed' ? (
+        {canSwitchManagedCoachTeam ? (
           <CoachTeamSwitcher
             currentDocument={document}
             teams={coachTeams}
@@ -1064,7 +1167,7 @@ export default function App() {
 
       <div className="main-column">
         <header className="topbar">
-          {coachDocumentOrigin === 'coordinator-managed' ? (
+          {canSwitchManagedCoachTeam ? (
             <button
               className="topbar-team topbar-team-switch"
               type="button"
@@ -1101,14 +1204,20 @@ export default function App() {
           {view === 'home' && (
             <Dashboard
               document={document}
-              onNewSession={() =>
-                navigate('/allenatore/sessione/nuova', { from: pathname })
+              onNewSession={(date) =>
+                navigate(
+                  date
+                    ? `/allenatore/sessione/nuova?${new URLSearchParams({ date }).toString()}`
+                    : '/allenatore/sessione/nuova',
+                  { from: pathname }
+                )
               }
               onEditSession={(session) =>
                 navigate(`/allenatore/sessione/${encodeURIComponent(session.id)}`, {
                   from: pathname
                 })
               }
+              onIgnorePlannedSession={handleIgnorePlannedSession}
             />
           )}
           {view === 'register' && (
@@ -1128,7 +1237,7 @@ export default function App() {
             <TeamSettings
               document={document}
               onUpdate={commitDocument}
-              managedByCoordinator={coachDocumentOrigin === 'coordinator-managed'}
+              managedByCoordinator={managedByCoordinator}
             />
           )}
           {view === 'settings' && (
@@ -1145,8 +1254,12 @@ export default function App() {
               onOpenOnboarding={() =>
                 navigate('/allenatore/configurazione-guidata')
               }
-              managedByCoordinator={coachDocumentOrigin === 'coordinator-managed'}
-              onChooseTeam={() => navigate('/allenatore/squadra-condivisa')}
+              managedByCoordinator={managedByCoordinator}
+              onChooseTeam={
+                syncConfig
+                  ? () => navigate('/allenatore/squadra-condivisa')
+                  : undefined
+              }
               onResetAllData={resetAllLocalData}
             />
           )}

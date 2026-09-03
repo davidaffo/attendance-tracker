@@ -1,12 +1,13 @@
 import { useMemo, useState } from 'react'
-import { ArrowLeft, Eraser, Save, Trash2, UserCheck, UserX } from 'lucide-react'
+import { ArrowLeft, DoorOpen, Eraser, Save, Trash2, UserCheck, UserX } from 'lucide-react'
 import type { TeamDocument, TrainingSession } from '../domain/types'
 import { compareAthletesByName } from '../domain/document'
 
 interface AttendanceEditorProps {
   document: TeamDocument
   initialSession?: TrainingSession
-  onSave: (input: Pick<TrainingSession, 'id' | 'date' | 'attendances'>) => Promise<void>
+  initialDate?: string
+  onSave: (input: Pick<TrainingSession, 'id' | 'date' | 'attendances' | 'earlyDepartures'>) => Promise<void>
   onDelete?: (sessionId: string) => Promise<void>
   onClose: () => void
 }
@@ -20,6 +21,7 @@ function localDate(): string {
 export function AttendanceEditor({
   document,
   initialSession,
+  initialDate,
   onSave,
   onDelete,
   onClose
@@ -28,9 +30,12 @@ export function AttendanceEditor({
     () => document.athletes.filter((athlete) => athlete.active).sort(compareAthletesByName),
     [document.athletes]
   )
-  const [date, setDate] = useState(initialSession?.date ?? localDate())
+  const [date, setDate] = useState(initialSession?.date ?? initialDate ?? localDate())
   const [attendances, setAttendances] = useState<Record<string, string>>(
     initialSession?.attendances ?? {}
+  )
+  const [earlyDepartures, setEarlyDepartures] = useState<string[]>(
+    initialSession?.earlyDepartures ?? []
   )
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
@@ -61,7 +66,8 @@ export function AttendanceEditor({
       await onSave({
         id: initialSession?.id ?? crypto.randomUUID(),
         date,
-        attendances
+        attendances,
+        earlyDepartures
       })
       onClose()
     } catch (caught) {
@@ -170,6 +176,23 @@ export function AttendanceEditor({
                     </button>
                   )
                 })}
+                <button
+                  type="button"
+                  className={`early-departure-button ${earlyDepartures.includes(athlete.id) ? 'selected' : ''}`}
+                  aria-label={`${athlete.name}: uscita anticipata`}
+                  aria-pressed={earlyDepartures.includes(athlete.id)}
+                  title="Uscita anticipata"
+                  onClick={() =>
+                    setEarlyDepartures((current) =>
+                      current.includes(athlete.id)
+                        ? current.filter((athleteId) => athleteId !== athlete.id)
+                        : [...current, athlete.id]
+                    )
+                  }
+                >
+                  <DoorOpen size={15} />
+                  <span>U</span>
+                </button>
               </div>
             </div>
           ))

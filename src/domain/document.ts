@@ -41,6 +41,8 @@ function isSession(value: unknown): value is TrainingSession {
     /^\d{4}-\d{2}-\d{2}$/.test(String(value.date)) &&
     isRecord(value.attendances) &&
     Object.values(value.attendances).every(isString) &&
+    (value.earlyDepartures === undefined ||
+      (Array.isArray(value.earlyDepartures) && value.earlyDepartures.every(isString))) &&
     isString(value.createdAt) &&
     isString(value.updatedAt) &&
     (value.updatedBy === undefined || isString(value.updatedBy))
@@ -63,6 +65,16 @@ export function isTeamDocument(value: unknown): value is TeamDocument {
     isString(value.updatedBy) &&
     Array.isArray(value.statuses) &&
     value.statuses.every(isStatus) &&
+    (value.trainingWeekdays === undefined ||
+      (Array.isArray(value.trainingWeekdays) &&
+        value.trainingWeekdays.every(
+          (weekday) => Number.isInteger(weekday) && weekday >= 0 && weekday <= 6
+        ))) &&
+    (value.ignoredTrainingDates === undefined ||
+      (Array.isArray(value.ignoredTrainingDates) &&
+        value.ignoredTrainingDates.every(
+          (date) => isString(date) && /^\d{4}-\d{2}-\d{2}$/.test(date)
+        ))) &&
     Array.isArray(value.athletes) &&
     value.athletes.every(isAthlete) &&
     Array.isArray(value.sessions) &&
@@ -85,10 +97,19 @@ export function isTeamDocument(value: unknown): value is TeamDocument {
     sessionDates.size !== document.sessions.length
   ) return false
 
+  if (
+    new Set(document.trainingWeekdays ?? []).size !==
+      (document.trainingWeekdays ?? []).length ||
+    new Set(document.ignoredTrainingDates ?? []).size !==
+      (document.ignoredTrainingDates ?? []).length
+  ) return false
+
   return document.sessions.every((session) =>
     Object.entries(session.attendances).every(
       ([athleteId, statusId]) => athleteIds.has(athleteId) && statusIds.has(statusId)
-    )
+    ) &&
+    (session.earlyDepartures ?? []).every((athleteId) => athleteIds.has(athleteId)) &&
+    new Set(session.earlyDepartures ?? []).size === (session.earlyDepartures ?? []).length
   )
 }
 
@@ -106,7 +127,7 @@ export function serializeTeamDocument(document: TeamDocument): string {
 
 export function saveSession(
   document: TeamDocument,
-  input: Pick<TrainingSession, 'id' | 'date' | 'attendances'>,
+  input: Pick<TrainingSession, 'id' | 'date' | 'attendances' | 'earlyDepartures'>,
   updatedBy: string
 ): TeamDocument {
   const now = new Date().toISOString()
@@ -127,6 +148,9 @@ export function saveSession(
     revision: document.revision + 1,
     updatedAt: now,
     updatedBy,
+    ignoredTrainingDates: (document.ignoredTrainingDates ?? []).filter(
+      (date) => date !== session.date
+    ),
     sessions: sessions.sort((a, b) => a.date.localeCompare(b.date))
   }
 }
@@ -169,22 +193,32 @@ export function mergeDocuments(local: TeamDocument, remote: TeamDocument): TeamD
   }
 
   const newerDocument = local.updatedAt >= remote.updatedAt ? local : remote
+  const mergedSessionDates = new Set(sessionsByDate.keys())
+  const ignoredTrainingDates = [
+    ...new Set([
+      ...(local.ignoredTrainingDates ?? []),
+      ...(remote.ignoredTrainingDates ?? [])
+    ])
+  ].filter((date) => !mergedSessionDates.has(date)).sort()
   return {
     ...newerDocument,
     revision: Math.max(local.revision, remote.revision) + 1,
     updatedAt: new Date().toISOString(),
+    ignoredTrainingDates,
     sessions: [...sessionsByDate.values()].sort((a, b) => a.date.localeCompare(b.date))
   }
 }
 
 export function totalsForDocument(document: TeamDocument): TeamTotals {
   const byStatus = Object.fromEntries(document.statuses.map((status) => [status.id, 0]))
+  let earlyDepartures = 0
   for (const session of document.sessions) {
     for (const statusId of Object.values(session.attendances)) {
       byStatus[statusId] = (byStatus[statusId] ?? 0) + 1
     }
+    earlyDepartures += (session.earlyDepartures ?? []).length
   }
-  return { sessions: document.sessions.length, byStatus }
+  return { sessions: document.sessions.length, byStatus, earlyDepartures }
 }
 
 export function athleteTotals(
@@ -198,6 +232,75 @@ export function athleteTotals(
     if (statusId) totals[statusId] = (totals[statusId] ?? 0) + 1
   }
   return totals
+}
+
+export function earlyDepartureCountForAthlete(
+  document: TeamDocument,
+  athleteId: string,
+  sessions = document.sessions
+): number {
+  return sessions.filter((session) => session.earlyDepartures?.includes(athleteId)).length
+}
+
+export interface PlannedTrainingSummary {
+  today: string
+  todayPlanned: boolean
+  todayRecorded: boolean
+  missingDates: string[]
+}
+
+export function plannedTrainingSummary(
+  document: TeamDocument,
+  today: string
+): PlannedTrainingSummary {
+  const weekdays = new Set(document.trainingWeekdays ?? [])
+  const sessions = new Set(document.sessions.map((session) => session.date))
+  const ignored = new Set(document.ignoredTrainingDates ?? [])
+  const seasonStart = `${document.season.startYear}-08-01`
+  const seasonEnd = `${document.season.endYear}-07-31`
+  const lastDate = today < seasonEnd ? today : seasonEnd
+  const missingDates: string[] = []
+
+  if (weekdays.size && lastDate >= seasonStart) {
+    const cursor = new Date(`${seasonStart}T00:00:00.000Z`)
+    const end = new Date(`${lastDate}T00:00:00.000Z`)
+    while (cursor <= end) {
+      const date = cursor.toISOString().slice(0, 10)
+      if (
+        date < today &&
+        weekdays.has(cursor.getUTCDay()) &&
+        !sessions.has(date) &&
+        !ignored.has(date)
+      ) {
+        missingDates.push(date)
+      }
+      cursor.setUTCDate(cursor.getUTCDate() + 1)
+    }
+  }
+
+  const todayInSeason = today >= seasonStart && today <= seasonEnd
+  return {
+    today,
+    todayPlanned: todayInSeason && weekdays.has(new Date(`${today}T00:00:00.000Z`).getUTCDay()),
+    todayRecorded: sessions.has(today),
+    missingDates: missingDates.reverse()
+  }
+}
+
+export function ignorePlannedTrainingDate(
+  document: TeamDocument,
+  date: string,
+  updatedBy: string
+): TeamDocument {
+  if (document.sessions.some((session) => session.date === date)) return document
+  const now = new Date().toISOString()
+  return {
+    ...document,
+    revision: document.revision + 1,
+    updatedAt: now,
+    updatedBy,
+    ignoredTrainingDates: [...new Set([...(document.ignoredTrainingDates ?? []), date])].sort()
+  }
 }
 
 export function sessionsInMonth(

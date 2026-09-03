@@ -47,6 +47,21 @@
     1,
     3
   ],
+  "ignoredTrainingDates": [
+    "2026-08-03",
+    "2026-08-05",
+    "2026-08-10",
+    "2026-08-12",
+    "2026-12-28",
+    "2026-12-30",
+    "2027-01-04",
+    "2027-01-06",
+    "2027-04-05",
+    "2027-07-19",
+    "2027-07-21",
+    "2027-07-26",
+    "2027-07-28"
+  ],
   "athletes": [
     {
       "id": "1547d05d-a7b2-4b6e-a047-b6a536eb91c0",
@@ -193,6 +208,9 @@
         "5eb7cee6-3f07-4b8b-9152-597fb290b394": "present",
         "2e6b503a-f3e6-43d1-aeb5-e22705a1784f": "present"
       },
+      "earlyDepartures": [
+        "55b308bf-bafd-47a7-bf89-124fa670a5d7"
+      ],
       "createdAt": "2026-08-24T20:30:00.000Z",
       "updatedAt": "2026-08-24T20:30:00.000Z",
       "updatedBy": "Giulia Neri"
@@ -256,6 +274,9 @@
         "5eb7cee6-3f07-4b8b-9152-597fb290b394": "volley",
         "2e6b503a-f3e6-43d1-aeb5-e22705a1784f": "present"
       },
+      "earlyDepartures": [
+        "2e6b503a-f3e6-43d1-aeb5-e22705a1784f"
+      ],
       "createdAt": "2026-09-02T20:30:00.000Z",
       "updatedAt": "2026-09-02T20:30:00.000Z",
       "updatedBy": "Giulia Neri"
@@ -382,6 +403,9 @@
         "5eb7cee6-3f07-4b8b-9152-597fb290b394": "present",
         "2e6b503a-f3e6-43d1-aeb5-e22705a1784f": "present"
       },
+      "earlyDepartures": [
+        "55b308bf-bafd-47a7-bf89-124fa670a5d7"
+      ],
       "createdAt": "2026-09-23T20:30:00.000Z",
       "updatedAt": "2026-09-23T20:30:00.000Z",
       "updatedBy": "Giulia Neri"
@@ -424,6 +448,9 @@
         "5eb7cee6-3f07-4b8b-9152-597fb290b394": "present",
         "2e6b503a-f3e6-43d1-aeb5-e22705a1784f": "absent"
       },
+      "earlyDepartures": [
+        "c1c4a57f-8235-4bda-adb6-c6269362b657"
+      ],
       "createdAt": "2026-09-30T20:30:00.000Z",
       "updatedAt": "2026-09-30T20:30:00.000Z",
       "updatedBy": "Giulia Neri"
@@ -550,6 +577,9 @@
         "5eb7cee6-3f07-4b8b-9152-597fb290b394": "present",
         "2e6b503a-f3e6-43d1-aeb5-e22705a1784f": "present"
       },
+      "earlyDepartures": [
+        "a4b18501-1024-4d1d-9333-dfba54cc370c"
+      ],
       "createdAt": "2026-10-21T20:30:00.000Z",
       "updatedAt": "2026-10-21T20:30:00.000Z",
       "updatedBy": "Giulia Neri"
@@ -592,6 +622,9 @@
         "5eb7cee6-3f07-4b8b-9152-597fb290b394": "present",
         "2e6b503a-f3e6-43d1-aeb5-e22705a1784f": "present"
       },
+      "earlyDepartures": [
+        "8c8a9dc8-3f06-4e83-9747-f5a27a2bc307"
+      ],
       "createdAt": "2026-10-28T20:30:00.000Z",
       "updatedAt": "2026-10-28T20:30:00.000Z",
       "updatedBy": "Giulia Neri"
@@ -781,6 +814,10 @@
         "5eb7cee6-3f07-4b8b-9152-597fb290b394": "present",
         "2e6b503a-f3e6-43d1-aeb5-e22705a1784f": "present"
       },
+      "earlyDepartures": [
+        "a4b18501-1024-4d1d-9333-dfba54cc370c",
+        "55b308bf-bafd-47a7-bf89-124fa670a5d7"
+      ],
       "createdAt": "2026-11-30T20:30:00.000Z",
       "updatedAt": "2026-11-30T20:30:00.000Z",
       "updatedBy": "Giulia Neri"
@@ -886,6 +923,9 @@
         "5eb7cee6-3f07-4b8b-9152-597fb290b394": "late",
         "2e6b503a-f3e6-43d1-aeb5-e22705a1784f": "present"
       },
+      "earlyDepartures": [
+        "768c5d90-775a-48a1-ac5f-e6a0f7cf6065"
+      ],
       "createdAt": "2026-12-16T20:30:00.000Z",
       "updatedAt": "2026-12-16T20:30:00.000Z",
       "updatedBy": "Giulia Neri"
@@ -907,6 +947,9 @@
         "5eb7cee6-3f07-4b8b-9152-597fb290b394": "present",
         "2e6b503a-f3e6-43d1-aeb5-e22705a1784f": "present"
       },
+      "earlyDepartures": [
+        "a4b18501-1024-4d1d-9333-dfba54cc370c"
+      ],
       "createdAt": "2026-12-21T20:30:00.000Z",
       "updatedAt": "2026-12-21T20:30:00.000Z",
       "updatedBy": "Giulia Neri"
@@ -970,6 +1013,9 @@
         "5eb7cee6-3f07-4b8b-9152-597fb290b394": "present",
         "2e6b503a-f3e6-43d1-aeb5-e22705a1784f": "volley"
       },
+      "earlyDepartures": [
+        "1547d05d-a7b2-4b6e-a047-b6a536eb91c0"
+      ],
       "createdAt": "2027-01-13T20:30:00.000Z",
       "updatedAt": "2027-01-13T20:30:00.000Z",
       "updatedBy": "Giulia Neri"
@@ -1075,6 +1121,9 @@
         "5eb7cee6-3f07-4b8b-9152-597fb290b394": "present",
         "2e6b503a-f3e6-43d1-aeb5-e22705a1784f": "injured"
       },
+      "earlyDepartures": [
+        "c1c4a57f-8235-4bda-adb6-c6269362b657"
+      ],
       "createdAt": "2027-02-01T20:30:00.000Z",
       "updatedAt": "2027-02-01T20:30:00.000Z",
       "updatedBy": "Giulia Neri"
@@ -1201,6 +1250,9 @@
         "5eb7cee6-3f07-4b8b-9152-597fb290b394": "present",
         "2e6b503a-f3e6-43d1-aeb5-e22705a1784f": "present"
       },
+      "earlyDepartures": [
+        "5eb7cee6-3f07-4b8b-9152-597fb290b394"
+      ],
       "createdAt": "2027-02-22T20:30:00.000Z",
       "updatedAt": "2027-02-22T20:30:00.000Z",
       "updatedBy": "Giulia Neri"
@@ -1222,6 +1274,9 @@
         "5eb7cee6-3f07-4b8b-9152-597fb290b394": "present",
         "2e6b503a-f3e6-43d1-aeb5-e22705a1784f": "present"
       },
+      "earlyDepartures": [
+        "1547d05d-a7b2-4b6e-a047-b6a536eb91c0"
+      ],
       "createdAt": "2027-02-24T20:30:00.000Z",
       "updatedAt": "2027-02-24T20:30:00.000Z",
       "updatedBy": "Giulia Neri"
@@ -1243,6 +1298,9 @@
         "5eb7cee6-3f07-4b8b-9152-597fb290b394": "present",
         "2e6b503a-f3e6-43d1-aeb5-e22705a1784f": "present"
       },
+      "earlyDepartures": [
+        "3979dac2-7f50-44e3-ab2e-4f8f33af429b"
+      ],
       "createdAt": "2027-03-01T20:30:00.000Z",
       "updatedAt": "2027-03-01T20:30:00.000Z",
       "updatedBy": "Giulia Neri"
@@ -1348,6 +1406,9 @@
         "5eb7cee6-3f07-4b8b-9152-597fb290b394": "present",
         "2e6b503a-f3e6-43d1-aeb5-e22705a1784f": "present"
       },
+      "earlyDepartures": [
+        "55b308bf-bafd-47a7-bf89-124fa670a5d7"
+      ],
       "createdAt": "2027-03-17T20:30:00.000Z",
       "updatedAt": "2027-03-17T20:30:00.000Z",
       "updatedBy": "Giulia Neri"
@@ -1390,6 +1451,9 @@
         "5eb7cee6-3f07-4b8b-9152-597fb290b394": "present",
         "2e6b503a-f3e6-43d1-aeb5-e22705a1784f": "volley"
       },
+      "earlyDepartures": [
+        "8c8a9dc8-3f06-4e83-9747-f5a27a2bc307"
+      ],
       "createdAt": "2027-03-24T20:30:00.000Z",
       "updatedAt": "2027-03-24T20:30:00.000Z",
       "updatedBy": "Giulia Neri"
@@ -1579,6 +1643,9 @@
         "5eb7cee6-3f07-4b8b-9152-597fb290b394": "present",
         "2e6b503a-f3e6-43d1-aeb5-e22705a1784f": "present"
       },
+      "earlyDepartures": [
+        "5eb7cee6-3f07-4b8b-9152-597fb290b394"
+      ],
       "createdAt": "2027-04-28T20:30:00.000Z",
       "updatedAt": "2027-04-28T20:30:00.000Z",
       "updatedBy": "Giulia Neri"
@@ -1621,6 +1688,9 @@
         "5eb7cee6-3f07-4b8b-9152-597fb290b394": "present",
         "2e6b503a-f3e6-43d1-aeb5-e22705a1784f": "present"
       },
+      "earlyDepartures": [
+        "2e6b503a-f3e6-43d1-aeb5-e22705a1784f"
+      ],
       "createdAt": "2027-05-05T20:30:00.000Z",
       "updatedAt": "2027-05-05T20:30:00.000Z",
       "updatedBy": "Giulia Neri"
@@ -1873,6 +1943,9 @@
         "5eb7cee6-3f07-4b8b-9152-597fb290b394": "present",
         "2e6b503a-f3e6-43d1-aeb5-e22705a1784f": "present"
       },
+      "earlyDepartures": [
+        "234d83d4-7dd6-48ca-9157-43a36f233883"
+      ],
       "createdAt": "2027-06-16T20:30:00.000Z",
       "updatedAt": "2027-06-16T20:30:00.000Z",
       "updatedBy": "Giulia Neri"
@@ -1894,6 +1967,9 @@
         "5eb7cee6-3f07-4b8b-9152-597fb290b394": "volley",
         "2e6b503a-f3e6-43d1-aeb5-e22705a1784f": "present"
       },
+      "earlyDepartures": [
+        "8c8a9dc8-3f06-4e83-9747-f5a27a2bc307"
+      ],
       "createdAt": "2027-06-21T20:30:00.000Z",
       "updatedAt": "2027-06-21T20:30:00.000Z",
       "updatedBy": "Giulia Neri"
@@ -1957,6 +2033,9 @@
         "5eb7cee6-3f07-4b8b-9152-597fb290b394": "present",
         "2e6b503a-f3e6-43d1-aeb5-e22705a1784f": "present"
       },
+      "earlyDepartures": [
+        "3979dac2-7f50-44e3-ab2e-4f8f33af429b"
+      ],
       "createdAt": "2027-06-30T20:30:00.000Z",
       "updatedAt": "2027-06-30T20:30:00.000Z",
       "updatedBy": "Giulia Neri"
@@ -1978,6 +2057,9 @@
         "5eb7cee6-3f07-4b8b-9152-597fb290b394": "present",
         "2e6b503a-f3e6-43d1-aeb5-e22705a1784f": "volley"
       },
+      "earlyDepartures": [
+        "8c8a9dc8-3f06-4e83-9747-f5a27a2bc307"
+      ],
       "createdAt": "2027-07-05T20:30:00.000Z",
       "updatedAt": "2027-07-05T20:30:00.000Z",
       "updatedBy": "Giulia Neri"
@@ -2020,6 +2102,9 @@
         "5eb7cee6-3f07-4b8b-9152-597fb290b394": "present",
         "2e6b503a-f3e6-43d1-aeb5-e22705a1784f": "present"
       },
+      "earlyDepartures": [
+        "8c8a9dc8-3f06-4e83-9747-f5a27a2bc307"
+      ],
       "createdAt": "2027-07-12T20:30:00.000Z",
       "updatedAt": "2027-07-12T20:30:00.000Z",
       "updatedBy": "Giulia Neri"

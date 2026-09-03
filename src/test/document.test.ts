@@ -8,9 +8,12 @@ import {
   athleteTotals,
   athletesForReport,
   completedAttendancesForAthletes,
+  earlyDepartureCountForAthlete,
+  ignorePlannedTrainingDate,
   isTeamDocument,
   mergeDocuments,
   parseTeamDocument,
+  plannedTrainingSummary,
   saveSession,
   serializeTeamDocument
 } from '../domain/document'
@@ -110,6 +113,77 @@ describe('documento squadra', () => {
     expect(athleteTotals(updated, athlete.id).present).toBe(1)
   })
 
+  it('mantiene l’uscita anticipata separata dallo stato e ne calcola la percentuale', () => {
+    const document = createTeamDocument({
+      teamName: 'U14',
+      organizationName: 'Volley Club',
+      coachName: 'Mario',
+      startYear: 2026,
+      athleteNames: ['Anna']
+    })
+    const athlete = document.athletes[0]
+    const updated = saveSession(
+      document,
+      {
+        id: 'session-1',
+        date: '2026-09-01',
+        attendances: { [athlete.id]: 'present' },
+        earlyDepartures: [athlete.id]
+      },
+      'Mario'
+    )
+
+    expect(athleteTotals(updated, athlete.id).present).toBe(1)
+    expect(earlyDepartureCountForAthlete(updated, athlete.id)).toBe(1)
+    expect(isTeamDocument(updated)).toBe(true)
+  })
+
+  it('individua gli allenamenti previsti non registrati e consente di ignorarli', () => {
+    let document = createTeamDocument({
+      teamName: 'U14',
+      organizationName: 'Volley Club',
+      coachName: 'Mario',
+      startYear: 2026,
+      weekdays: [1, 3, 4],
+      athleteNames: ['Anna']
+    })
+    document = saveSession(
+      document,
+      { id: 'session-1', date: '2026-08-03', attendances: {} },
+      'Mario'
+    )
+    document = ignorePlannedTrainingDate(document, '2026-08-05', 'Mario')
+
+    expect(plannedTrainingSummary(document, '2026-08-13')).toEqual({
+      today: '2026-08-13',
+      todayPlanned: true,
+      todayRecorded: false,
+      missingDates: ['2026-08-12', '2026-08-10', '2026-08-06']
+    })
+
+    document = saveSession(
+      document,
+      { id: 'session-2', date: '2026-08-05', attendances: {} },
+      'Mario'
+    )
+    expect(document.ignoredTrainingDates).not.toContain('2026-08-05')
+  })
+
+  it('continua ad accettare i registri creati senza calendario settimanale', () => {
+    const document = createTeamDocument({
+      teamName: 'U14',
+      organizationName: 'Volley Club',
+      coachName: 'Mario',
+      startYear: 2026,
+      athleteNames: ['Anna']
+    })
+    delete document.trainingWeekdays
+    delete document.ignoredTrainingDates
+
+    expect(isTeamDocument(document)).toBe(true)
+    expect(plannedTrainingSummary(document, '2026-09-01').missingDates).toEqual([])
+  })
+
   it('unisce sessioni diverse senza perderle', () => {
     const base = createTeamDocument({
       teamName: 'U14',
@@ -130,6 +204,22 @@ describe('documento squadra', () => {
     )
 
     expect(mergeDocuments(local, remote).sessions).toHaveLength(2)
+  })
+
+  it('propaga all’allenatore le date previste ignorate dal coordinatore', () => {
+    const base = createTeamDocument({
+      teamName: 'U14',
+      organizationName: 'Volley Club',
+      coachName: 'Mario',
+      startYear: 2026,
+      weekdays: [1],
+      athleteNames: ['Anna']
+    })
+    const coordinator = ignorePlannedTrainingDate(base, '2026-08-03', 'Coordinatore')
+    const mergedForCoach = mergeDocuments(base, coordinator)
+
+    expect(mergedForCoach.ignoredTrainingDates).toContain('2026-08-03')
+    expect(plannedTrainingSummary(mergedForCoach, '2026-08-04').missingDates).toEqual([])
   })
 
   it('non crea due allenamenti nella stessa data durante un merge', () => {

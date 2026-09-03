@@ -8,6 +8,12 @@ interface FileSystemDirectoryHandle {
   requestPermission(descriptor?: { mode?: 'read' | 'readwrite' }): Promise<PermissionState>
 }
 
+interface FileSystemFileHandle {
+  queryPermission(descriptor?: { mode?: 'read' | 'readwrite' }): Promise<PermissionState>
+  requestPermission(descriptor?: { mode?: 'read' | 'readwrite' }): Promise<PermissionState>
+  createWritable(): Promise<FileSystemWritableFileStream>
+}
+
 interface Window {
-  showDirectoryPicker?: () => Promise<FileSystemDirectoryHandle>
+  showDirectoryPicker?: (options?: { mode?: 'read' | 'readwrite' }) => Promise<FileSystemDirectoryHandle>
 }

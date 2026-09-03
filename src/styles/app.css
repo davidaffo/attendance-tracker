@@ -1230,7 +1230,7 @@ h2 {
 
 .metric-grid {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 0.8rem;
 }
 
@@ -1619,6 +1619,8 @@ h2 {
 
 .status-options {
   display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
   gap: 0.4rem;
 }
 
@@ -1649,6 +1651,112 @@ h2 {
   border-color: var(--status-color);
   background: var(--status-color);
   box-shadow: 0 4px 12px color-mix(in srgb, var(--status-color) 25%, transparent);
+}
+
+.early-departure-button {
+  display: inline-flex;
+  min-width: 54px;
+  height: 42px;
+  align-items: center;
+  justify-content: center;
+  gap: 0.2rem;
+  padding: 0 0.45rem;
+  color: #a65a25;
+  border: 1px solid #e4b58f;
+  border-radius: 11px;
+  background: #fff4ea;
+  font-size: 0.7rem;
+  font-weight: 900;
+}
+
+.early-departure-button.selected {
+  color: #fff;
+  border-color: #c66a2c;
+  background: #c66a2c;
+}
+
+.planned-sessions-panel {
+  display: grid;
+  gap: 1rem;
+  padding: 1rem;
+}
+
+.planned-today,
+.planned-today > div,
+.missing-sessions-heading,
+.missing-session-row,
+.missing-session-row > div {
+  display: flex;
+  align-items: center;
+}
+
+.planned-today {
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.planned-today > svg {
+  flex: 0 0 auto;
+  color: var(--green-2);
+}
+
+.planned-today > div {
+  min-width: 0;
+  flex: 1;
+  justify-content: space-between;
+  gap: 0.8rem;
+}
+
+.missing-sessions {
+  display: grid;
+  gap: 0.55rem;
+  padding-top: 0.8rem;
+  border-top: 1px solid var(--line);
+}
+
+.missing-sessions-heading,
+.missing-session-row {
+  justify-content: space-between;
+  gap: 0.8rem;
+}
+
+.missing-sessions-heading span {
+  display: inline-grid;
+  min-width: 26px;
+  height: 26px;
+  place-items: center;
+  color: #8b3d36;
+  border-radius: 999px;
+  background: #f8e7e5;
+  font-size: 0.7rem;
+  font-weight: 850;
+}
+
+.missing-session-list {
+  display: grid;
+  max-height: 280px;
+  gap: 0.4rem;
+  overflow-y: auto;
+}
+
+.missing-session-row {
+  min-height: 48px;
+  padding: 0.35rem 0.45rem 0.35rem 0.8rem;
+  border: 1px solid var(--line);
+  border-radius: 11px;
+  background: color-mix(in srgb, var(--paper) 90%, var(--cream));
+  font-size: 0.76rem;
+}
+
+.missing-session-row > div {
+  gap: 0.35rem;
+}
+
+.planned-sessions-panel.compact {
+  margin-top: 1rem;
+  padding: 0.75rem;
+  background: color-mix(in srgb, var(--paper) 92%, var(--cream));
+  box-shadow: none;
 }
 
 .text-danger {
@@ -1847,6 +1955,7 @@ h2 {
 
 .attendance-matrix th,
 .attendance-matrix td {
+  position: relative;
   min-width: 46px;
   height: 49px;
   padding: 0.4rem;
@@ -1992,6 +2101,32 @@ h2 {
 
 .matrix-empty {
   color: #c2c6c3;
+}
+
+.matrix-early-departure {
+  position: absolute;
+  right: 2px;
+  bottom: 2px;
+  display: inline-grid;
+  min-width: 20px;
+  height: 15px;
+  place-items: center;
+  color: #fff;
+  border-radius: 5px;
+  background: #c66a2c;
+  font-size: 0.48rem;
+  font-weight: 900;
+}
+
+.early-departure-dot,
+.early-departure-badge,
+.early-departure-head > span,
+.mobile-status-total.early-departure-total i {
+  background: #c66a2c !important;
+}
+
+.early-departure-total {
+  background-color: color-mix(in srgb, #c66a2c 10%, var(--paper)) !important;
 }
 
 .mobile-athlete-summary,
@@ -2458,6 +2593,12 @@ html[data-theme='dark'] :is(
 
 html[data-theme='dark'] .status-button:not(.selected) {
   background: color-mix(in srgb, var(--status-color) 14%, var(--paper));
+}
+
+html[data-theme='dark'] .early-departure-button:not(.selected) {
+  color: #f2ae7c;
+  border-color: #7c4c2d;
+  background: #322319;
 }
 
 html[data-theme='dark'] :is(
@@ -3145,8 +3286,32 @@ html[data-theme='dark'] .sharing-cors-help code {
   background: var(--green);
 }
 
+.team-card-actions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.55rem;
+  margin-top: 1.2rem;
+}
+
+.team-card-actions .team-report-button {
+  margin-top: 0;
+}
+
 .coordinator-detail {
   padding-bottom: 3rem;
+}
+
+.coordinator-detail-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.missing-session-more {
+  padding: 0.35rem 0.2rem;
+  color: var(--muted);
+  font-size: 0.67rem;
 }
 
 .report-back {
@@ -3586,7 +3751,7 @@ html[data-theme='dark'] .sharing-cors-help code {
   }
 
   .metric-grid {
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(2, 1fr);
   }
 
   .metric-card {
@@ -3621,11 +3786,15 @@ html[data-theme='dark'] .sharing-cors-help code {
   }
 
   .status-options {
-    justify-content: space-between;
+    justify-content: flex-start;
   }
 
   .status-button {
     width: min(15vw, 48px);
+    height: min(15vw, 48px);
+  }
+
+  .early-departure-button {
     height: min(15vw, 48px);
   }
 
@@ -3828,6 +3997,23 @@ html[data-theme='dark'] .sharing-cors-help code {
     width: 16vw;
     max-width: 51px;
     height: 48px;
+  }
+
+
+  .planned-today,
+  .planned-today > div,
+  .missing-session-row {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .planned-today > div .button,
+  .missing-session-row .button {
+    width: 100%;
+  }
+
+  .missing-session-row > div {
+    justify-content: flex-end;
   }
 
   .month-picker {
@@ -4062,6 +4248,19 @@ html[data-theme='dark'] .sharing-cors-help code {
 
   .team-management-row-actions .button {
     flex: 1;
+  }
+
+  .team-card-actions {
+    grid-template-columns: 1fr;
+  }
+
+  .coordinator-detail-actions {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .coordinator-detail-actions .button {
+    width: 100%;
   }
 
   .sharing-panel-heading,

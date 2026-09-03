@@ -5,6 +5,7 @@ import {
   athleteTotals,
   athletesForReport,
   completedAttendancesForAthletes,
+  earlyDepartureCountForAthlete,
   sessionsInMonth
 } from '../domain/document'
 import { percentageScaleColor } from '../domain/percentageColorScale'
@@ -138,6 +139,10 @@ export function MonthlyRegister({
             <strong>{status.code}</strong> {status.label}
           </span>
         ))}
+        <span>
+          <i className="early-departure-dot" />
+          <strong>U</strong> Uscita anticipata
+        </span>
       </div>
 
       {selectedMonth ? (
@@ -210,6 +215,10 @@ function MonthMatrix({ document, sessions, athletes, onEditSession }: MatrixProp
                   <small>n · %</small>
                 </th>
               ))}
+              <th className="total-head early-departure-head">
+                <span>U</span>
+                <small>n · %</small>
+              </th>
             </tr>
           </thead>
           <tbody>
@@ -237,6 +246,9 @@ function MonthMatrix({ document, sessions, athletes, onEditSession }: MatrixProp
                         ) : (
                           <span className="matrix-empty">—</span>
                         )}
+                        {session.earlyDepartures?.includes(athlete.id) && (
+                          <span className="matrix-early-departure" title="Uscita anticipata">U</span>
+                        )}
                       </td>
                     )
                   })}
@@ -256,6 +268,17 @@ function MonthMatrix({ document, sessions, athletes, onEditSession }: MatrixProp
                       </td>
                     )
                   })}
+                  <td className="total-cell early-departure-total">
+                    <strong>{earlyDepartureCountForAthlete(document, athlete.id, sessions)}</strong>
+                    <span>
+                      {sessions.length
+                        ? Math.round(
+                            (earlyDepartureCountForAthlete(document, athlete.id, sessions) /
+                              sessions.length) * 100
+                          )
+                        : 0}%
+                    </span>
+                  </td>
                 </tr>
               )
             })}
@@ -305,6 +328,10 @@ function SeasonOverview({
                   {status.label}
                 </th>
               ))}
+              <th className="season-status-head early-departure-head">
+                <span>U</span>
+                Uscita anticipata
+              </th>
             </tr>
           </thead>
           <tbody>
@@ -332,6 +359,17 @@ function SeasonOverview({
                       </td>
                     )
                   })}
+                  <td className="season-total-cell early-departure-total">
+                    <strong>{earlyDepartureCountForAthlete(document, athlete.id)}</strong>
+                    <span>
+                      {document.sessions.length
+                        ? Math.round(
+                            (earlyDepartureCountForAthlete(document, athlete.id) /
+                              document.sessions.length) * 100
+                          )
+                        : 0}%
+                    </span>
+                  </td>
                 </tr>
               )
             })}
@@ -370,6 +408,18 @@ function MobileAthleteSummary({ document, sessions, athletes }: MatrixProps) {
                     </span>
                   )
                 })}
+                <span className="mobile-status-total early-departure-total">
+                  <i>U</i>
+                  <b>{earlyDepartureCountForAthlete(document, athlete.id, sessions)}</b>
+                  <small>
+                    {sessions.length
+                      ? Math.round(
+                          (earlyDepartureCountForAthlete(document, athlete.id, sessions) /
+                            sessions.length) * 100
+                        )
+                      : 0}%
+                  </small>
+                </span>
               </div>
             </article>
           )
