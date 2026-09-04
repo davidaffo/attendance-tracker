@@ -1148,14 +1148,6 @@ export function CoordinatorDashboard({
                               </span>
                             )
                           })}
-                          <span title={`Uscite anticipate: ${totals.earlyDepartures}`}>
-                            <i className="early-departure-badge">U</i>
-                            <b>
-                              {possibleAttendances
-                                ? Math.round((totals.earlyDepartures / possibleAttendances) * 100)
-                                : 0}%
-                            </b>
-                          </span>
                         </div>
                         <PlannedSessionsPanel
                           document={document}

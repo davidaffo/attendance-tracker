@@ -1524,6 +1524,10 @@ h2 {
   color: var(--muted);
 }
 
+.mobile-save-fab {
+  display: none;
+}
+
 .password-dialog .password-dialog-error {
   margin: 0;
   padding: 0.7rem 0.8rem;
@@ -3692,6 +3696,24 @@ html[data-theme='dark'] .sharing-cors-help code {
 }
 
 @media (max-width: 820px) {
+  .mobile-save-fab {
+    position: fixed;
+    z-index: 40;
+    right: max(1rem, env(safe-area-inset-right));
+    bottom: max(1rem, env(safe-area-inset-bottom));
+    display: inline-grid;
+    width: 56px;
+    height: 56px;
+    padding: 0;
+    place-items: center;
+    border-radius: 50%;
+    box-shadow: 0 8px 24px rgba(17, 55, 44, 0.3);
+  }
+
+  .app-shell .mobile-save-fab {
+    bottom: calc(4.8rem + env(safe-area-inset-bottom));
+  }
+
   .app-update-banner {
     bottom: calc(5rem + env(safe-area-inset-bottom));
   }

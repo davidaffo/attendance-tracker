@@ -425,6 +425,17 @@ export function TeamSettings({
           ))}
         </div>
       </section>}
+
+      <button
+        className="button primary mobile-save-fab"
+        type="button"
+        onClick={save}
+        disabled={saving}
+        aria-label={saving ? 'Salvataggio in corso' : 'Salva modifiche'}
+        title={saving ? 'Salvataggio in corso' : 'Salva modifiche'}
+      >
+        <Save size={22} />
+      </button>
     </div>
   )
 }
