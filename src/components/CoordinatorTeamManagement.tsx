@@ -7,6 +7,7 @@ import {
   ClipboardCheck,
   Plus,
   RefreshCw,
+  Save,
   Trash2,
   Users
 } from 'lucide-react'
@@ -30,6 +31,8 @@ interface CoordinatorTeamManagementProps {
   onOpenAsCoach: (team: TeamSummary) => Promise<void>
   canOpenAsCoach: (team: TeamSummary) => boolean
   renderTeamControls: (team: TeamSummary) => ReactNode
+  dirtyTeams: number
+  onSaveAll: () => Promise<void>
 }
 
 export function CoordinatorTeamManagement({
@@ -46,7 +49,9 @@ export function CoordinatorTeamManagement({
   onQuickAccessCopied,
   onOpenAsCoach,
   canOpenAsCoach,
-  renderTeamControls
+  renderTeamControls,
+  dirtyTeams,
+  onSaveAll
 }: CoordinatorTeamManagementProps) {
   const [creating, setCreating] = useState(false)
   const [expandedTeam, setExpandedTeam] = useState<string>()
@@ -189,6 +194,23 @@ export function CoordinatorTeamManagement({
           </div>
         )}
       </section>
+
+      <div className="team-management-save-all">
+        <span>
+          {dirtyTeams
+            ? `${dirtyTeams} ${dirtyTeams === 1 ? 'squadra modificata' : 'squadre modificate'}`
+            : 'Nessuna modifica da salvare'}
+        </span>
+        <button
+          className="button primary"
+          type="button"
+          disabled={loading || dirtyTeams === 0}
+          onClick={() => void onSaveAll()}
+        >
+          <Save size={18} />
+          {loading ? 'Salvataggio…' : 'Salva tutte le modifiche'}
+        </button>
+      </div>
     </main>
   )
 }

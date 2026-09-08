@@ -56,7 +56,7 @@ import { CoordinatorTeamCreator } from './CoordinatorTeamCreator'
 import { NextcloudSharingPanel } from './NextcloudSharingPanel'
 import { CoordinatorTeamManagement } from './CoordinatorTeamManagement'
 import { NextcloudQuickAccessButtons } from './NextcloudQuickAccessButton'
-import { TeamSettings } from './TeamSettings'
+import { prepareTeamSettingsDocument, TeamSettings } from './TeamSettings'
 import { PlannedSessionsPanel } from './PlannedSessionsPanel'
 import { ConflictResolutionDialog } from './ConflictResolutionDialog'
 
@@ -127,6 +127,10 @@ function canWriteTeam(team: TeamSummary): boolean {
   )
 }
 
+function managementTeamKey(team: TeamSummary): string {
+  return `${team.source}-${team.document.teamId}`
+}
+
 export function CoordinatorDashboard({
   accessMode,
   onChooseMode,
@@ -167,6 +171,7 @@ export function CoordinatorDashboard({
   const [teams, setTeams] = useState<TeamSummary[]>([])
   const [message, setMessage] = useState('')
   const [loading, setLoading] = useState(false)
+  const [savingAll, setSavingAll] = useState(false)
   const [cloudConfigOpen, setCloudConfigOpen] = useState(
     Boolean(initialNextcloudLink) || !config
   )
@@ -181,10 +186,13 @@ export function CoordinatorDashboard({
     config: SyncConfig
     error?: string
   }>()
+  const [managementDrafts, setManagementDrafts] = useState<Record<string, {
+    document: TeamDocument
+    dirty: boolean
+  }>>({})
   const inputRef = useRef<HTMLInputElement>(null)
   const loadedOnce = useRef(false)
   const freshTeamsLoaded = useRef(false)
-  const wasManagingTeams = useRef(false)
 
   const quickAccessLinks: Partial<Record<AppMode, string>> = (() => {
     const link = folderLink.trim() || draft.baseUrl.trim()
@@ -278,6 +286,7 @@ export function CoordinatorDashboard({
         await onSaveConfig(readyConnection)
       }
       const found = await discoverRemoteTeamDocuments(readyConnection)
+      setManagementDrafts({})
       onAuthenticated(readyConnection)
       await rememberTeams(found, 'nextcloud', 'Nextcloud', readyConnection)
       const loadMessage = found.length === 1
@@ -337,8 +346,6 @@ export function CoordinatorDashboard({
   }, [])
 
   useEffect(() => {
-    const openedManagement = Boolean(managingTeams && !wasManagingTeams.current)
-    wasManagingTeams.current = Boolean(managingTeams)
     if (!config) return
     if (!initialNextcloudLink) {
       setDraft((current) =>
@@ -355,7 +362,7 @@ export function CoordinatorDashboard({
       navigator.onLine &&
       !initialNextcloudLink &&
       !creatingTeam &&
-      (!loadedOnce.current || openedManagement)
+      !loadedOnce.current
     ) {
       loadedOnce.current = true
       void loadCloud(config, !managingTeams)
@@ -626,6 +633,7 @@ export function CoordinatorDashboard({
         readyConnection
       )
       setMessage(`${updated.teamName}: modifiche salvate.`)
+      return updated
     } catch (error) {
       if (error instanceof RemoteDocumentConflictError && readyConnection) {
         setPendingConflict({ team, document, config: readyConnection })
@@ -636,6 +644,57 @@ export function CoordinatorDashboard({
       throw error
     } finally {
       setLoading(false)
+    }
+  }
+
+  const saveAllManagementChanges = async () => {
+    const changed = teams.flatMap((team) => {
+      const entry = managementDrafts[managementTeamKey(team)]
+      return entry?.dirty ? [{ team, document: entry.document }] : []
+    })
+    if (!changed.length) return
+
+    const saved = new Map<string, TeamDocument>()
+    setSavingAll(true)
+    try {
+      for (const change of changed) {
+        const prepared = prepareTeamSettingsDocument(
+          change.document,
+          change.team.document,
+          false
+        )
+        const updated = await updateTeam(change.team, prepared)
+        saved.set(managementTeamKey(change.team), updated)
+      }
+      const nextTeams = teams.map((team) => {
+        const updated = saved.get(managementTeamKey(team))
+        return updated ? { ...team, document: updated } : team
+      })
+      const source = nextTeams.every((team) => team.remoteFolder !== undefined)
+        ? 'nextcloud'
+        : nextTeams.some((team) => team.fileHandle)
+          ? 'directory'
+          : 'files'
+      await rememberTeams(
+        nextTeams,
+        source,
+        source === 'nextcloud'
+          ? 'Nextcloud'
+          : source === 'directory'
+            ? `cartella ${rememberedHandle?.name ?? 'locale'}`
+            : 'registri locali',
+        source === 'nextcloud' ? draft : undefined
+      )
+      setManagementDrafts((current) => {
+        const next = { ...current }
+        for (const [key, document] of saved) next[key] = { document, dirty: false }
+        return next
+      })
+      setMessage(`${saved.size} ${saved.size === 1 ? 'squadra salvata' : 'squadre salvate'}.`)
+    } catch (error) {
+      setMessage(error instanceof Error ? error.message : 'Salvataggio non riuscito.')
+    } finally {
+      setSavingAll(false)
     }
   }
 
@@ -770,7 +829,7 @@ export function CoordinatorDashboard({
       ) : managingTeams && !isViewer ? (
         <CoordinatorTeamManagement
           teams={teams}
-          loading={loading}
+          loading={loading || savingAll}
           message={message}
           onBack={() => onNavigate(basePath)}
           onCreate={(document) => createTeam(document, false)}
@@ -782,8 +841,47 @@ export function CoordinatorDashboard({
           onQuickAccessCopied={quickAccessCopied}
           onOpenAsCoach={(team) => openTeamAsCoach(team)}
           canOpenAsCoach={canWriteTeam}
+          dirtyTeams={teams.filter(
+            (team) => managementDrafts[managementTeamKey(team)]?.dirty
+          ).length}
+          onSaveAll={saveAllManagementChanges}
           renderTeamControls={(team) => (
             <>
+              <section className="coordinator-report-shell team-management-report">
+                <MonthlyRegister document={team.document} compactHeader />
+              </section>
+              <PlannedSessionsPanel
+                document={team.document}
+                onAdd={
+                  canWriteTeam(team)
+                    ? (date) => void openTeamAsCoach(team, date)
+                    : undefined
+                }
+                onIgnore={
+                  canWriteTeam(team)
+                    ? (date) => ignoreTeamTrainingDate(team, date)
+                    : undefined
+                }
+              />
+              {canWriteTeam(team) && (
+                <TeamSettings
+                  document={managementDrafts[managementTeamKey(team)]?.document ?? team.document}
+                  comparisonDocument={team.document}
+                  deferredSave
+                  onDraftChange={(document, dirty) => {
+                    const key = managementTeamKey(team)
+                    setManagementDrafts((current) => {
+                      const previous = current[key]
+                      if (
+                        previous?.dirty === dirty &&
+                        JSON.stringify(previous.document) === JSON.stringify(document)
+                      ) return current
+                      return { ...current, [key]: { document, dirty } }
+                    })
+                  }}
+                  onUpdate={(updated) => updateTeam(team, updated).then(() => undefined)}
+                />
+              )}
               {team.remoteFolder !== undefined && (
                 <NextcloudSharingPanel
                   document={team.document}
@@ -807,28 +905,6 @@ export function CoordinatorDashboard({
                   }}
                 />
               )}
-              {canWriteTeam(team) && (
-                <TeamSettings
-                  document={team.document}
-                  onUpdate={(updated) => updateTeam(team, updated)}
-                />
-              )}
-              <PlannedSessionsPanel
-                document={team.document}
-                onAdd={
-                  canWriteTeam(team)
-                    ? (date) => void openTeamAsCoach(team, date)
-                    : undefined
-                }
-                onIgnore={
-                  canWriteTeam(team)
-                    ? (date) => ignoreTeamTrainingDate(team, date)
-                    : undefined
-                }
-              />
-              <section className="coordinator-report-shell team-management-report">
-                <MonthlyRegister document={team.document} />
-              </section>
             </>
           )}
         />
@@ -856,6 +932,28 @@ export function CoordinatorDashboard({
             )}
           </div>
           {message && <div className="coordinator-message">{message}</div>}
+          <PlannedSessionsPanel
+            document={selectedTeam.document}
+            onAdd={
+              !isViewer && canWriteTeam(selectedTeam)
+                ? (date) => void openTeamAsCoach(selectedTeam, date)
+                : undefined
+            }
+            onIgnore={
+              !isViewer && canWriteTeam(selectedTeam)
+                ? (date) => ignoreTeamTrainingDate(selectedTeam, date)
+                : undefined
+            }
+          />
+          <section className="coordinator-report-shell">
+            <MonthlyRegister document={selectedTeam.document} compactHeader />
+          </section>
+          {!isViewer && canWriteTeam(selectedTeam) && (
+            <TeamSettings
+              document={selectedTeam.document}
+              onUpdate={(updated) => updateTeam(selectedTeam, updated).then(() => undefined)}
+            />
+          )}
           {!isViewer && selectedTeam.remoteFolder !== undefined && (
             <NextcloudSharingPanel
               document={selectedTeam.document}
@@ -877,28 +975,6 @@ export function CoordinatorDashboard({
               }}
             />
           )}
-          {!isViewer && canWriteTeam(selectedTeam) && (
-            <TeamSettings
-              document={selectedTeam.document}
-              onUpdate={(updated) => updateTeam(selectedTeam, updated)}
-            />
-          )}
-          <PlannedSessionsPanel
-            document={selectedTeam.document}
-            onAdd={
-              !isViewer && canWriteTeam(selectedTeam)
-                ? (date) => void openTeamAsCoach(selectedTeam, date)
-                : undefined
-            }
-            onIgnore={
-              !isViewer && canWriteTeam(selectedTeam)
-                ? (date) => ignoreTeamTrainingDate(selectedTeam, date)
-                : undefined
-            }
-          />
-          <section className="coordinator-report-shell">
-            <MonthlyRegister document={selectedTeam.document} />
-          </section>
         </main>
       ) : (
         <main className="coordinator-main">
@@ -1078,10 +1154,6 @@ export function CoordinatorDashboard({
             <article>
               <span>Allenamenti</span>
               <strong>{totalSessions}</strong>
-            </article>
-            <article className="privacy-metric">
-              <ShieldCheck size={22} />
-              <span>{isViewer ? 'Consultazione in sola lettura' : 'Registri sincronizzati'}</span>
             </article>
           </section>
 

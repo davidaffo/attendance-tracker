@@ -14,6 +14,7 @@ interface MonthlyRegisterProps {
   document: TeamDocument
   onEditSession?: (session: TrainingSession) => void
   onNewSession?: () => void
+  compactHeader?: boolean
 }
 
 interface SeasonMonth {
@@ -51,7 +52,8 @@ function getSeasonMonths(startYear: number): SeasonMonth[] {
 export function MonthlyRegister({
   document,
   onEditSession,
-  onNewSession
+  onNewSession,
+  compactHeader = false
 }: MonthlyRegisterProps) {
   const months = useMemo(() => getSeasonMonths(document.season.startYear), [document.season.startYear])
   const [selectedPeriod, setSelectedPeriod] = useState('season')
@@ -72,7 +74,7 @@ export function MonthlyRegister({
     : 0
 
   return (
-    <div className="page-content register-page">
+    <div className={`page-content register-page${compactHeader ? ' compact-header' : ''}`}>
       <div className="page-title-row">
         <div>
           <h1>

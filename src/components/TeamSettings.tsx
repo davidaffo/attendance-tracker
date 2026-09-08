@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { Archive, Plus, RotateCcw, Save } from 'lucide-react'
 import type { TeamDocument } from '../domain/types'
 import { compareAthletesByName } from '../domain/document'
@@ -12,6 +12,9 @@ interface TeamSettingsProps {
   document: TeamDocument
   onUpdate: (document: TeamDocument) => Promise<void>
   managedByCoordinator?: boolean
+  deferredSave?: boolean
+  onDraftChange?: (document: TeamDocument, dirty: boolean) => void
+  comparisonDocument?: TeamDocument
 }
 
 function withScheduleDefaults(value: TeamDocument, enabled: boolean): TeamDocument {
@@ -29,10 +32,52 @@ function withScheduleDefaults(value: TeamDocument, enabled: boolean): TeamDocume
   }
 }
 
+export function prepareTeamSettingsDocument(
+  draft: TeamDocument,
+  original: TeamDocument,
+  managedByCoordinator: boolean
+): TeamDocument {
+  const seasonStart = `${draft.season.startYear}-08-01`
+  const seasonEnd = `${draft.season.endYear}-07-31`
+  if (
+    !managedByCoordinator &&
+    (!draft.trainingStartDate ||
+      !draft.trainingEndDate ||
+      draft.trainingStartDate > draft.trainingEndDate ||
+      draft.trainingStartDate < seasonStart ||
+      draft.trainingEndDate > seasonEnd)
+  ) {
+    throw new Error('Inserisci un intervallo valido per il calendario degli allenamenti.')
+  }
+  const now = new Date().toISOString()
+  const selectedWeekdays = new Set(draft.trainingWeekdays ?? [])
+  const ignoredTrainingDates = managedByCoordinator
+    ? draft.ignoredTrainingDates
+    : (draft.ignoredTrainingDates ?? []).filter((date) =>
+        Boolean(
+          draft.trainingStartDate &&
+          draft.trainingEndDate &&
+          date >= draft.trainingStartDate &&
+          date <= draft.trainingEndDate &&
+          selectedWeekdays.has(new Date(`${date}T00:00:00.000Z`).getUTCDay())
+        )
+      )
+  return {
+    ...draft,
+    ignoredTrainingDates,
+    revision: original.revision + 1,
+    updatedAt: now,
+    updatedBy: draft.coachName
+  }
+}
+
 export function TeamSettings({
   document,
   onUpdate,
-  managedByCoordinator = false
+  managedByCoordinator = false,
+  deferredSave = false,
+  onDraftChange,
+  comparisonDocument = document
 }: TeamSettingsProps) {
   const [draft, setDraft] = useState(() =>
     withScheduleDefaults(document, !managedByCoordinator)
@@ -40,9 +85,19 @@ export function TeamSettings({
   const [newAthlete, setNewAthlete] = useState('')
   const [saving, setSaving] = useState(false)
   const [message, setMessage] = useState('')
+  const onDraftChangeRef = useRef(onDraftChange)
+  useEffect(() => {
+    onDraftChangeRef.current = onDraftChange
+  }, [onDraftChange])
   useEffect(() => {
     setDraft(withScheduleDefaults(document, !managedByCoordinator))
-  }, [document, managedByCoordinator])
+  }, [document.teamId, document.revision, document.updatedAt, managedByCoordinator])
+  useEffect(() => {
+    onDraftChangeRef.current?.(
+      draft,
+      JSON.stringify(draft) !== JSON.stringify(comparisonDocument)
+    )
+  }, [draft, comparisonDocument])
   const activeAthletes = useMemo(
     () => [...draft.athletes].filter((athlete) => athlete.active).sort(compareAthletesByName),
     [draft.athletes]
@@ -117,38 +172,7 @@ export function TeamSettings({
     setSaving(true)
     setMessage('')
     try {
-      const seasonStart = `${draft.season.startYear}-08-01`
-      const seasonEnd = `${draft.season.endYear}-07-31`
-      if (
-        !managedByCoordinator &&
-        (!draft.trainingStartDate ||
-          !draft.trainingEndDate ||
-          draft.trainingStartDate > draft.trainingEndDate ||
-          draft.trainingStartDate < seasonStart ||
-          draft.trainingEndDate > seasonEnd)
-      ) {
-        throw new Error('Inserisci un intervallo valido per il calendario degli allenamenti.')
-      }
-      const now = new Date().toISOString()
-      const selectedWeekdays = new Set(draft.trainingWeekdays ?? [])
-      const ignoredTrainingDates = managedByCoordinator
-        ? draft.ignoredTrainingDates
-        : (draft.ignoredTrainingDates ?? []).filter((date) =>
-            Boolean(
-              draft.trainingStartDate &&
-              draft.trainingEndDate &&
-              date >= draft.trainingStartDate &&
-              date <= draft.trainingEndDate &&
-              selectedWeekdays.has(new Date(`${date}T00:00:00.000Z`).getUTCDay())
-            )
-          )
-      const updated = {
-        ...draft,
-        ignoredTrainingDates,
-        revision: document.revision + 1,
-        updatedAt: now,
-        updatedBy: draft.coachName
-      }
+      const updated = prepareTeamSettingsDocument(draft, document, managedByCoordinator)
       await onUpdate(updated)
       setDraft(updated)
     } catch (error) {
@@ -164,10 +188,12 @@ export function TeamSettings({
         <div>
           <h1>Squadra e rosa</h1>
         </div>
-        <button className="button primary" onClick={save} disabled={saving}>
-          <Save size={17} />
-          {saving ? 'Salvo…' : 'Salva modifiche'}
-        </button>
+        {!deferredSave && (
+          <button className="button primary" onClick={save} disabled={saving}>
+            <Save size={17} />
+            {saving ? 'Salvo…' : 'Salva modifiche'}
+          </button>
+        )}
       </div>
 
       <section className="panel settings-panel">
@@ -426,16 +452,18 @@ export function TeamSettings({
         </div>
       </section>}
 
-      <button
-        className="button primary mobile-save-fab"
-        type="button"
-        onClick={save}
-        disabled={saving}
-        aria-label={saving ? 'Salvataggio in corso' : 'Salva modifiche'}
-        title={saving ? 'Salvataggio in corso' : 'Salva modifiche'}
-      >
-        <Save size={22} />
-      </button>
+      {!deferredSave && (
+        <button
+          className="button primary mobile-save-fab"
+          type="button"
+          onClick={save}
+          disabled={saving}
+          aria-label={saving ? 'Salvataggio in corso' : 'Salva modifiche'}
+          title={saving ? 'Salvataggio in corso' : 'Salva modifiche'}
+        >
+          <Save size={22} />
+        </button>
+      )}
     </div>
   )
 }
