@@ -847,22 +847,6 @@ export function CoordinatorDashboard({
           onSaveAll={saveAllManagementChanges}
           renderTeamControls={(team) => (
             <>
-              <section className="coordinator-report-shell team-management-report">
-                <MonthlyRegister document={team.document} compactHeader />
-              </section>
-              <PlannedSessionsPanel
-                document={team.document}
-                onAdd={
-                  canWriteTeam(team)
-                    ? (date) => void openTeamAsCoach(team, date)
-                    : undefined
-                }
-                onIgnore={
-                  canWriteTeam(team)
-                    ? (date) => ignoreTeamTrainingDate(team, date)
-                    : undefined
-                }
-              />
               {canWriteTeam(team) && (
                 <TeamSettings
                   document={managementDrafts[managementTeamKey(team)]?.document ?? team.document}
