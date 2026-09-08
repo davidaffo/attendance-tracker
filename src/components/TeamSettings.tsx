@@ -93,11 +93,15 @@ export function TeamSettings({
     setDraft(withScheduleDefaults(document, !managedByCoordinator))
   }, [document.teamId, document.revision, document.updatedAt, managedByCoordinator])
   useEffect(() => {
+    const comparableDocument = withScheduleDefaults(
+      comparisonDocument,
+      !managedByCoordinator
+    )
     onDraftChangeRef.current?.(
       draft,
-      JSON.stringify(draft) !== JSON.stringify(comparisonDocument)
+      JSON.stringify(draft) !== JSON.stringify(comparableDocument)
     )
-  }, [draft, comparisonDocument])
+  }, [draft, comparisonDocument, managedByCoordinator])
   const activeAthletes = useMemo(
     () => [...draft.athletes].filter((athlete) => athlete.active).sort(compareAthletesByName),
     [draft.athletes]
