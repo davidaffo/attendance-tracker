@@ -42,6 +42,7 @@ describe('stagione dimostrativa del coordinatore', () => {
           0
         )
       ).toBeGreaterThan(0)
+      expect(document.sessions.filter((session) => session.score).length).toBeGreaterThan(0)
     }
   })
 

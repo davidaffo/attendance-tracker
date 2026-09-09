@@ -36,7 +36,19 @@ export interface TrainingSession {
   date: string
   attendances: Record<string, string>
   earlyDepartures?: string[]
+  score?: SessionScore
   createdAt: string
+  updatedAt: string
+  attendanceUpdatedAt?: string
+  updatedBy?: string
+}
+
+export type ScoreTeam = 'a' | 'b'
+
+export interface SessionScore {
+  teamPoints: Record<ScoreTeam, number[]>
+  assignments: Record<string, ScoreTeam>
+  adjustments: Record<string, number>
   updatedAt: string
   updatedBy?: string
 }

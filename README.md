@@ -276,11 +276,24 @@ npm run generate:demo
 
 ## Navigazione
 
-Le sezioni hanno indirizzi distinti (`#/allenatore/registro`,
+Le sezioni hanno indirizzi distinti (`#/allenatore/registro`, `#/allenatore/punteggi`,
 `#/allenatore/impostazioni`, `#/coordinatore`, `#/consultazione` e i dettagli
 delle squadre).
 Indietro, Avanti, apertura diretta e ricaricamento funzionano anche nella PWA
 installata e su hosting statici privi di fallback, come GitHub Pages.
+
+## Punteggi degli allenamenti
+
+La sezione `Punteggi` usa esclusivamente gli allenamenti già presenti nel
+registro. Per ogni sessione si assegnano le atlete alla Squadra A o B e si
+inseriscono uno o più parziali: il totale viene calcolato automaticamente. Ogni
+atleta riceve il totale della propria squadra, più un’eventuale correzione
+individuale positiva o negativa. Le assenti ricevono sempre zero punti.
+
+La classifica può essere consultata per singolo mese o per l’intera stagione.
+I dati sono opzionali e vengono salvati dentro la sessione corrispondente, così
+sincronizzazione e backup continuano a usare lo stesso registro senza creare
+sessioni parallele.
 
 ## Allenamenti previsti e uscite anticipate
 

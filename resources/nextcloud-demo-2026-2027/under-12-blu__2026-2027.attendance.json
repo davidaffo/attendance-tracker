@@ -168,8 +168,38 @@
         "5eb7cee6-3f07-4b8b-9152-597fb290b394": "present",
         "2e6b503a-f3e6-43d1-aeb5-e22705a1784f": "absent"
       },
+      "score": {
+        "teamPoints": {
+          "a": [
+            12,
+            8
+          ],
+          "b": [
+            10,
+            9
+          ]
+        },
+        "assignments": {
+          "1547d05d-a7b2-4b6e-a047-b6a536eb91c0": "a",
+          "c1c4a57f-8235-4bda-adb6-c6269362b657": "b",
+          "a4b18501-1024-4d1d-9333-dfba54cc370c": "a",
+          "8c8a9dc8-3f06-4e83-9747-f5a27a2bc307": "b",
+          "3979dac2-7f50-44e3-ab2e-4f8f33af429b": "a",
+          "55b308bf-bafd-47a7-bf89-124fa670a5d7": "b",
+          "09ac2cbc-09ad-41c4-8da9-853c156d946b": "a",
+          "234d83d4-7dd6-48ca-9157-43a36f233883": "b",
+          "72f455d1-3c2c-4708-b749-f6b79624c5b8": "b",
+          "5eb7cee6-3f07-4b8b-9152-597fb290b394": "a"
+        },
+        "adjustments": {
+          "1547d05d-a7b2-4b6e-a047-b6a536eb91c0": -2
+        },
+        "updatedAt": "2026-08-17T20:30:00.000Z",
+        "updatedBy": "Giulia Neri"
+      },
       "createdAt": "2026-08-17T20:30:00.000Z",
       "updatedAt": "2026-08-17T20:30:00.000Z",
+      "attendanceUpdatedAt": "2026-08-17T20:30:00.000Z",
       "updatedBy": "Giulia Neri"
     },
     {
@@ -189,8 +219,34 @@
         "5eb7cee6-3f07-4b8b-9152-597fb290b394": "absent",
         "2e6b503a-f3e6-43d1-aeb5-e22705a1784f": "present"
       },
+      "score": {
+        "teamPoints": {
+          "a": [
+            13,
+            9
+          ],
+          "b": [
+            11,
+            10
+          ]
+        },
+        "assignments": {
+          "c1c4a57f-8235-4bda-adb6-c6269362b657": "b",
+          "8c8a9dc8-3f06-4e83-9747-f5a27a2bc307": "b",
+          "3979dac2-7f50-44e3-ab2e-4f8f33af429b": "a",
+          "09ac2cbc-09ad-41c4-8da9-853c156d946b": "a",
+          "234d83d4-7dd6-48ca-9157-43a36f233883": "b",
+          "768c5d90-775a-48a1-ac5f-e6a0f7cf6065": "a",
+          "72f455d1-3c2c-4708-b749-f6b79624c5b8": "b",
+          "2e6b503a-f3e6-43d1-aeb5-e22705a1784f": "b"
+        },
+        "adjustments": {},
+        "updatedAt": "2026-08-19T20:30:00.000Z",
+        "updatedBy": "Giulia Neri"
+      },
       "createdAt": "2026-08-19T20:30:00.000Z",
       "updatedAt": "2026-08-19T20:30:00.000Z",
+      "attendanceUpdatedAt": "2026-08-19T20:30:00.000Z",
       "updatedBy": "Giulia Neri"
     },
     {
@@ -213,8 +269,40 @@
       "earlyDepartures": [
         "55b308bf-bafd-47a7-bf89-124fa670a5d7"
       ],
+      "score": {
+        "teamPoints": {
+          "a": [
+            14,
+            10
+          ],
+          "b": [
+            12,
+            9
+          ]
+        },
+        "assignments": {
+          "1547d05d-a7b2-4b6e-a047-b6a536eb91c0": "a",
+          "c1c4a57f-8235-4bda-adb6-c6269362b657": "b",
+          "a4b18501-1024-4d1d-9333-dfba54cc370c": "a",
+          "8c8a9dc8-3f06-4e83-9747-f5a27a2bc307": "b",
+          "3979dac2-7f50-44e3-ab2e-4f8f33af429b": "a",
+          "55b308bf-bafd-47a7-bf89-124fa670a5d7": "b",
+          "09ac2cbc-09ad-41c4-8da9-853c156d946b": "a",
+          "234d83d4-7dd6-48ca-9157-43a36f233883": "b",
+          "768c5d90-775a-48a1-ac5f-e6a0f7cf6065": "a",
+          "72f455d1-3c2c-4708-b749-f6b79624c5b8": "b",
+          "5eb7cee6-3f07-4b8b-9152-597fb290b394": "a",
+          "2e6b503a-f3e6-43d1-aeb5-e22705a1784f": "b"
+        },
+        "adjustments": {
+          "55b308bf-bafd-47a7-bf89-124fa670a5d7": -3
+        },
+        "updatedAt": "2026-08-24T20:30:00.000Z",
+        "updatedBy": "Giulia Neri"
+      },
       "createdAt": "2026-08-24T20:30:00.000Z",
       "updatedAt": "2026-08-24T20:30:00.000Z",
+      "attendanceUpdatedAt": "2026-08-24T20:30:00.000Z",
       "updatedBy": "Giulia Neri"
     },
     {
@@ -236,6 +324,7 @@
       },
       "createdAt": "2026-08-26T20:30:00.000Z",
       "updatedAt": "2026-08-26T20:30:00.000Z",
+      "attendanceUpdatedAt": "2026-08-26T20:30:00.000Z",
       "updatedBy": "Giulia Neri"
     },
     {
@@ -257,6 +346,7 @@
       },
       "createdAt": "2026-08-31T20:30:00.000Z",
       "updatedAt": "2026-08-31T20:30:00.000Z",
+      "attendanceUpdatedAt": "2026-08-31T20:30:00.000Z",
       "updatedBy": "Giulia Neri"
     },
     {
@@ -281,6 +371,7 @@
       ],
       "createdAt": "2026-09-02T20:30:00.000Z",
       "updatedAt": "2026-09-02T20:30:00.000Z",
+      "attendanceUpdatedAt": "2026-09-02T20:30:00.000Z",
       "updatedBy": "Giulia Neri"
     },
     {
@@ -302,6 +393,7 @@
       },
       "createdAt": "2026-09-07T20:30:00.000Z",
       "updatedAt": "2026-09-07T20:30:00.000Z",
+      "attendanceUpdatedAt": "2026-09-07T20:30:00.000Z",
       "updatedBy": "Giulia Neri"
     },
     {
@@ -323,6 +415,7 @@
       },
       "createdAt": "2026-09-09T20:30:00.000Z",
       "updatedAt": "2026-09-09T20:30:00.000Z",
+      "attendanceUpdatedAt": "2026-09-09T20:30:00.000Z",
       "updatedBy": "Giulia Neri"
     },
     {
@@ -344,6 +437,7 @@
       },
       "createdAt": "2026-09-14T20:30:00.000Z",
       "updatedAt": "2026-09-14T20:30:00.000Z",
+      "attendanceUpdatedAt": "2026-09-14T20:30:00.000Z",
       "updatedBy": "Giulia Neri"
     },
     {
@@ -365,6 +459,7 @@
       },
       "createdAt": "2026-09-16T20:30:00.000Z",
       "updatedAt": "2026-09-16T20:30:00.000Z",
+      "attendanceUpdatedAt": "2026-09-16T20:30:00.000Z",
       "updatedBy": "Giulia Neri"
     },
     {
@@ -386,6 +481,7 @@
       },
       "createdAt": "2026-09-21T20:30:00.000Z",
       "updatedAt": "2026-09-21T20:30:00.000Z",
+      "attendanceUpdatedAt": "2026-09-21T20:30:00.000Z",
       "updatedBy": "Giulia Neri"
     },
     {
@@ -410,6 +506,7 @@
       ],
       "createdAt": "2026-09-23T20:30:00.000Z",
       "updatedAt": "2026-09-23T20:30:00.000Z",
+      "attendanceUpdatedAt": "2026-09-23T20:30:00.000Z",
       "updatedBy": "Giulia Neri"
     },
     {
@@ -431,6 +528,7 @@
       },
       "createdAt": "2026-09-28T20:30:00.000Z",
       "updatedAt": "2026-09-28T20:30:00.000Z",
+      "attendanceUpdatedAt": "2026-09-28T20:30:00.000Z",
       "updatedBy": "Giulia Neri"
     },
     {
@@ -455,6 +553,7 @@
       ],
       "createdAt": "2026-09-30T20:30:00.000Z",
       "updatedAt": "2026-09-30T20:30:00.000Z",
+      "attendanceUpdatedAt": "2026-09-30T20:30:00.000Z",
       "updatedBy": "Giulia Neri"
     },
     {
@@ -476,6 +575,7 @@
       },
       "createdAt": "2026-10-05T20:30:00.000Z",
       "updatedAt": "2026-10-05T20:30:00.000Z",
+      "attendanceUpdatedAt": "2026-10-05T20:30:00.000Z",
       "updatedBy": "Giulia Neri"
     },
     {
@@ -497,6 +597,7 @@
       },
       "createdAt": "2026-10-07T20:30:00.000Z",
       "updatedAt": "2026-10-07T20:30:00.000Z",
+      "attendanceUpdatedAt": "2026-10-07T20:30:00.000Z",
       "updatedBy": "Giulia Neri"
     },
     {
@@ -518,6 +619,7 @@
       },
       "createdAt": "2026-10-12T20:30:00.000Z",
       "updatedAt": "2026-10-12T20:30:00.000Z",
+      "attendanceUpdatedAt": "2026-10-12T20:30:00.000Z",
       "updatedBy": "Giulia Neri"
     },
     {
@@ -539,6 +641,7 @@
       },
       "createdAt": "2026-10-14T20:30:00.000Z",
       "updatedAt": "2026-10-14T20:30:00.000Z",
+      "attendanceUpdatedAt": "2026-10-14T20:30:00.000Z",
       "updatedBy": "Giulia Neri"
     },
     {
@@ -560,6 +663,7 @@
       },
       "createdAt": "2026-10-19T20:30:00.000Z",
       "updatedAt": "2026-10-19T20:30:00.000Z",
+      "attendanceUpdatedAt": "2026-10-19T20:30:00.000Z",
       "updatedBy": "Giulia Neri"
     },
     {
@@ -584,6 +688,7 @@
       ],
       "createdAt": "2026-10-21T20:30:00.000Z",
       "updatedAt": "2026-10-21T20:30:00.000Z",
+      "attendanceUpdatedAt": "2026-10-21T20:30:00.000Z",
       "updatedBy": "Giulia Neri"
     },
     {
@@ -605,6 +710,7 @@
       },
       "createdAt": "2026-10-26T20:30:00.000Z",
       "updatedAt": "2026-10-26T20:30:00.000Z",
+      "attendanceUpdatedAt": "2026-10-26T20:30:00.000Z",
       "updatedBy": "Giulia Neri"
     },
     {
@@ -629,6 +735,7 @@
       ],
       "createdAt": "2026-10-28T20:30:00.000Z",
       "updatedAt": "2026-10-28T20:30:00.000Z",
+      "attendanceUpdatedAt": "2026-10-28T20:30:00.000Z",
       "updatedBy": "Giulia Neri"
     },
     {
@@ -650,6 +757,7 @@
       },
       "createdAt": "2026-11-02T20:30:00.000Z",
       "updatedAt": "2026-11-02T20:30:00.000Z",
+      "attendanceUpdatedAt": "2026-11-02T20:30:00.000Z",
       "updatedBy": "Giulia Neri"
     },
     {
@@ -671,6 +779,7 @@
       },
       "createdAt": "2026-11-04T20:30:00.000Z",
       "updatedAt": "2026-11-04T20:30:00.000Z",
+      "attendanceUpdatedAt": "2026-11-04T20:30:00.000Z",
       "updatedBy": "Giulia Neri"
     },
     {
@@ -692,6 +801,7 @@
       },
       "createdAt": "2026-11-09T20:30:00.000Z",
       "updatedAt": "2026-11-09T20:30:00.000Z",
+      "attendanceUpdatedAt": "2026-11-09T20:30:00.000Z",
       "updatedBy": "Giulia Neri"
     },
     {
@@ -713,6 +823,7 @@
       },
       "createdAt": "2026-11-11T20:30:00.000Z",
       "updatedAt": "2026-11-11T20:30:00.000Z",
+      "attendanceUpdatedAt": "2026-11-11T20:30:00.000Z",
       "updatedBy": "Giulia Neri"
     },
     {
@@ -734,6 +845,7 @@
       },
       "createdAt": "2026-11-16T20:30:00.000Z",
       "updatedAt": "2026-11-16T20:30:00.000Z",
+      "attendanceUpdatedAt": "2026-11-16T20:30:00.000Z",
       "updatedBy": "Giulia Neri"
     },
     {
@@ -755,6 +867,7 @@
       },
       "createdAt": "2026-11-18T20:30:00.000Z",
       "updatedAt": "2026-11-18T20:30:00.000Z",
+      "attendanceUpdatedAt": "2026-11-18T20:30:00.000Z",
       "updatedBy": "Giulia Neri"
     },
     {
@@ -776,6 +889,7 @@
       },
       "createdAt": "2026-11-23T20:30:00.000Z",
       "updatedAt": "2026-11-23T20:30:00.000Z",
+      "attendanceUpdatedAt": "2026-11-23T20:30:00.000Z",
       "updatedBy": "Giulia Neri"
     },
     {
@@ -797,6 +911,7 @@
       },
       "createdAt": "2026-11-25T20:30:00.000Z",
       "updatedAt": "2026-11-25T20:30:00.000Z",
+      "attendanceUpdatedAt": "2026-11-25T20:30:00.000Z",
       "updatedBy": "Giulia Neri"
     },
     {
@@ -822,6 +937,7 @@
       ],
       "createdAt": "2026-11-30T20:30:00.000Z",
       "updatedAt": "2026-11-30T20:30:00.000Z",
+      "attendanceUpdatedAt": "2026-11-30T20:30:00.000Z",
       "updatedBy": "Giulia Neri"
     },
     {
@@ -843,6 +959,7 @@
       },
       "createdAt": "2026-12-02T20:30:00.000Z",
       "updatedAt": "2026-12-02T20:30:00.000Z",
+      "attendanceUpdatedAt": "2026-12-02T20:30:00.000Z",
       "updatedBy": "Giulia Neri"
     },
     {
@@ -864,6 +981,7 @@
       },
       "createdAt": "2026-12-07T20:30:00.000Z",
       "updatedAt": "2026-12-07T20:30:00.000Z",
+      "attendanceUpdatedAt": "2026-12-07T20:30:00.000Z",
       "updatedBy": "Giulia Neri"
     },
     {
@@ -885,6 +1003,7 @@
       },
       "createdAt": "2026-12-09T20:30:00.000Z",
       "updatedAt": "2026-12-09T20:30:00.000Z",
+      "attendanceUpdatedAt": "2026-12-09T20:30:00.000Z",
       "updatedBy": "Giulia Neri"
     },
     {
@@ -906,6 +1025,7 @@
       },
       "createdAt": "2026-12-14T20:30:00.000Z",
       "updatedAt": "2026-12-14T20:30:00.000Z",
+      "attendanceUpdatedAt": "2026-12-14T20:30:00.000Z",
       "updatedBy": "Giulia Neri"
     },
     {
@@ -930,6 +1050,7 @@
       ],
       "createdAt": "2026-12-16T20:30:00.000Z",
       "updatedAt": "2026-12-16T20:30:00.000Z",
+      "attendanceUpdatedAt": "2026-12-16T20:30:00.000Z",
       "updatedBy": "Giulia Neri"
     },
     {
@@ -954,6 +1075,7 @@
       ],
       "createdAt": "2026-12-21T20:30:00.000Z",
       "updatedAt": "2026-12-21T20:30:00.000Z",
+      "attendanceUpdatedAt": "2026-12-21T20:30:00.000Z",
       "updatedBy": "Giulia Neri"
     },
     {
@@ -975,6 +1097,7 @@
       },
       "createdAt": "2026-12-23T20:30:00.000Z",
       "updatedAt": "2026-12-23T20:30:00.000Z",
+      "attendanceUpdatedAt": "2026-12-23T20:30:00.000Z",
       "updatedBy": "Giulia Neri"
     },
     {
@@ -996,6 +1119,7 @@
       },
       "createdAt": "2027-01-11T20:30:00.000Z",
       "updatedAt": "2027-01-11T20:30:00.000Z",
+      "attendanceUpdatedAt": "2027-01-11T20:30:00.000Z",
       "updatedBy": "Giulia Neri"
     },
     {
@@ -1020,6 +1144,7 @@
       ],
       "createdAt": "2027-01-13T20:30:00.000Z",
       "updatedAt": "2027-01-13T20:30:00.000Z",
+      "attendanceUpdatedAt": "2027-01-13T20:30:00.000Z",
       "updatedBy": "Giulia Neri"
     },
     {
@@ -1041,6 +1166,7 @@
       },
       "createdAt": "2027-01-18T20:30:00.000Z",
       "updatedAt": "2027-01-18T20:30:00.000Z",
+      "attendanceUpdatedAt": "2027-01-18T20:30:00.000Z",
       "updatedBy": "Giulia Neri"
     },
     {
@@ -1062,6 +1188,7 @@
       },
       "createdAt": "2027-01-20T20:30:00.000Z",
       "updatedAt": "2027-01-20T20:30:00.000Z",
+      "attendanceUpdatedAt": "2027-01-20T20:30:00.000Z",
       "updatedBy": "Giulia Neri"
     },
     {
@@ -1083,6 +1210,7 @@
       },
       "createdAt": "2027-01-25T20:30:00.000Z",
       "updatedAt": "2027-01-25T20:30:00.000Z",
+      "attendanceUpdatedAt": "2027-01-25T20:30:00.000Z",
       "updatedBy": "Giulia Neri"
     },
     {
@@ -1104,6 +1232,7 @@
       },
       "createdAt": "2027-01-27T20:30:00.000Z",
       "updatedAt": "2027-01-27T20:30:00.000Z",
+      "attendanceUpdatedAt": "2027-01-27T20:30:00.000Z",
       "updatedBy": "Giulia Neri"
     },
     {
@@ -1128,6 +1257,7 @@
       ],
       "createdAt": "2027-02-01T20:30:00.000Z",
       "updatedAt": "2027-02-01T20:30:00.000Z",
+      "attendanceUpdatedAt": "2027-02-01T20:30:00.000Z",
       "updatedBy": "Giulia Neri"
     },
     {
@@ -1149,6 +1279,7 @@
       },
       "createdAt": "2027-02-03T20:30:00.000Z",
       "updatedAt": "2027-02-03T20:30:00.000Z",
+      "attendanceUpdatedAt": "2027-02-03T20:30:00.000Z",
       "updatedBy": "Giulia Neri"
     },
     {
@@ -1170,6 +1301,7 @@
       },
       "createdAt": "2027-02-08T20:30:00.000Z",
       "updatedAt": "2027-02-08T20:30:00.000Z",
+      "attendanceUpdatedAt": "2027-02-08T20:30:00.000Z",
       "updatedBy": "Giulia Neri"
     },
     {
@@ -1191,6 +1323,7 @@
       },
       "createdAt": "2027-02-10T20:30:00.000Z",
       "updatedAt": "2027-02-10T20:30:00.000Z",
+      "attendanceUpdatedAt": "2027-02-10T20:30:00.000Z",
       "updatedBy": "Giulia Neri"
     },
     {
@@ -1212,6 +1345,7 @@
       },
       "createdAt": "2027-02-15T20:30:00.000Z",
       "updatedAt": "2027-02-15T20:30:00.000Z",
+      "attendanceUpdatedAt": "2027-02-15T20:30:00.000Z",
       "updatedBy": "Giulia Neri"
     },
     {
@@ -1233,6 +1367,7 @@
       },
       "createdAt": "2027-02-17T20:30:00.000Z",
       "updatedAt": "2027-02-17T20:30:00.000Z",
+      "attendanceUpdatedAt": "2027-02-17T20:30:00.000Z",
       "updatedBy": "Giulia Neri"
     },
     {
@@ -1257,6 +1392,7 @@
       ],
       "createdAt": "2027-02-22T20:30:00.000Z",
       "updatedAt": "2027-02-22T20:30:00.000Z",
+      "attendanceUpdatedAt": "2027-02-22T20:30:00.000Z",
       "updatedBy": "Giulia Neri"
     },
     {
@@ -1281,6 +1417,7 @@
       ],
       "createdAt": "2027-02-24T20:30:00.000Z",
       "updatedAt": "2027-02-24T20:30:00.000Z",
+      "attendanceUpdatedAt": "2027-02-24T20:30:00.000Z",
       "updatedBy": "Giulia Neri"
     },
     {
@@ -1305,6 +1442,7 @@
       ],
       "createdAt": "2027-03-01T20:30:00.000Z",
       "updatedAt": "2027-03-01T20:30:00.000Z",
+      "attendanceUpdatedAt": "2027-03-01T20:30:00.000Z",
       "updatedBy": "Giulia Neri"
     },
     {
@@ -1326,6 +1464,7 @@
       },
       "createdAt": "2027-03-03T20:30:00.000Z",
       "updatedAt": "2027-03-03T20:30:00.000Z",
+      "attendanceUpdatedAt": "2027-03-03T20:30:00.000Z",
       "updatedBy": "Giulia Neri"
     },
     {
@@ -1347,6 +1486,7 @@
       },
       "createdAt": "2027-03-08T20:30:00.000Z",
       "updatedAt": "2027-03-08T20:30:00.000Z",
+      "attendanceUpdatedAt": "2027-03-08T20:30:00.000Z",
       "updatedBy": "Giulia Neri"
     },
     {
@@ -1368,6 +1508,7 @@
       },
       "createdAt": "2027-03-10T20:30:00.000Z",
       "updatedAt": "2027-03-10T20:30:00.000Z",
+      "attendanceUpdatedAt": "2027-03-10T20:30:00.000Z",
       "updatedBy": "Giulia Neri"
     },
     {
@@ -1389,6 +1530,7 @@
       },
       "createdAt": "2027-03-15T20:30:00.000Z",
       "updatedAt": "2027-03-15T20:30:00.000Z",
+      "attendanceUpdatedAt": "2027-03-15T20:30:00.000Z",
       "updatedBy": "Giulia Neri"
     },
     {
@@ -1413,6 +1555,7 @@
       ],
       "createdAt": "2027-03-17T20:30:00.000Z",
       "updatedAt": "2027-03-17T20:30:00.000Z",
+      "attendanceUpdatedAt": "2027-03-17T20:30:00.000Z",
       "updatedBy": "Giulia Neri"
     },
     {
@@ -1434,6 +1577,7 @@
       },
       "createdAt": "2027-03-22T20:30:00.000Z",
       "updatedAt": "2027-03-22T20:30:00.000Z",
+      "attendanceUpdatedAt": "2027-03-22T20:30:00.000Z",
       "updatedBy": "Giulia Neri"
     },
     {
@@ -1458,6 +1602,7 @@
       ],
       "createdAt": "2027-03-24T20:30:00.000Z",
       "updatedAt": "2027-03-24T20:30:00.000Z",
+      "attendanceUpdatedAt": "2027-03-24T20:30:00.000Z",
       "updatedBy": "Giulia Neri"
     },
     {
@@ -1479,6 +1624,7 @@
       },
       "createdAt": "2027-03-29T20:30:00.000Z",
       "updatedAt": "2027-03-29T20:30:00.000Z",
+      "attendanceUpdatedAt": "2027-03-29T20:30:00.000Z",
       "updatedBy": "Giulia Neri"
     },
     {
@@ -1500,6 +1646,7 @@
       },
       "createdAt": "2027-03-31T20:30:00.000Z",
       "updatedAt": "2027-03-31T20:30:00.000Z",
+      "attendanceUpdatedAt": "2027-03-31T20:30:00.000Z",
       "updatedBy": "Giulia Neri"
     },
     {
@@ -1521,6 +1668,7 @@
       },
       "createdAt": "2027-04-07T20:30:00.000Z",
       "updatedAt": "2027-04-07T20:30:00.000Z",
+      "attendanceUpdatedAt": "2027-04-07T20:30:00.000Z",
       "updatedBy": "Giulia Neri"
     },
     {
@@ -1542,6 +1690,7 @@
       },
       "createdAt": "2027-04-12T20:30:00.000Z",
       "updatedAt": "2027-04-12T20:30:00.000Z",
+      "attendanceUpdatedAt": "2027-04-12T20:30:00.000Z",
       "updatedBy": "Giulia Neri"
     },
     {
@@ -1563,6 +1712,7 @@
       },
       "createdAt": "2027-04-14T20:30:00.000Z",
       "updatedAt": "2027-04-14T20:30:00.000Z",
+      "attendanceUpdatedAt": "2027-04-14T20:30:00.000Z",
       "updatedBy": "Giulia Neri"
     },
     {
@@ -1584,6 +1734,7 @@
       },
       "createdAt": "2027-04-19T20:30:00.000Z",
       "updatedAt": "2027-04-19T20:30:00.000Z",
+      "attendanceUpdatedAt": "2027-04-19T20:30:00.000Z",
       "updatedBy": "Giulia Neri"
     },
     {
@@ -1605,6 +1756,7 @@
       },
       "createdAt": "2027-04-21T20:30:00.000Z",
       "updatedAt": "2027-04-21T20:30:00.000Z",
+      "attendanceUpdatedAt": "2027-04-21T20:30:00.000Z",
       "updatedBy": "Giulia Neri"
     },
     {
@@ -1626,6 +1778,7 @@
       },
       "createdAt": "2027-04-26T20:30:00.000Z",
       "updatedAt": "2027-04-26T20:30:00.000Z",
+      "attendanceUpdatedAt": "2027-04-26T20:30:00.000Z",
       "updatedBy": "Giulia Neri"
     },
     {
@@ -1650,6 +1803,7 @@
       ],
       "createdAt": "2027-04-28T20:30:00.000Z",
       "updatedAt": "2027-04-28T20:30:00.000Z",
+      "attendanceUpdatedAt": "2027-04-28T20:30:00.000Z",
       "updatedBy": "Giulia Neri"
     },
     {
@@ -1671,6 +1825,7 @@
       },
       "createdAt": "2027-05-03T20:30:00.000Z",
       "updatedAt": "2027-05-03T20:30:00.000Z",
+      "attendanceUpdatedAt": "2027-05-03T20:30:00.000Z",
       "updatedBy": "Giulia Neri"
     },
     {
@@ -1695,6 +1850,7 @@
       ],
       "createdAt": "2027-05-05T20:30:00.000Z",
       "updatedAt": "2027-05-05T20:30:00.000Z",
+      "attendanceUpdatedAt": "2027-05-05T20:30:00.000Z",
       "updatedBy": "Giulia Neri"
     },
     {
@@ -1716,6 +1872,7 @@
       },
       "createdAt": "2027-05-10T20:30:00.000Z",
       "updatedAt": "2027-05-10T20:30:00.000Z",
+      "attendanceUpdatedAt": "2027-05-10T20:30:00.000Z",
       "updatedBy": "Giulia Neri"
     },
     {
@@ -1737,6 +1894,7 @@
       },
       "createdAt": "2027-05-12T20:30:00.000Z",
       "updatedAt": "2027-05-12T20:30:00.000Z",
+      "attendanceUpdatedAt": "2027-05-12T20:30:00.000Z",
       "updatedBy": "Giulia Neri"
     },
     {
@@ -1758,6 +1916,7 @@
       },
       "createdAt": "2027-05-17T20:30:00.000Z",
       "updatedAt": "2027-05-17T20:30:00.000Z",
+      "attendanceUpdatedAt": "2027-05-17T20:30:00.000Z",
       "updatedBy": "Giulia Neri"
     },
     {
@@ -1779,6 +1938,7 @@
       },
       "createdAt": "2027-05-19T20:30:00.000Z",
       "updatedAt": "2027-05-19T20:30:00.000Z",
+      "attendanceUpdatedAt": "2027-05-19T20:30:00.000Z",
       "updatedBy": "Giulia Neri"
     },
     {
@@ -1800,6 +1960,7 @@
       },
       "createdAt": "2027-05-24T20:30:00.000Z",
       "updatedAt": "2027-05-24T20:30:00.000Z",
+      "attendanceUpdatedAt": "2027-05-24T20:30:00.000Z",
       "updatedBy": "Giulia Neri"
     },
     {
@@ -1821,6 +1982,7 @@
       },
       "createdAt": "2027-05-26T20:30:00.000Z",
       "updatedAt": "2027-05-26T20:30:00.000Z",
+      "attendanceUpdatedAt": "2027-05-26T20:30:00.000Z",
       "updatedBy": "Giulia Neri"
     },
     {
@@ -1842,6 +2004,7 @@
       },
       "createdAt": "2027-05-31T20:30:00.000Z",
       "updatedAt": "2027-05-31T20:30:00.000Z",
+      "attendanceUpdatedAt": "2027-05-31T20:30:00.000Z",
       "updatedBy": "Giulia Neri"
     },
     {
@@ -1863,6 +2026,7 @@
       },
       "createdAt": "2027-06-02T20:30:00.000Z",
       "updatedAt": "2027-06-02T20:30:00.000Z",
+      "attendanceUpdatedAt": "2027-06-02T20:30:00.000Z",
       "updatedBy": "Giulia Neri"
     },
     {
@@ -1884,6 +2048,7 @@
       },
       "createdAt": "2027-06-07T20:30:00.000Z",
       "updatedAt": "2027-06-07T20:30:00.000Z",
+      "attendanceUpdatedAt": "2027-06-07T20:30:00.000Z",
       "updatedBy": "Giulia Neri"
     },
     {
@@ -1905,6 +2070,7 @@
       },
       "createdAt": "2027-06-09T20:30:00.000Z",
       "updatedAt": "2027-06-09T20:30:00.000Z",
+      "attendanceUpdatedAt": "2027-06-09T20:30:00.000Z",
       "updatedBy": "Giulia Neri"
     },
     {
@@ -1926,6 +2092,7 @@
       },
       "createdAt": "2027-06-14T20:30:00.000Z",
       "updatedAt": "2027-06-14T20:30:00.000Z",
+      "attendanceUpdatedAt": "2027-06-14T20:30:00.000Z",
       "updatedBy": "Giulia Neri"
     },
     {
@@ -1950,6 +2117,7 @@
       ],
       "createdAt": "2027-06-16T20:30:00.000Z",
       "updatedAt": "2027-06-16T20:30:00.000Z",
+      "attendanceUpdatedAt": "2027-06-16T20:30:00.000Z",
       "updatedBy": "Giulia Neri"
     },
     {
@@ -1974,6 +2142,7 @@
       ],
       "createdAt": "2027-06-21T20:30:00.000Z",
       "updatedAt": "2027-06-21T20:30:00.000Z",
+      "attendanceUpdatedAt": "2027-06-21T20:30:00.000Z",
       "updatedBy": "Giulia Neri"
     },
     {
@@ -1995,6 +2164,7 @@
       },
       "createdAt": "2027-06-23T20:30:00.000Z",
       "updatedAt": "2027-06-23T20:30:00.000Z",
+      "attendanceUpdatedAt": "2027-06-23T20:30:00.000Z",
       "updatedBy": "Giulia Neri"
     },
     {
@@ -2016,6 +2186,7 @@
       },
       "createdAt": "2027-06-28T20:30:00.000Z",
       "updatedAt": "2027-06-28T20:30:00.000Z",
+      "attendanceUpdatedAt": "2027-06-28T20:30:00.000Z",
       "updatedBy": "Giulia Neri"
     },
     {
@@ -2040,6 +2211,7 @@
       ],
       "createdAt": "2027-06-30T20:30:00.000Z",
       "updatedAt": "2027-06-30T20:30:00.000Z",
+      "attendanceUpdatedAt": "2027-06-30T20:30:00.000Z",
       "updatedBy": "Giulia Neri"
     },
     {
@@ -2064,6 +2236,7 @@
       ],
       "createdAt": "2027-07-05T20:30:00.000Z",
       "updatedAt": "2027-07-05T20:30:00.000Z",
+      "attendanceUpdatedAt": "2027-07-05T20:30:00.000Z",
       "updatedBy": "Giulia Neri"
     },
     {
@@ -2085,6 +2258,7 @@
       },
       "createdAt": "2027-07-07T20:30:00.000Z",
       "updatedAt": "2027-07-07T20:30:00.000Z",
+      "attendanceUpdatedAt": "2027-07-07T20:30:00.000Z",
       "updatedBy": "Giulia Neri"
     },
     {
@@ -2109,6 +2283,7 @@
       ],
       "createdAt": "2027-07-12T20:30:00.000Z",
       "updatedAt": "2027-07-12T20:30:00.000Z",
+      "attendanceUpdatedAt": "2027-07-12T20:30:00.000Z",
       "updatedBy": "Giulia Neri"
     },
     {
@@ -2129,6 +2304,7 @@
       },
       "createdAt": "2027-07-14T20:30:00.000Z",
       "updatedAt": "2027-07-14T20:30:00.000Z",
+      "attendanceUpdatedAt": "2027-07-14T20:30:00.000Z",
       "updatedBy": "Giulia Neri"
     }
   ]

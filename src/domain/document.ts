@@ -3,7 +3,9 @@ import type {
   AttendanceStatus,
   TeamDocument,
   TeamTotals,
-  TrainingSession
+  TrainingSession,
+  SessionScore,
+  ScoreTeam
 } from './types'
 import { ATTENDANCE_SCHEMA_VERSION } from './types'
 
@@ -48,7 +50,27 @@ function isSession(value: unknown): value is TrainingSession {
     Object.values(value.attendances).every(isString) &&
     (value.earlyDepartures === undefined ||
       (Array.isArray(value.earlyDepartures) && value.earlyDepartures.every(isString))) &&
+    (value.score === undefined || isSessionScore(value.score)) &&
     isString(value.createdAt) &&
+    isString(value.updatedAt) &&
+    (value.attendanceUpdatedAt === undefined || isString(value.attendanceUpdatedAt)) &&
+    (value.updatedBy === undefined || isString(value.updatedBy))
+  )
+}
+
+function isSessionScore(value: unknown): value is SessionScore {
+  if (!isRecord(value) || !isRecord(value.teamPoints)) return false
+  const validPoints = (points: unknown) =>
+    Array.isArray(points) && points.every((point) => typeof point === 'number' && Number.isFinite(point))
+  return (
+    validPoints(value.teamPoints.a) &&
+    validPoints(value.teamPoints.b) &&
+    isRecord(value.assignments) &&
+    Object.values(value.assignments).every((team) => team === 'a' || team === 'b') &&
+    isRecord(value.adjustments) &&
+    Object.values(value.adjustments).every(
+      (adjustment) => typeof adjustment === 'number' && Number.isFinite(adjustment)
+    ) &&
     isString(value.updatedAt) &&
     (value.updatedBy === undefined || isString(value.updatedBy))
   )
@@ -128,7 +150,9 @@ export function isTeamDocument(value: unknown): value is TeamDocument {
       ([athleteId, statusId]) => athleteIds.has(athleteId) && statusIds.has(statusId)
     ) &&
     (session.earlyDepartures ?? []).every((athleteId) => athleteIds.has(athleteId)) &&
-    new Set(session.earlyDepartures ?? []).size === (session.earlyDepartures ?? []).length
+    new Set(session.earlyDepartures ?? []).size === (session.earlyDepartures ?? []).length &&
+    Object.keys(session.score?.assignments ?? {}).every((athleteId) => athleteIds.has(athleteId)) &&
+    Object.keys(session.score?.adjustments ?? {}).every((athleteId) => athleteIds.has(athleteId))
   )
 }
 
@@ -153,8 +177,10 @@ export function saveSession(
   const existing = document.sessions.find((session) => session.id === input.id)
   const session: TrainingSession = {
     ...input,
+    ...(existing?.score ? { score: existing.score } : {}),
     createdAt: existing?.createdAt ?? now,
     updatedAt: now,
+    attendanceUpdatedAt: now,
     updatedBy
   }
 
@@ -172,6 +198,96 @@ export function saveSession(
     ),
     sessions: sessions.sort((a, b) => a.date.localeCompare(b.date))
   }
+}
+
+export function saveSessionScore(
+  document: TeamDocument,
+  sessionId: string,
+  input: Pick<SessionScore, 'teamPoints' | 'assignments' | 'adjustments'>,
+  updatedBy: string
+): TeamDocument {
+  const existing = document.sessions.find((session) => session.id === sessionId)
+  if (!existing) throw new Error('L’allenamento non esiste più.')
+  const now = new Date().toISOString()
+  const score: SessionScore = {
+    teamPoints: {
+      a: [...input.teamPoints.a],
+      b: [...input.teamPoints.b]
+    },
+    assignments: { ...input.assignments },
+    adjustments: { ...input.adjustments },
+    updatedAt: now,
+    updatedBy
+  }
+  return {
+    ...document,
+    revision: document.revision + 1,
+    updatedAt: now,
+    updatedBy,
+    sessions: document.sessions.map((session) =>
+      session.id === sessionId
+        ? {
+            ...session,
+            score,
+            attendanceUpdatedAt: session.attendanceUpdatedAt ?? session.updatedAt,
+            updatedAt: now,
+            updatedBy
+          }
+        : session
+    )
+  }
+}
+
+export function scoreTeamTotal(score: SessionScore | undefined, team: ScoreTeam): number {
+  return (score?.teamPoints[team] ?? []).reduce((total, points) => total + points, 0)
+}
+
+export function athleteScoreForSession(
+  document: TeamDocument,
+  session: TrainingSession,
+  athleteId: string
+): number {
+  const statusId = session.attendances[athleteId]
+  const status = document.statuses.find((candidate) => candidate.id === statusId)
+  if (status?.code.toLocaleUpperCase() === 'A') return 0
+  const team = session.score?.assignments[athleteId]
+  if (!team) return 0
+  return scoreTeamTotal(session.score, team) + (session.score?.adjustments[athleteId] ?? 0)
+}
+
+export interface AthleteScoreTotal {
+  athleteId: string
+  points: number
+  scoredSessions: number
+}
+
+export function scoreRanking(
+  document: TeamDocument,
+  month?: string
+): AthleteScoreTotal[] {
+  const sessions = month
+    ? document.sessions.filter((session) => session.date.startsWith(`${month}-`))
+    : document.sessions
+  return document.athletes
+    .map((athlete) => {
+      const scored = sessions.filter((session) => session.score?.assignments[athlete.id])
+      return {
+        athleteId: athlete.id,
+        points: scored.reduce(
+          (total, session) => total + athleteScoreForSession(document, session, athlete.id),
+          0
+        ),
+        scoredSessions: scored.length
+      }
+    })
+    .sort((first, second) =>
+      second.points - first.points ||
+      (document.athletes.find((athlete) => athlete.id === first.athleteId)?.name ?? '')
+        .localeCompare(
+          document.athletes.find((athlete) => athlete.id === second.athleteId)?.name ?? '',
+          'it-IT'
+        )
+    )
 }
 
 export function deleteSession(
@@ -198,9 +314,10 @@ export function mergeDocuments(local: TeamDocument, remote: TeamDocument): TeamD
   for (const session of remote.sessions) sessions.set(session.id, session)
   for (const session of local.sessions) {
     const remoteSession = sessions.get(session.id)
-    if (!remoteSession || session.updatedAt > remoteSession.updatedAt) {
-      sessions.set(session.id, session)
-    }
+    sessions.set(
+      session.id,
+      remoteSession ? mergeTrainingSession(session, remoteSession) : session
+    )
   }
 
   const sessionsByDate = new Map<string, TrainingSession>()
@@ -225,6 +342,28 @@ export function mergeDocuments(local: TeamDocument, remote: TeamDocument): TeamD
     updatedAt: new Date().toISOString(),
     ignoredTrainingDates,
     sessions: [...sessionsByDate.values()].sort((a, b) => a.date.localeCompare(b.date))
+  }
+}
+
+function mergeTrainingSession(
+  local: TrainingSession,
+  remote: TrainingSession
+): TrainingSession {
+  const localAttendanceUpdatedAt = local.attendanceUpdatedAt ?? local.updatedAt
+  const remoteAttendanceUpdatedAt = remote.attendanceUpdatedAt ?? remote.updatedAt
+  const attendanceWinner = localAttendanceUpdatedAt >= remoteAttendanceUpdatedAt ? local : remote
+  const scoreWinner = !local.score
+    ? remote.score
+    : !remote.score || local.score.updatedAt >= remote.score.updatedAt
+      ? local.score
+      : remote.score
+  const { score: _discardedScore, ...attendance } = attendanceWinner
+  return {
+    ...attendance,
+    ...(scoreWinner ? { score: scoreWinner } : {}),
+    updatedAt: [local.updatedAt, remote.updatedAt, scoreWinner?.updatedAt ?? '']
+      .sort()
+      .at(-1) ?? attendanceWinner.updatedAt
   }
 }
 

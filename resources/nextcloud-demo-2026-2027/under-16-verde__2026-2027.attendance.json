@@ -202,8 +202,43 @@
       "earlyDepartures": [
         "e71eedd9-7b45-4437-a679-f755da378eb9"
       ],
+      "score": {
+        "teamPoints": {
+          "a": [
+            12,
+            8
+          ],
+          "b": [
+            10,
+            9
+          ]
+        },
+        "assignments": {
+          "906682cc-f89d-4f63-a8a2-56591da173dc": "a",
+          "f2dd7b29-a1c1-4b43-8cb0-cc65bcd9e53a": "b",
+          "23568e91-bb63-4831-8d74-be777456df37": "a",
+          "018e2894-def9-4c6f-8b7c-7cb80cb8708a": "b",
+          "a318ea56-beaa-4242-ae4f-6fe73c447c90": "a",
+          "31456a24-d45a-488f-96c6-ed01fdc1d587": "b",
+          "625958de-e8cd-48bf-ba63-1465e5eea02e": "a",
+          "b964a746-714e-4ef4-b161-cf93e03973cb": "b",
+          "807f90f8-c8b7-4c31-a83e-94640f86e018": "a",
+          "1fbe7145-832b-48fc-8ca1-c96bece70079": "b",
+          "e71eedd9-7b45-4437-a679-f755da378eb9": "a",
+          "eafd3bfb-6fa3-4a37-8807-a7865f02b29d": "b",
+          "68545bf4-83f7-4581-a9b3-29f89883f18f": "a",
+          "b98c0140-8299-4116-bba3-7791d69ef7eb": "a"
+        },
+        "adjustments": {
+          "906682cc-f89d-4f63-a8a2-56591da173dc": -2,
+          "e71eedd9-7b45-4437-a679-f755da378eb9": -3
+        },
+        "updatedAt": "2026-08-17T20:30:00.000Z",
+        "updatedBy": "Chiara Santoro"
+      },
       "createdAt": "2026-08-17T20:30:00.000Z",
       "updatedAt": "2026-08-17T20:30:00.000Z",
+      "attendanceUpdatedAt": "2026-08-17T20:30:00.000Z",
       "updatedBy": "Chiara Santoro"
     },
     {
@@ -225,8 +260,41 @@
         "68545bf4-83f7-4581-a9b3-29f89883f18f": "present",
         "b98c0140-8299-4116-bba3-7791d69ef7eb": "present"
       },
+      "score": {
+        "teamPoints": {
+          "a": [
+            13,
+            9
+          ],
+          "b": [
+            11,
+            10
+          ]
+        },
+        "assignments": {
+          "906682cc-f89d-4f63-a8a2-56591da173dc": "a",
+          "f2dd7b29-a1c1-4b43-8cb0-cc65bcd9e53a": "b",
+          "23568e91-bb63-4831-8d74-be777456df37": "a",
+          "018e2894-def9-4c6f-8b7c-7cb80cb8708a": "b",
+          "a318ea56-beaa-4242-ae4f-6fe73c447c90": "a",
+          "31456a24-d45a-488f-96c6-ed01fdc1d587": "b",
+          "b964a746-714e-4ef4-b161-cf93e03973cb": "b",
+          "807f90f8-c8b7-4c31-a83e-94640f86e018": "a",
+          "1fbe7145-832b-48fc-8ca1-c96bece70079": "b",
+          "e71eedd9-7b45-4437-a679-f755da378eb9": "a",
+          "eafd3bfb-6fa3-4a37-8807-a7865f02b29d": "b",
+          "68545bf4-83f7-4581-a9b3-29f89883f18f": "a",
+          "b98c0140-8299-4116-bba3-7791d69ef7eb": "a"
+        },
+        "adjustments": {
+          "e71eedd9-7b45-4437-a679-f755da378eb9": -2
+        },
+        "updatedAt": "2026-08-19T20:30:00.000Z",
+        "updatedBy": "Chiara Santoro"
+      },
       "createdAt": "2026-08-19T20:30:00.000Z",
       "updatedAt": "2026-08-19T20:30:00.000Z",
+      "attendanceUpdatedAt": "2026-08-19T20:30:00.000Z",
       "updatedBy": "Chiara Santoro"
     },
     {
@@ -251,8 +319,40 @@
       "earlyDepartures": [
         "b98c0140-8299-4116-bba3-7791d69ef7eb"
       ],
+      "score": {
+        "teamPoints": {
+          "a": [
+            14,
+            10
+          ],
+          "b": [
+            12,
+            9
+          ]
+        },
+        "assignments": {
+          "906682cc-f89d-4f63-a8a2-56591da173dc": "a",
+          "23568e91-bb63-4831-8d74-be777456df37": "a",
+          "018e2894-def9-4c6f-8b7c-7cb80cb8708a": "b",
+          "a318ea56-beaa-4242-ae4f-6fe73c447c90": "a",
+          "31456a24-d45a-488f-96c6-ed01fdc1d587": "b",
+          "625958de-e8cd-48bf-ba63-1465e5eea02e": "a",
+          "b964a746-714e-4ef4-b161-cf93e03973cb": "b",
+          "807f90f8-c8b7-4c31-a83e-94640f86e018": "a",
+          "1fbe7145-832b-48fc-8ca1-c96bece70079": "b",
+          "e71eedd9-7b45-4437-a679-f755da378eb9": "a",
+          "eafd3bfb-6fa3-4a37-8807-a7865f02b29d": "b",
+          "b98c0140-8299-4116-bba3-7791d69ef7eb": "a"
+        },
+        "adjustments": {
+          "b98c0140-8299-4116-bba3-7791d69ef7eb": -2
+        },
+        "updatedAt": "2026-08-21T20:30:00.000Z",
+        "updatedBy": "Chiara Santoro"
+      },
       "createdAt": "2026-08-21T20:30:00.000Z",
       "updatedAt": "2026-08-21T20:30:00.000Z",
+      "attendanceUpdatedAt": "2026-08-21T20:30:00.000Z",
       "updatedBy": "Chiara Santoro"
     },
     {
@@ -276,6 +376,7 @@
       },
       "createdAt": "2026-08-24T20:30:00.000Z",
       "updatedAt": "2026-08-24T20:30:00.000Z",
+      "attendanceUpdatedAt": "2026-08-24T20:30:00.000Z",
       "updatedBy": "Chiara Santoro"
     },
     {
@@ -299,6 +400,7 @@
       },
       "createdAt": "2026-08-26T20:30:00.000Z",
       "updatedAt": "2026-08-26T20:30:00.000Z",
+      "attendanceUpdatedAt": "2026-08-26T20:30:00.000Z",
       "updatedBy": "Chiara Santoro"
     },
     {
@@ -322,6 +424,7 @@
       },
       "createdAt": "2026-08-28T20:30:00.000Z",
       "updatedAt": "2026-08-28T20:30:00.000Z",
+      "attendanceUpdatedAt": "2026-08-28T20:30:00.000Z",
       "updatedBy": "Chiara Santoro"
     },
     {
@@ -345,6 +448,7 @@
       },
       "createdAt": "2026-08-31T20:30:00.000Z",
       "updatedAt": "2026-08-31T20:30:00.000Z",
+      "attendanceUpdatedAt": "2026-08-31T20:30:00.000Z",
       "updatedBy": "Chiara Santoro"
     },
     {
@@ -368,6 +472,7 @@
       },
       "createdAt": "2026-09-02T20:30:00.000Z",
       "updatedAt": "2026-09-02T20:30:00.000Z",
+      "attendanceUpdatedAt": "2026-09-02T20:30:00.000Z",
       "updatedBy": "Chiara Santoro"
     },
     {
@@ -391,6 +496,7 @@
       },
       "createdAt": "2026-09-04T20:30:00.000Z",
       "updatedAt": "2026-09-04T20:30:00.000Z",
+      "attendanceUpdatedAt": "2026-09-04T20:30:00.000Z",
       "updatedBy": "Chiara Santoro"
     },
     {
@@ -414,6 +520,7 @@
       },
       "createdAt": "2026-09-07T20:30:00.000Z",
       "updatedAt": "2026-09-07T20:30:00.000Z",
+      "attendanceUpdatedAt": "2026-09-07T20:30:00.000Z",
       "updatedBy": "Chiara Santoro"
     },
     {
@@ -440,6 +547,7 @@
       ],
       "createdAt": "2026-09-09T20:30:00.000Z",
       "updatedAt": "2026-09-09T20:30:00.000Z",
+      "attendanceUpdatedAt": "2026-09-09T20:30:00.000Z",
       "updatedBy": "Chiara Santoro"
     },
     {
@@ -463,6 +571,7 @@
       },
       "createdAt": "2026-09-11T20:30:00.000Z",
       "updatedAt": "2026-09-11T20:30:00.000Z",
+      "attendanceUpdatedAt": "2026-09-11T20:30:00.000Z",
       "updatedBy": "Chiara Santoro"
     },
     {
@@ -486,6 +595,7 @@
       },
       "createdAt": "2026-09-14T20:30:00.000Z",
       "updatedAt": "2026-09-14T20:30:00.000Z",
+      "attendanceUpdatedAt": "2026-09-14T20:30:00.000Z",
       "updatedBy": "Chiara Santoro"
     },
     {
@@ -509,6 +619,7 @@
       },
       "createdAt": "2026-09-16T20:30:00.000Z",
       "updatedAt": "2026-09-16T20:30:00.000Z",
+      "attendanceUpdatedAt": "2026-09-16T20:30:00.000Z",
       "updatedBy": "Chiara Santoro"
     },
     {
@@ -537,6 +648,7 @@
       ],
       "createdAt": "2026-09-18T20:30:00.000Z",
       "updatedAt": "2026-09-18T20:30:00.000Z",
+      "attendanceUpdatedAt": "2026-09-18T20:30:00.000Z",
       "updatedBy": "Chiara Santoro"
     },
     {
@@ -565,6 +677,7 @@
       ],
       "createdAt": "2026-09-21T20:30:00.000Z",
       "updatedAt": "2026-09-21T20:30:00.000Z",
+      "attendanceUpdatedAt": "2026-09-21T20:30:00.000Z",
       "updatedBy": "Chiara Santoro"
     },
     {
@@ -588,6 +701,7 @@
       },
       "createdAt": "2026-09-23T20:30:00.000Z",
       "updatedAt": "2026-09-23T20:30:00.000Z",
+      "attendanceUpdatedAt": "2026-09-23T20:30:00.000Z",
       "updatedBy": "Chiara Santoro"
     },
     {
@@ -611,6 +725,7 @@
       },
       "createdAt": "2026-09-25T20:30:00.000Z",
       "updatedAt": "2026-09-25T20:30:00.000Z",
+      "attendanceUpdatedAt": "2026-09-25T20:30:00.000Z",
       "updatedBy": "Chiara Santoro"
     },
     {
@@ -634,6 +749,7 @@
       },
       "createdAt": "2026-09-28T20:30:00.000Z",
       "updatedAt": "2026-09-28T20:30:00.000Z",
+      "attendanceUpdatedAt": "2026-09-28T20:30:00.000Z",
       "updatedBy": "Chiara Santoro"
     },
     {
@@ -660,6 +776,7 @@
       ],
       "createdAt": "2026-09-30T20:30:00.000Z",
       "updatedAt": "2026-09-30T20:30:00.000Z",
+      "attendanceUpdatedAt": "2026-09-30T20:30:00.000Z",
       "updatedBy": "Chiara Santoro"
     },
     {
@@ -683,6 +800,7 @@
       },
       "createdAt": "2026-10-02T20:30:00.000Z",
       "updatedAt": "2026-10-02T20:30:00.000Z",
+      "attendanceUpdatedAt": "2026-10-02T20:30:00.000Z",
       "updatedBy": "Chiara Santoro"
     },
     {
@@ -709,6 +827,7 @@
       ],
       "createdAt": "2026-10-05T20:30:00.000Z",
       "updatedAt": "2026-10-05T20:30:00.000Z",
+      "attendanceUpdatedAt": "2026-10-05T20:30:00.000Z",
       "updatedBy": "Chiara Santoro"
     },
     {
@@ -732,6 +851,7 @@
       },
       "createdAt": "2026-10-07T20:30:00.000Z",
       "updatedAt": "2026-10-07T20:30:00.000Z",
+      "attendanceUpdatedAt": "2026-10-07T20:30:00.000Z",
       "updatedBy": "Chiara Santoro"
     },
     {
@@ -755,6 +875,7 @@
       },
       "createdAt": "2026-10-09T20:30:00.000Z",
       "updatedAt": "2026-10-09T20:30:00.000Z",
+      "attendanceUpdatedAt": "2026-10-09T20:30:00.000Z",
       "updatedBy": "Chiara Santoro"
     },
     {
@@ -781,6 +902,7 @@
       ],
       "createdAt": "2026-10-12T20:30:00.000Z",
       "updatedAt": "2026-10-12T20:30:00.000Z",
+      "attendanceUpdatedAt": "2026-10-12T20:30:00.000Z",
       "updatedBy": "Chiara Santoro"
     },
     {
@@ -807,6 +929,7 @@
       ],
       "createdAt": "2026-10-14T20:30:00.000Z",
       "updatedAt": "2026-10-14T20:30:00.000Z",
+      "attendanceUpdatedAt": "2026-10-14T20:30:00.000Z",
       "updatedBy": "Chiara Santoro"
     },
     {
@@ -830,6 +953,7 @@
       },
       "createdAt": "2026-10-16T20:30:00.000Z",
       "updatedAt": "2026-10-16T20:30:00.000Z",
+      "attendanceUpdatedAt": "2026-10-16T20:30:00.000Z",
       "updatedBy": "Chiara Santoro"
     },
     {
@@ -853,6 +977,7 @@
       },
       "createdAt": "2026-10-19T20:30:00.000Z",
       "updatedAt": "2026-10-19T20:30:00.000Z",
+      "attendanceUpdatedAt": "2026-10-19T20:30:00.000Z",
       "updatedBy": "Chiara Santoro"
     },
     {
@@ -876,6 +1001,7 @@
       },
       "createdAt": "2026-10-21T20:30:00.000Z",
       "updatedAt": "2026-10-21T20:30:00.000Z",
+      "attendanceUpdatedAt": "2026-10-21T20:30:00.000Z",
       "updatedBy": "Chiara Santoro"
     },
     {
@@ -899,6 +1025,7 @@
       },
       "createdAt": "2026-10-23T20:30:00.000Z",
       "updatedAt": "2026-10-23T20:30:00.000Z",
+      "attendanceUpdatedAt": "2026-10-23T20:30:00.000Z",
       "updatedBy": "Chiara Santoro"
     },
     {
@@ -922,6 +1049,7 @@
       },
       "createdAt": "2026-10-26T20:30:00.000Z",
       "updatedAt": "2026-10-26T20:30:00.000Z",
+      "attendanceUpdatedAt": "2026-10-26T20:30:00.000Z",
       "updatedBy": "Chiara Santoro"
     },
     {
@@ -945,6 +1073,7 @@
       },
       "createdAt": "2026-10-28T20:30:00.000Z",
       "updatedAt": "2026-10-28T20:30:00.000Z",
+      "attendanceUpdatedAt": "2026-10-28T20:30:00.000Z",
       "updatedBy": "Chiara Santoro"
     },
     {
@@ -968,6 +1097,7 @@
       },
       "createdAt": "2026-10-30T20:30:00.000Z",
       "updatedAt": "2026-10-30T20:30:00.000Z",
+      "attendanceUpdatedAt": "2026-10-30T20:30:00.000Z",
       "updatedBy": "Chiara Santoro"
     },
     {
@@ -992,6 +1122,7 @@
       },
       "createdAt": "2026-11-02T20:30:00.000Z",
       "updatedAt": "2026-11-02T20:30:00.000Z",
+      "attendanceUpdatedAt": "2026-11-02T20:30:00.000Z",
       "updatedBy": "Chiara Santoro"
     },
     {
@@ -1016,6 +1147,7 @@
       },
       "createdAt": "2026-11-04T20:30:00.000Z",
       "updatedAt": "2026-11-04T20:30:00.000Z",
+      "attendanceUpdatedAt": "2026-11-04T20:30:00.000Z",
       "updatedBy": "Chiara Santoro"
     },
     {
@@ -1040,6 +1172,7 @@
       },
       "createdAt": "2026-11-06T20:30:00.000Z",
       "updatedAt": "2026-11-06T20:30:00.000Z",
+      "attendanceUpdatedAt": "2026-11-06T20:30:00.000Z",
       "updatedBy": "Chiara Santoro"
     },
     {
@@ -1064,6 +1197,7 @@
       },
       "createdAt": "2026-11-09T20:30:00.000Z",
       "updatedAt": "2026-11-09T20:30:00.000Z",
+      "attendanceUpdatedAt": "2026-11-09T20:30:00.000Z",
       "updatedBy": "Chiara Santoro"
     },
     {
@@ -1088,6 +1222,7 @@
       },
       "createdAt": "2026-11-11T20:30:00.000Z",
       "updatedAt": "2026-11-11T20:30:00.000Z",
+      "attendanceUpdatedAt": "2026-11-11T20:30:00.000Z",
       "updatedBy": "Chiara Santoro"
     },
     {
@@ -1115,6 +1250,7 @@
       ],
       "createdAt": "2026-11-13T20:30:00.000Z",
       "updatedAt": "2026-11-13T20:30:00.000Z",
+      "attendanceUpdatedAt": "2026-11-13T20:30:00.000Z",
       "updatedBy": "Chiara Santoro"
     },
     {
@@ -1142,6 +1278,7 @@
       ],
       "createdAt": "2026-11-16T20:30:00.000Z",
       "updatedAt": "2026-11-16T20:30:00.000Z",
+      "attendanceUpdatedAt": "2026-11-16T20:30:00.000Z",
       "updatedBy": "Chiara Santoro"
     },
     {
@@ -1169,6 +1306,7 @@
       ],
       "createdAt": "2026-11-18T20:30:00.000Z",
       "updatedAt": "2026-11-18T20:30:00.000Z",
+      "attendanceUpdatedAt": "2026-11-18T20:30:00.000Z",
       "updatedBy": "Chiara Santoro"
     },
     {
@@ -1193,6 +1331,7 @@
       },
       "createdAt": "2026-11-20T20:30:00.000Z",
       "updatedAt": "2026-11-20T20:30:00.000Z",
+      "attendanceUpdatedAt": "2026-11-20T20:30:00.000Z",
       "updatedBy": "Chiara Santoro"
     },
     {
@@ -1217,6 +1356,7 @@
       },
       "createdAt": "2026-11-23T20:30:00.000Z",
       "updatedAt": "2026-11-23T20:30:00.000Z",
+      "attendanceUpdatedAt": "2026-11-23T20:30:00.000Z",
       "updatedBy": "Chiara Santoro"
     },
     {
@@ -1241,6 +1381,7 @@
       },
       "createdAt": "2026-11-25T20:30:00.000Z",
       "updatedAt": "2026-11-25T20:30:00.000Z",
+      "attendanceUpdatedAt": "2026-11-25T20:30:00.000Z",
       "updatedBy": "Chiara Santoro"
     },
     {
@@ -1265,6 +1406,7 @@
       },
       "createdAt": "2026-11-27T20:30:00.000Z",
       "updatedAt": "2026-11-27T20:30:00.000Z",
+      "attendanceUpdatedAt": "2026-11-27T20:30:00.000Z",
       "updatedBy": "Chiara Santoro"
     },
     {
@@ -1289,6 +1431,7 @@
       },
       "createdAt": "2026-11-30T20:30:00.000Z",
       "updatedAt": "2026-11-30T20:30:00.000Z",
+      "attendanceUpdatedAt": "2026-11-30T20:30:00.000Z",
       "updatedBy": "Chiara Santoro"
     },
     {
@@ -1313,6 +1456,7 @@
       },
       "createdAt": "2026-12-02T20:30:00.000Z",
       "updatedAt": "2026-12-02T20:30:00.000Z",
+      "attendanceUpdatedAt": "2026-12-02T20:30:00.000Z",
       "updatedBy": "Chiara Santoro"
     },
     {
@@ -1337,6 +1481,7 @@
       },
       "createdAt": "2026-12-04T20:30:00.000Z",
       "updatedAt": "2026-12-04T20:30:00.000Z",
+      "attendanceUpdatedAt": "2026-12-04T20:30:00.000Z",
       "updatedBy": "Chiara Santoro"
     },
     {
@@ -1364,6 +1509,7 @@
       ],
       "createdAt": "2026-12-07T20:30:00.000Z",
       "updatedAt": "2026-12-07T20:30:00.000Z",
+      "attendanceUpdatedAt": "2026-12-07T20:30:00.000Z",
       "updatedBy": "Chiara Santoro"
     },
     {
@@ -1391,6 +1537,7 @@
       ],
       "createdAt": "2026-12-09T20:30:00.000Z",
       "updatedAt": "2026-12-09T20:30:00.000Z",
+      "attendanceUpdatedAt": "2026-12-09T20:30:00.000Z",
       "updatedBy": "Chiara Santoro"
     },
     {
@@ -1415,6 +1562,7 @@
       },
       "createdAt": "2026-12-11T20:30:00.000Z",
       "updatedAt": "2026-12-11T20:30:00.000Z",
+      "attendanceUpdatedAt": "2026-12-11T20:30:00.000Z",
       "updatedBy": "Chiara Santoro"
     },
     {
@@ -1443,6 +1591,7 @@
       ],
       "createdAt": "2026-12-14T20:30:00.000Z",
       "updatedAt": "2026-12-14T20:30:00.000Z",
+      "attendanceUpdatedAt": "2026-12-14T20:30:00.000Z",
       "updatedBy": "Chiara Santoro"
     },
     {
@@ -1470,6 +1619,7 @@
       ],
       "createdAt": "2026-12-16T20:30:00.000Z",
       "updatedAt": "2026-12-16T20:30:00.000Z",
+      "attendanceUpdatedAt": "2026-12-16T20:30:00.000Z",
       "updatedBy": "Chiara Santoro"
     },
     {
@@ -1494,6 +1644,7 @@
       },
       "createdAt": "2026-12-18T20:30:00.000Z",
       "updatedAt": "2026-12-18T20:30:00.000Z",
+      "attendanceUpdatedAt": "2026-12-18T20:30:00.000Z",
       "updatedBy": "Chiara Santoro"
     },
     {
@@ -1518,6 +1669,7 @@
       },
       "createdAt": "2026-12-21T20:30:00.000Z",
       "updatedAt": "2026-12-21T20:30:00.000Z",
+      "attendanceUpdatedAt": "2026-12-21T20:30:00.000Z",
       "updatedBy": "Chiara Santoro"
     },
     {
@@ -1542,6 +1694,7 @@
       },
       "createdAt": "2026-12-23T20:30:00.000Z",
       "updatedAt": "2026-12-23T20:30:00.000Z",
+      "attendanceUpdatedAt": "2026-12-23T20:30:00.000Z",
       "updatedBy": "Chiara Santoro"
     },
     {
@@ -1569,6 +1722,7 @@
       ],
       "createdAt": "2027-01-08T20:30:00.000Z",
       "updatedAt": "2027-01-08T20:30:00.000Z",
+      "attendanceUpdatedAt": "2027-01-08T20:30:00.000Z",
       "updatedBy": "Chiara Santoro"
     },
     {
@@ -1596,6 +1750,7 @@
       ],
       "createdAt": "2027-01-11T20:30:00.000Z",
       "updatedAt": "2027-01-11T20:30:00.000Z",
+      "attendanceUpdatedAt": "2027-01-11T20:30:00.000Z",
       "updatedBy": "Chiara Santoro"
     },
     {
@@ -1623,6 +1778,7 @@
       ],
       "createdAt": "2027-01-13T20:30:00.000Z",
       "updatedAt": "2027-01-13T20:30:00.000Z",
+      "attendanceUpdatedAt": "2027-01-13T20:30:00.000Z",
       "updatedBy": "Chiara Santoro"
     },
     {
@@ -1647,6 +1803,7 @@
       },
       "createdAt": "2027-01-15T20:30:00.000Z",
       "updatedAt": "2027-01-15T20:30:00.000Z",
+      "attendanceUpdatedAt": "2027-01-15T20:30:00.000Z",
       "updatedBy": "Chiara Santoro"
     },
     {
@@ -1674,6 +1831,7 @@
       ],
       "createdAt": "2027-01-18T20:30:00.000Z",
       "updatedAt": "2027-01-18T20:30:00.000Z",
+      "attendanceUpdatedAt": "2027-01-18T20:30:00.000Z",
       "updatedBy": "Chiara Santoro"
     },
     {
@@ -1698,6 +1856,7 @@
       },
       "createdAt": "2027-01-20T20:30:00.000Z",
       "updatedAt": "2027-01-20T20:30:00.000Z",
+      "attendanceUpdatedAt": "2027-01-20T20:30:00.000Z",
       "updatedBy": "Chiara Santoro"
     },
     {
@@ -1725,6 +1884,7 @@
       ],
       "createdAt": "2027-01-22T20:30:00.000Z",
       "updatedAt": "2027-01-22T20:30:00.000Z",
+      "attendanceUpdatedAt": "2027-01-22T20:30:00.000Z",
       "updatedBy": "Chiara Santoro"
     },
     {
@@ -1749,6 +1909,7 @@
       },
       "createdAt": "2027-01-25T20:30:00.000Z",
       "updatedAt": "2027-01-25T20:30:00.000Z",
+      "attendanceUpdatedAt": "2027-01-25T20:30:00.000Z",
       "updatedBy": "Chiara Santoro"
     },
     {
@@ -1773,6 +1934,7 @@
       },
       "createdAt": "2027-01-27T20:30:00.000Z",
       "updatedAt": "2027-01-27T20:30:00.000Z",
+      "attendanceUpdatedAt": "2027-01-27T20:30:00.000Z",
       "updatedBy": "Chiara Santoro"
     },
     {
@@ -1797,6 +1959,7 @@
       },
       "createdAt": "2027-01-29T20:30:00.000Z",
       "updatedAt": "2027-01-29T20:30:00.000Z",
+      "attendanceUpdatedAt": "2027-01-29T20:30:00.000Z",
       "updatedBy": "Chiara Santoro"
     },
     {
@@ -1821,6 +1984,7 @@
       },
       "createdAt": "2027-02-01T20:30:00.000Z",
       "updatedAt": "2027-02-01T20:30:00.000Z",
+      "attendanceUpdatedAt": "2027-02-01T20:30:00.000Z",
       "updatedBy": "Chiara Santoro"
     },
     {
@@ -1845,6 +2009,7 @@
       },
       "createdAt": "2027-02-03T20:30:00.000Z",
       "updatedAt": "2027-02-03T20:30:00.000Z",
+      "attendanceUpdatedAt": "2027-02-03T20:30:00.000Z",
       "updatedBy": "Chiara Santoro"
     },
     {
@@ -1869,6 +2034,7 @@
       },
       "createdAt": "2027-02-05T20:30:00.000Z",
       "updatedAt": "2027-02-05T20:30:00.000Z",
+      "attendanceUpdatedAt": "2027-02-05T20:30:00.000Z",
       "updatedBy": "Chiara Santoro"
     },
     {
@@ -1893,6 +2059,7 @@
       },
       "createdAt": "2027-02-08T20:30:00.000Z",
       "updatedAt": "2027-02-08T20:30:00.000Z",
+      "attendanceUpdatedAt": "2027-02-08T20:30:00.000Z",
       "updatedBy": "Chiara Santoro"
     },
     {
@@ -1917,6 +2084,7 @@
       },
       "createdAt": "2027-02-10T20:30:00.000Z",
       "updatedAt": "2027-02-10T20:30:00.000Z",
+      "attendanceUpdatedAt": "2027-02-10T20:30:00.000Z",
       "updatedBy": "Chiara Santoro"
     },
     {
@@ -1944,6 +2112,7 @@
       ],
       "createdAt": "2027-02-12T20:30:00.000Z",
       "updatedAt": "2027-02-12T20:30:00.000Z",
+      "attendanceUpdatedAt": "2027-02-12T20:30:00.000Z",
       "updatedBy": "Chiara Santoro"
     },
     {
@@ -1968,6 +2137,7 @@
       },
       "createdAt": "2027-02-15T20:30:00.000Z",
       "updatedAt": "2027-02-15T20:30:00.000Z",
+      "attendanceUpdatedAt": "2027-02-15T20:30:00.000Z",
       "updatedBy": "Chiara Santoro"
     },
     {
@@ -1992,6 +2162,7 @@
       },
       "createdAt": "2027-02-17T20:30:00.000Z",
       "updatedAt": "2027-02-17T20:30:00.000Z",
+      "attendanceUpdatedAt": "2027-02-17T20:30:00.000Z",
       "updatedBy": "Chiara Santoro"
     },
     {
@@ -2016,6 +2187,7 @@
       },
       "createdAt": "2027-02-19T20:30:00.000Z",
       "updatedAt": "2027-02-19T20:30:00.000Z",
+      "attendanceUpdatedAt": "2027-02-19T20:30:00.000Z",
       "updatedBy": "Chiara Santoro"
     },
     {
@@ -2040,6 +2212,7 @@
       },
       "createdAt": "2027-02-22T20:30:00.000Z",
       "updatedAt": "2027-02-22T20:30:00.000Z",
+      "attendanceUpdatedAt": "2027-02-22T20:30:00.000Z",
       "updatedBy": "Chiara Santoro"
     },
     {
@@ -2064,6 +2237,7 @@
       },
       "createdAt": "2027-02-24T20:30:00.000Z",
       "updatedAt": "2027-02-24T20:30:00.000Z",
+      "attendanceUpdatedAt": "2027-02-24T20:30:00.000Z",
       "updatedBy": "Chiara Santoro"
     },
     {
@@ -2088,6 +2262,7 @@
       },
       "createdAt": "2027-02-26T20:30:00.000Z",
       "updatedAt": "2027-02-26T20:30:00.000Z",
+      "attendanceUpdatedAt": "2027-02-26T20:30:00.000Z",
       "updatedBy": "Chiara Santoro"
     },
     {
@@ -2115,6 +2290,7 @@
       ],
       "createdAt": "2027-03-01T20:30:00.000Z",
       "updatedAt": "2027-03-01T20:30:00.000Z",
+      "attendanceUpdatedAt": "2027-03-01T20:30:00.000Z",
       "updatedBy": "Chiara Santoro"
     },
     {
@@ -2139,6 +2315,7 @@
       },
       "createdAt": "2027-03-03T20:30:00.000Z",
       "updatedAt": "2027-03-03T20:30:00.000Z",
+      "attendanceUpdatedAt": "2027-03-03T20:30:00.000Z",
       "updatedBy": "Chiara Santoro"
     },
     {
@@ -2163,6 +2340,7 @@
       },
       "createdAt": "2027-03-05T20:30:00.000Z",
       "updatedAt": "2027-03-05T20:30:00.000Z",
+      "attendanceUpdatedAt": "2027-03-05T20:30:00.000Z",
       "updatedBy": "Chiara Santoro"
     },
     {
@@ -2187,6 +2365,7 @@
       },
       "createdAt": "2027-03-08T20:30:00.000Z",
       "updatedAt": "2027-03-08T20:30:00.000Z",
+      "attendanceUpdatedAt": "2027-03-08T20:30:00.000Z",
       "updatedBy": "Chiara Santoro"
     },
     {
@@ -2214,6 +2393,7 @@
       ],
       "createdAt": "2027-03-10T20:30:00.000Z",
       "updatedAt": "2027-03-10T20:30:00.000Z",
+      "attendanceUpdatedAt": "2027-03-10T20:30:00.000Z",
       "updatedBy": "Chiara Santoro"
     },
     {
@@ -2238,6 +2418,7 @@
       },
       "createdAt": "2027-03-12T20:30:00.000Z",
       "updatedAt": "2027-03-12T20:30:00.000Z",
+      "attendanceUpdatedAt": "2027-03-12T20:30:00.000Z",
       "updatedBy": "Chiara Santoro"
     },
     {
@@ -2262,6 +2443,7 @@
       },
       "createdAt": "2027-03-15T20:30:00.000Z",
       "updatedAt": "2027-03-15T20:30:00.000Z",
+      "attendanceUpdatedAt": "2027-03-15T20:30:00.000Z",
       "updatedBy": "Chiara Santoro"
     },
     {
@@ -2286,6 +2468,7 @@
       },
       "createdAt": "2027-03-17T20:30:00.000Z",
       "updatedAt": "2027-03-17T20:30:00.000Z",
+      "attendanceUpdatedAt": "2027-03-17T20:30:00.000Z",
       "updatedBy": "Chiara Santoro"
     },
     {
@@ -2314,6 +2497,7 @@
       ],
       "createdAt": "2027-03-19T20:30:00.000Z",
       "updatedAt": "2027-03-19T20:30:00.000Z",
+      "attendanceUpdatedAt": "2027-03-19T20:30:00.000Z",
       "updatedBy": "Chiara Santoro"
     },
     {
@@ -2338,6 +2522,7 @@
       },
       "createdAt": "2027-03-22T20:30:00.000Z",
       "updatedAt": "2027-03-22T20:30:00.000Z",
+      "attendanceUpdatedAt": "2027-03-22T20:30:00.000Z",
       "updatedBy": "Chiara Santoro"
     },
     {
@@ -2362,6 +2547,7 @@
       },
       "createdAt": "2027-03-24T20:30:00.000Z",
       "updatedAt": "2027-03-24T20:30:00.000Z",
+      "attendanceUpdatedAt": "2027-03-24T20:30:00.000Z",
       "updatedBy": "Chiara Santoro"
     },
     {
@@ -2390,6 +2576,7 @@
       ],
       "createdAt": "2027-03-26T20:30:00.000Z",
       "updatedAt": "2027-03-26T20:30:00.000Z",
+      "attendanceUpdatedAt": "2027-03-26T20:30:00.000Z",
       "updatedBy": "Chiara Santoro"
     },
     {
@@ -2417,6 +2604,7 @@
       ],
       "createdAt": "2027-03-29T20:30:00.000Z",
       "updatedAt": "2027-03-29T20:30:00.000Z",
+      "attendanceUpdatedAt": "2027-03-29T20:30:00.000Z",
       "updatedBy": "Chiara Santoro"
     },
     {
@@ -2444,6 +2632,7 @@
       ],
       "createdAt": "2027-03-31T20:30:00.000Z",
       "updatedAt": "2027-03-31T20:30:00.000Z",
+      "attendanceUpdatedAt": "2027-03-31T20:30:00.000Z",
       "updatedBy": "Chiara Santoro"
     },
     {
@@ -2468,6 +2657,7 @@
       },
       "createdAt": "2027-04-07T20:30:00.000Z",
       "updatedAt": "2027-04-07T20:30:00.000Z",
+      "attendanceUpdatedAt": "2027-04-07T20:30:00.000Z",
       "updatedBy": "Chiara Santoro"
     },
     {
@@ -2495,6 +2685,7 @@
       ],
       "createdAt": "2027-04-09T20:30:00.000Z",
       "updatedAt": "2027-04-09T20:30:00.000Z",
+      "attendanceUpdatedAt": "2027-04-09T20:30:00.000Z",
       "updatedBy": "Chiara Santoro"
     },
     {
@@ -2523,6 +2714,7 @@
       ],
       "createdAt": "2027-04-12T20:30:00.000Z",
       "updatedAt": "2027-04-12T20:30:00.000Z",
+      "attendanceUpdatedAt": "2027-04-12T20:30:00.000Z",
       "updatedBy": "Chiara Santoro"
     },
     {
@@ -2547,6 +2739,7 @@
       },
       "createdAt": "2027-04-14T20:30:00.000Z",
       "updatedAt": "2027-04-14T20:30:00.000Z",
+      "attendanceUpdatedAt": "2027-04-14T20:30:00.000Z",
       "updatedBy": "Chiara Santoro"
     },
     {
@@ -2574,6 +2767,7 @@
       ],
       "createdAt": "2027-04-16T20:30:00.000Z",
       "updatedAt": "2027-04-16T20:30:00.000Z",
+      "attendanceUpdatedAt": "2027-04-16T20:30:00.000Z",
       "updatedBy": "Chiara Santoro"
     },
     {
@@ -2598,6 +2792,7 @@
       },
       "createdAt": "2027-04-19T20:30:00.000Z",
       "updatedAt": "2027-04-19T20:30:00.000Z",
+      "attendanceUpdatedAt": "2027-04-19T20:30:00.000Z",
       "updatedBy": "Chiara Santoro"
     },
     {
@@ -2622,6 +2817,7 @@
       },
       "createdAt": "2027-04-21T20:30:00.000Z",
       "updatedAt": "2027-04-21T20:30:00.000Z",
+      "attendanceUpdatedAt": "2027-04-21T20:30:00.000Z",
       "updatedBy": "Chiara Santoro"
     },
     {
@@ -2646,6 +2842,7 @@
       },
       "createdAt": "2027-04-23T20:30:00.000Z",
       "updatedAt": "2027-04-23T20:30:00.000Z",
+      "attendanceUpdatedAt": "2027-04-23T20:30:00.000Z",
       "updatedBy": "Chiara Santoro"
     },
     {
@@ -2670,6 +2867,7 @@
       },
       "createdAt": "2027-04-26T20:30:00.000Z",
       "updatedAt": "2027-04-26T20:30:00.000Z",
+      "attendanceUpdatedAt": "2027-04-26T20:30:00.000Z",
       "updatedBy": "Chiara Santoro"
     },
     {
@@ -2694,6 +2892,7 @@
       },
       "createdAt": "2027-04-28T20:30:00.000Z",
       "updatedAt": "2027-04-28T20:30:00.000Z",
+      "attendanceUpdatedAt": "2027-04-28T20:30:00.000Z",
       "updatedBy": "Chiara Santoro"
     },
     {
@@ -2721,6 +2920,7 @@
       ],
       "createdAt": "2027-04-30T20:30:00.000Z",
       "updatedAt": "2027-04-30T20:30:00.000Z",
+      "attendanceUpdatedAt": "2027-04-30T20:30:00.000Z",
       "updatedBy": "Chiara Santoro"
     },
     {
@@ -2745,6 +2945,7 @@
       },
       "createdAt": "2027-05-03T20:30:00.000Z",
       "updatedAt": "2027-05-03T20:30:00.000Z",
+      "attendanceUpdatedAt": "2027-05-03T20:30:00.000Z",
       "updatedBy": "Chiara Santoro"
     },
     {
@@ -2769,6 +2970,7 @@
       },
       "createdAt": "2027-05-05T20:30:00.000Z",
       "updatedAt": "2027-05-05T20:30:00.000Z",
+      "attendanceUpdatedAt": "2027-05-05T20:30:00.000Z",
       "updatedBy": "Chiara Santoro"
     },
     {
@@ -2797,6 +2999,7 @@
       ],
       "createdAt": "2027-05-07T20:30:00.000Z",
       "updatedAt": "2027-05-07T20:30:00.000Z",
+      "attendanceUpdatedAt": "2027-05-07T20:30:00.000Z",
       "updatedBy": "Chiara Santoro"
     },
     {
@@ -2824,6 +3027,7 @@
       ],
       "createdAt": "2027-05-10T20:30:00.000Z",
       "updatedAt": "2027-05-10T20:30:00.000Z",
+      "attendanceUpdatedAt": "2027-05-10T20:30:00.000Z",
       "updatedBy": "Chiara Santoro"
     },
     {
@@ -2848,6 +3052,7 @@
       },
       "createdAt": "2027-05-12T20:30:00.000Z",
       "updatedAt": "2027-05-12T20:30:00.000Z",
+      "attendanceUpdatedAt": "2027-05-12T20:30:00.000Z",
       "updatedBy": "Chiara Santoro"
     },
     {
@@ -2875,6 +3080,7 @@
       ],
       "createdAt": "2027-05-14T20:30:00.000Z",
       "updatedAt": "2027-05-14T20:30:00.000Z",
+      "attendanceUpdatedAt": "2027-05-14T20:30:00.000Z",
       "updatedBy": "Chiara Santoro"
     },
     {
@@ -2903,6 +3109,7 @@
       ],
       "createdAt": "2027-05-17T20:30:00.000Z",
       "updatedAt": "2027-05-17T20:30:00.000Z",
+      "attendanceUpdatedAt": "2027-05-17T20:30:00.000Z",
       "updatedBy": "Chiara Santoro"
     },
     {
@@ -2927,6 +3134,7 @@
       },
       "createdAt": "2027-05-19T20:30:00.000Z",
       "updatedAt": "2027-05-19T20:30:00.000Z",
+      "attendanceUpdatedAt": "2027-05-19T20:30:00.000Z",
       "updatedBy": "Chiara Santoro"
     },
     {
@@ -2951,6 +3159,7 @@
       },
       "createdAt": "2027-05-21T20:30:00.000Z",
       "updatedAt": "2027-05-21T20:30:00.000Z",
+      "attendanceUpdatedAt": "2027-05-21T20:30:00.000Z",
       "updatedBy": "Chiara Santoro"
     },
     {
@@ -2975,6 +3184,7 @@
       },
       "createdAt": "2027-05-24T20:30:00.000Z",
       "updatedAt": "2027-05-24T20:30:00.000Z",
+      "attendanceUpdatedAt": "2027-05-24T20:30:00.000Z",
       "updatedBy": "Chiara Santoro"
     },
     {
@@ -2999,6 +3209,7 @@
       },
       "createdAt": "2027-05-26T20:30:00.000Z",
       "updatedAt": "2027-05-26T20:30:00.000Z",
+      "attendanceUpdatedAt": "2027-05-26T20:30:00.000Z",
       "updatedBy": "Chiara Santoro"
     },
     {
@@ -3023,6 +3234,7 @@
       },
       "createdAt": "2027-05-28T20:30:00.000Z",
       "updatedAt": "2027-05-28T20:30:00.000Z",
+      "attendanceUpdatedAt": "2027-05-28T20:30:00.000Z",
       "updatedBy": "Chiara Santoro"
     },
     {
@@ -3050,6 +3262,7 @@
       ],
       "createdAt": "2027-05-31T20:30:00.000Z",
       "updatedAt": "2027-05-31T20:30:00.000Z",
+      "attendanceUpdatedAt": "2027-05-31T20:30:00.000Z",
       "updatedBy": "Chiara Santoro"
     },
     {
@@ -3077,6 +3290,7 @@
       ],
       "createdAt": "2027-06-02T20:30:00.000Z",
       "updatedAt": "2027-06-02T20:30:00.000Z",
+      "attendanceUpdatedAt": "2027-06-02T20:30:00.000Z",
       "updatedBy": "Chiara Santoro"
     },
     {
@@ -3101,6 +3315,7 @@
       },
       "createdAt": "2027-06-04T20:30:00.000Z",
       "updatedAt": "2027-06-04T20:30:00.000Z",
+      "attendanceUpdatedAt": "2027-06-04T20:30:00.000Z",
       "updatedBy": "Chiara Santoro"
     },
     {
@@ -3125,6 +3340,7 @@
       },
       "createdAt": "2027-06-07T20:30:00.000Z",
       "updatedAt": "2027-06-07T20:30:00.000Z",
+      "attendanceUpdatedAt": "2027-06-07T20:30:00.000Z",
       "updatedBy": "Chiara Santoro"
     },
     {
@@ -3149,6 +3365,7 @@
       },
       "createdAt": "2027-06-09T20:30:00.000Z",
       "updatedAt": "2027-06-09T20:30:00.000Z",
+      "attendanceUpdatedAt": "2027-06-09T20:30:00.000Z",
       "updatedBy": "Chiara Santoro"
     },
     {
@@ -3173,6 +3390,7 @@
       },
       "createdAt": "2027-06-11T20:30:00.000Z",
       "updatedAt": "2027-06-11T20:30:00.000Z",
+      "attendanceUpdatedAt": "2027-06-11T20:30:00.000Z",
       "updatedBy": "Chiara Santoro"
     },
     {
@@ -3197,6 +3415,7 @@
       },
       "createdAt": "2027-06-14T20:30:00.000Z",
       "updatedAt": "2027-06-14T20:30:00.000Z",
+      "attendanceUpdatedAt": "2027-06-14T20:30:00.000Z",
       "updatedBy": "Chiara Santoro"
     },
     {
@@ -3225,6 +3444,7 @@
       ],
       "createdAt": "2027-06-16T20:30:00.000Z",
       "updatedAt": "2027-06-16T20:30:00.000Z",
+      "attendanceUpdatedAt": "2027-06-16T20:30:00.000Z",
       "updatedBy": "Chiara Santoro"
     },
     {
@@ -3249,6 +3469,7 @@
       },
       "createdAt": "2027-06-18T20:30:00.000Z",
       "updatedAt": "2027-06-18T20:30:00.000Z",
+      "attendanceUpdatedAt": "2027-06-18T20:30:00.000Z",
       "updatedBy": "Chiara Santoro"
     },
     {
@@ -3273,6 +3494,7 @@
       },
       "createdAt": "2027-06-21T20:30:00.000Z",
       "updatedAt": "2027-06-21T20:30:00.000Z",
+      "attendanceUpdatedAt": "2027-06-21T20:30:00.000Z",
       "updatedBy": "Chiara Santoro"
     },
     {
@@ -3300,6 +3522,7 @@
       ],
       "createdAt": "2027-06-23T20:30:00.000Z",
       "updatedAt": "2027-06-23T20:30:00.000Z",
+      "attendanceUpdatedAt": "2027-06-23T20:30:00.000Z",
       "updatedBy": "Chiara Santoro"
     },
     {
@@ -3324,6 +3547,7 @@
       },
       "createdAt": "2027-06-25T20:30:00.000Z",
       "updatedAt": "2027-06-25T20:30:00.000Z",
+      "attendanceUpdatedAt": "2027-06-25T20:30:00.000Z",
       "updatedBy": "Chiara Santoro"
     },
     {
@@ -3348,6 +3572,7 @@
       },
       "createdAt": "2027-06-28T20:30:00.000Z",
       "updatedAt": "2027-06-28T20:30:00.000Z",
+      "attendanceUpdatedAt": "2027-06-28T20:30:00.000Z",
       "updatedBy": "Chiara Santoro"
     },
     {
@@ -3372,6 +3597,7 @@
       },
       "createdAt": "2027-06-30T20:30:00.000Z",
       "updatedAt": "2027-06-30T20:30:00.000Z",
+      "attendanceUpdatedAt": "2027-06-30T20:30:00.000Z",
       "updatedBy": "Chiara Santoro"
     },
     {
@@ -3399,6 +3625,7 @@
       ],
       "createdAt": "2027-07-02T20:30:00.000Z",
       "updatedAt": "2027-07-02T20:30:00.000Z",
+      "attendanceUpdatedAt": "2027-07-02T20:30:00.000Z",
       "updatedBy": "Chiara Santoro"
     },
     {
@@ -3423,6 +3650,7 @@
       },
       "createdAt": "2027-07-05T20:30:00.000Z",
       "updatedAt": "2027-07-05T20:30:00.000Z",
+      "attendanceUpdatedAt": "2027-07-05T20:30:00.000Z",
       "updatedBy": "Chiara Santoro"
     },
     {
@@ -3450,6 +3678,7 @@
       ],
       "createdAt": "2027-07-07T20:30:00.000Z",
       "updatedAt": "2027-07-07T20:30:00.000Z",
+      "attendanceUpdatedAt": "2027-07-07T20:30:00.000Z",
       "updatedBy": "Chiara Santoro"
     },
     {
@@ -3474,6 +3703,7 @@
       },
       "createdAt": "2027-07-09T20:30:00.000Z",
       "updatedAt": "2027-07-09T20:30:00.000Z",
+      "attendanceUpdatedAt": "2027-07-09T20:30:00.000Z",
       "updatedBy": "Chiara Santoro"
     },
     {
@@ -3498,6 +3728,7 @@
       },
       "createdAt": "2027-07-12T20:30:00.000Z",
       "updatedAt": "2027-07-12T20:30:00.000Z",
+      "attendanceUpdatedAt": "2027-07-12T20:30:00.000Z",
       "updatedBy": "Chiara Santoro"
     },
     {
@@ -3522,6 +3753,7 @@
       },
       "createdAt": "2027-07-14T20:30:00.000Z",
       "updatedAt": "2027-07-14T20:30:00.000Z",
+      "attendanceUpdatedAt": "2027-07-14T20:30:00.000Z",
       "updatedBy": "Chiara Santoro"
     },
     {
@@ -3546,6 +3778,7 @@
       ],
       "createdAt": "2027-07-16T20:30:00.000Z",
       "updatedAt": "2027-07-16T20:30:00.000Z",
+      "attendanceUpdatedAt": "2027-07-16T20:30:00.000Z",
       "updatedBy": "Chiara Santoro"
     }
   ]

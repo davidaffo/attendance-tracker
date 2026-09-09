@@ -187,13 +187,39 @@ function createDocument(team) {
     }
 
     const timestamp = `${date}T20:30:00.000Z`
+    const score = sessionIndex < 3
+      ? {
+          teamPoints: {
+            a: [12 + (sessionIndex % 4), 8 + (sessionIndex % 3)],
+            b: [10 + (sessionIndex % 5), 9 + (sessionIndex % 2)]
+          },
+          assignments: Object.fromEntries(
+            athletes.flatMap((athlete, athleteIndex) =>
+              attendances[athlete.id] && attendances[athlete.id] !== 'absent'
+                ? [[athlete.id, athleteIndex % 2 === 0 ? 'a' : 'b']]
+                : []
+            )
+          ),
+          adjustments: Object.fromEntries(
+            athletes.flatMap((athlete) => {
+              if (attendances[athlete.id] === 'late') return [[athlete.id, -2]]
+              if (earlyDepartures.includes(athlete.id)) return [[athlete.id, -3]]
+              return []
+            })
+          ),
+          updatedAt: timestamp,
+          updatedBy: team.coach
+        }
+      : undefined
     return {
       id: uuidFor(`${team.id}:session:${date}`),
       date,
       attendances,
       ...(earlyDepartures.length ? { earlyDepartures } : {}),
+      ...(score ? { score } : {}),
       createdAt: timestamp,
       updatedAt: timestamp,
+      attendanceUpdatedAt: timestamp,
       updatedBy: team.coach
     }
   })

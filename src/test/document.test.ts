@@ -6,6 +6,7 @@ import {
   isFirstCoachUse
 } from '../domain/defaults'
 import {
+  athleteScoreForSession,
   athleteTotals,
   athletesForReport,
   completedAttendancesForAthletes,
@@ -16,6 +17,9 @@ import {
   parseTeamDocument,
   plannedTrainingSummary,
   saveSession,
+  saveSessionScore,
+  scoreRanking,
+  scoreTeamTotal,
   serializeTeamDocument
 } from '../domain/document'
 
@@ -153,6 +157,103 @@ describe('documento squadra', () => {
     expect(athleteTotals(updated, athlete.id).present).toBe(1)
     expect(earlyDepartureCountForAthlete(updated, athlete.id)).toBe(1)
     expect(isTeamDocument(updated)).toBe(true)
+  })
+
+  it('calcola i punteggi dalla squadra con correzioni individuali e zero alle assenti', () => {
+    let document = createTeamDocument({
+      teamName: 'U14',
+      organizationName: 'Volley Club',
+      coachName: 'Mario',
+      startYear: 2026,
+      athleteNames: ['Anna', 'Bianca', 'Carla']
+    })
+    const [anna, bianca, carla] = document.athletes
+    document = saveSession(document, {
+      id: 'session-1',
+      date: '2026-09-07',
+      attendances: {
+        [anna.id]: 'present',
+        [bianca.id]: 'late',
+        [carla.id]: 'absent'
+      }
+    }, 'Mario')
+    document = saveSessionScore(document, 'session-1', {
+      teamPoints: { a: [10, 5], b: [8, 4] },
+      assignments: { [anna.id]: 'a', [bianca.id]: 'b', [carla.id]: 'a' },
+      adjustments: { [bianca.id]: -2, [carla.id]: 100 }
+    }, 'Mario')
+
+    const session = document.sessions[0]
+    expect(scoreTeamTotal(session.score, 'a')).toBe(15)
+    expect(athleteScoreForSession(document, session, anna.id)).toBe(15)
+    expect(athleteScoreForSession(document, session, bianca.id)).toBe(10)
+    expect(athleteScoreForSession(document, session, carla.id)).toBe(0)
+    expect(scoreRanking(document, '2026-09').map((entry) => entry.points)).toEqual([15, 10, 0])
+    expect(isTeamDocument(document)).toBe(true)
+  })
+
+  it('conserva i punteggi quando vengono corrette le presenze della sessione', () => {
+    let document = createTeamDocument({
+      teamName: 'U14',
+      organizationName: 'Volley Club',
+      coachName: 'Mario',
+      startYear: 2026,
+      athleteNames: ['Anna']
+    })
+    const athlete = document.athletes[0]
+    document = saveSession(document, {
+      id: 'session-1',
+      date: '2026-09-07',
+      attendances: { [athlete.id]: 'present' }
+    }, 'Mario')
+    document = saveSessionScore(document, 'session-1', {
+      teamPoints: { a: [12], b: [] },
+      assignments: { [athlete.id]: 'a' },
+      adjustments: {}
+    }, 'Mario')
+    document = saveSession(document, {
+      id: 'session-1',
+      date: '2026-09-07',
+      attendances: { [athlete.id]: 'late' }
+    }, 'Mario')
+
+    expect(document.sessions[0].score?.teamPoints.a).toEqual([12])
+  })
+
+  it('unisce una correzione delle presenze remota con i punteggi inseriti localmente', () => {
+    let base = createTeamDocument({
+      teamName: 'U14',
+      organizationName: 'Volley Club',
+      coachName: 'Mario',
+      startYear: 2026,
+      athleteNames: ['Anna']
+    })
+    const athlete = base.athletes[0]
+    base = saveSession(base, {
+      id: 'session-1',
+      date: '2026-09-07',
+      attendances: { [athlete.id]: 'present' }
+    }, 'Mario')
+    base.sessions[0].attendanceUpdatedAt = '2026-09-07T20:00:00.000Z'
+    base.sessions[0].updatedAt = '2026-09-07T20:00:00.000Z'
+
+    const local = saveSessionScore(base, 'session-1', {
+      teamPoints: { a: [15], b: [] },
+      assignments: { [athlete.id]: 'a' },
+      adjustments: {}
+    }, 'Mario')
+    local.sessions[0].score!.updatedAt = '2026-09-07T20:20:00.000Z'
+    local.sessions[0].updatedAt = '2026-09-07T20:20:00.000Z'
+
+    const remote = structuredClone(base)
+    remote.sessions[0].attendances[athlete.id] = 'late'
+    remote.sessions[0].attendanceUpdatedAt = '2026-09-07T20:10:00.000Z'
+    remote.sessions[0].updatedAt = '2026-09-07T20:10:00.000Z'
+
+    const merged = mergeDocuments(local, remote)
+
+    expect(merged.sessions[0].attendances[athlete.id]).toBe('late')
+    expect(merged.sessions[0].score?.teamPoints.a).toEqual([15])
   })
 
   it('individua gli allenamenti previsti non registrati e consente di ignorarli', () => {

@@ -193,8 +193,40 @@
         "f89564c8-8dfd-4ffe-93e4-d113ae6be8b4": "present",
         "8f89f50e-08b1-4dc8-bf7a-1e8d45b5e8f6": "present"
       },
+      "score": {
+        "teamPoints": {
+          "a": [
+            12,
+            8
+          ],
+          "b": [
+            10,
+            9
+          ]
+        },
+        "assignments": {
+          "2415ed31-9afb-4dde-90af-91a74e9974d5": "a",
+          "61b514b5-81a8-42a8-9988-06ba33e99a98": "b",
+          "3fd5d15e-e88c-4001-aa63-afc775f671b5": "a",
+          "9ade93b6-f118-40f3-81b1-f6d316d8eb1b": "b",
+          "f969757b-3d7f-4e6e-8751-abdf660c95be": "a",
+          "a80ba703-b3a5-4a9d-9d0d-cd26419924a2": "b",
+          "9f88d698-e8fe-4308-868e-fd0508326edf": "a",
+          "d9163f22-a770-46d4-888a-c3bd657e8eae": "b",
+          "959caf4c-5710-4024-bbc7-3139819a9f5a": "a",
+          "0bc19135-8618-446b-8078-0d28e3b9eef7": "b",
+          "67de2317-30b3-4b45-ac29-00ed8084e5e7": "a",
+          "0721def6-442b-4106-aa80-84bce941bd96": "b",
+          "f89564c8-8dfd-4ffe-93e4-d113ae6be8b4": "a",
+          "8f89f50e-08b1-4dc8-bf7a-1e8d45b5e8f6": "b"
+        },
+        "adjustments": {},
+        "updatedAt": "2026-08-18T20:30:00.000Z",
+        "updatedBy": "Lorenzo Fontana"
+      },
       "createdAt": "2026-08-18T20:30:00.000Z",
       "updatedAt": "2026-08-18T20:30:00.000Z",
+      "attendanceUpdatedAt": "2026-08-18T20:30:00.000Z",
       "updatedBy": "Lorenzo Fontana"
     },
     {
@@ -216,8 +248,40 @@
         "f89564c8-8dfd-4ffe-93e4-d113ae6be8b4": "present",
         "8f89f50e-08b1-4dc8-bf7a-1e8d45b5e8f6": "present"
       },
+      "score": {
+        "teamPoints": {
+          "a": [
+            13,
+            9
+          ],
+          "b": [
+            11,
+            10
+          ]
+        },
+        "assignments": {
+          "2415ed31-9afb-4dde-90af-91a74e9974d5": "a",
+          "61b514b5-81a8-42a8-9988-06ba33e99a98": "b",
+          "3fd5d15e-e88c-4001-aa63-afc775f671b5": "a",
+          "9ade93b6-f118-40f3-81b1-f6d316d8eb1b": "b",
+          "a80ba703-b3a5-4a9d-9d0d-cd26419924a2": "b",
+          "9f88d698-e8fe-4308-868e-fd0508326edf": "a",
+          "d9163f22-a770-46d4-888a-c3bd657e8eae": "b",
+          "959caf4c-5710-4024-bbc7-3139819a9f5a": "a",
+          "0bc19135-8618-446b-8078-0d28e3b9eef7": "b",
+          "67de2317-30b3-4b45-ac29-00ed8084e5e7": "a",
+          "f89564c8-8dfd-4ffe-93e4-d113ae6be8b4": "a",
+          "8f89f50e-08b1-4dc8-bf7a-1e8d45b5e8f6": "b"
+        },
+        "adjustments": {
+          "a80ba703-b3a5-4a9d-9d0d-cd26419924a2": -2
+        },
+        "updatedAt": "2026-08-20T20:30:00.000Z",
+        "updatedBy": "Lorenzo Fontana"
+      },
       "createdAt": "2026-08-20T20:30:00.000Z",
       "updatedAt": "2026-08-20T20:30:00.000Z",
+      "attendanceUpdatedAt": "2026-08-20T20:30:00.000Z",
       "updatedBy": "Lorenzo Fontana"
     },
     {
@@ -239,8 +303,42 @@
         "f89564c8-8dfd-4ffe-93e4-d113ae6be8b4": "present",
         "8f89f50e-08b1-4dc8-bf7a-1e8d45b5e8f6": "present"
       },
+      "score": {
+        "teamPoints": {
+          "a": [
+            14,
+            10
+          ],
+          "b": [
+            12,
+            9
+          ]
+        },
+        "assignments": {
+          "2415ed31-9afb-4dde-90af-91a74e9974d5": "a",
+          "61b514b5-81a8-42a8-9988-06ba33e99a98": "b",
+          "3fd5d15e-e88c-4001-aa63-afc775f671b5": "a",
+          "9ade93b6-f118-40f3-81b1-f6d316d8eb1b": "b",
+          "f969757b-3d7f-4e6e-8751-abdf660c95be": "a",
+          "a80ba703-b3a5-4a9d-9d0d-cd26419924a2": "b",
+          "9f88d698-e8fe-4308-868e-fd0508326edf": "a",
+          "d9163f22-a770-46d4-888a-c3bd657e8eae": "b",
+          "959caf4c-5710-4024-bbc7-3139819a9f5a": "a",
+          "0bc19135-8618-446b-8078-0d28e3b9eef7": "b",
+          "67de2317-30b3-4b45-ac29-00ed8084e5e7": "a",
+          "0721def6-442b-4106-aa80-84bce941bd96": "b",
+          "f89564c8-8dfd-4ffe-93e4-d113ae6be8b4": "a",
+          "8f89f50e-08b1-4dc8-bf7a-1e8d45b5e8f6": "b"
+        },
+        "adjustments": {
+          "f969757b-3d7f-4e6e-8751-abdf660c95be": -2
+        },
+        "updatedAt": "2026-08-22T20:30:00.000Z",
+        "updatedBy": "Lorenzo Fontana"
+      },
       "createdAt": "2026-08-22T20:30:00.000Z",
       "updatedAt": "2026-08-22T20:30:00.000Z",
+      "attendanceUpdatedAt": "2026-08-22T20:30:00.000Z",
       "updatedBy": "Lorenzo Fontana"
     },
     {
@@ -264,6 +362,7 @@
       },
       "createdAt": "2026-08-25T20:30:00.000Z",
       "updatedAt": "2026-08-25T20:30:00.000Z",
+      "attendanceUpdatedAt": "2026-08-25T20:30:00.000Z",
       "updatedBy": "Lorenzo Fontana"
     },
     {
@@ -290,6 +389,7 @@
       ],
       "createdAt": "2026-08-27T20:30:00.000Z",
       "updatedAt": "2026-08-27T20:30:00.000Z",
+      "attendanceUpdatedAt": "2026-08-27T20:30:00.000Z",
       "updatedBy": "Lorenzo Fontana"
     },
     {
@@ -316,6 +416,7 @@
       ],
       "createdAt": "2026-08-29T20:30:00.000Z",
       "updatedAt": "2026-08-29T20:30:00.000Z",
+      "attendanceUpdatedAt": "2026-08-29T20:30:00.000Z",
       "updatedBy": "Lorenzo Fontana"
     },
     {
@@ -342,6 +443,7 @@
       ],
       "createdAt": "2026-09-01T20:30:00.000Z",
       "updatedAt": "2026-09-01T20:30:00.000Z",
+      "attendanceUpdatedAt": "2026-09-01T20:30:00.000Z",
       "updatedBy": "Lorenzo Fontana"
     },
     {
@@ -368,6 +470,7 @@
       ],
       "createdAt": "2026-09-03T20:30:00.000Z",
       "updatedAt": "2026-09-03T20:30:00.000Z",
+      "attendanceUpdatedAt": "2026-09-03T20:30:00.000Z",
       "updatedBy": "Lorenzo Fontana"
     },
     {
@@ -391,6 +494,7 @@
       },
       "createdAt": "2026-09-05T20:30:00.000Z",
       "updatedAt": "2026-09-05T20:30:00.000Z",
+      "attendanceUpdatedAt": "2026-09-05T20:30:00.000Z",
       "updatedBy": "Lorenzo Fontana"
     },
     {
@@ -418,6 +522,7 @@
       ],
       "createdAt": "2026-09-08T20:30:00.000Z",
       "updatedAt": "2026-09-08T20:30:00.000Z",
+      "attendanceUpdatedAt": "2026-09-08T20:30:00.000Z",
       "updatedBy": "Lorenzo Fontana"
     },
     {
@@ -441,6 +546,7 @@
       },
       "createdAt": "2026-09-10T20:30:00.000Z",
       "updatedAt": "2026-09-10T20:30:00.000Z",
+      "attendanceUpdatedAt": "2026-09-10T20:30:00.000Z",
       "updatedBy": "Lorenzo Fontana"
     },
     {
@@ -467,6 +573,7 @@
       ],
       "createdAt": "2026-09-12T20:30:00.000Z",
       "updatedAt": "2026-09-12T20:30:00.000Z",
+      "attendanceUpdatedAt": "2026-09-12T20:30:00.000Z",
       "updatedBy": "Lorenzo Fontana"
     },
     {
@@ -490,6 +597,7 @@
       },
       "createdAt": "2026-09-15T20:30:00.000Z",
       "updatedAt": "2026-09-15T20:30:00.000Z",
+      "attendanceUpdatedAt": "2026-09-15T20:30:00.000Z",
       "updatedBy": "Lorenzo Fontana"
     },
     {
@@ -513,6 +621,7 @@
       },
       "createdAt": "2026-09-17T20:30:00.000Z",
       "updatedAt": "2026-09-17T20:30:00.000Z",
+      "attendanceUpdatedAt": "2026-09-17T20:30:00.000Z",
       "updatedBy": "Lorenzo Fontana"
     },
     {
@@ -536,6 +645,7 @@
       },
       "createdAt": "2026-09-19T20:30:00.000Z",
       "updatedAt": "2026-09-19T20:30:00.000Z",
+      "attendanceUpdatedAt": "2026-09-19T20:30:00.000Z",
       "updatedBy": "Lorenzo Fontana"
     },
     {
@@ -559,6 +669,7 @@
       },
       "createdAt": "2026-09-22T20:30:00.000Z",
       "updatedAt": "2026-09-22T20:30:00.000Z",
+      "attendanceUpdatedAt": "2026-09-22T20:30:00.000Z",
       "updatedBy": "Lorenzo Fontana"
     },
     {
@@ -585,6 +696,7 @@
       ],
       "createdAt": "2026-09-24T20:30:00.000Z",
       "updatedAt": "2026-09-24T20:30:00.000Z",
+      "attendanceUpdatedAt": "2026-09-24T20:30:00.000Z",
       "updatedBy": "Lorenzo Fontana"
     },
     {
@@ -608,6 +720,7 @@
       },
       "createdAt": "2026-09-26T20:30:00.000Z",
       "updatedAt": "2026-09-26T20:30:00.000Z",
+      "attendanceUpdatedAt": "2026-09-26T20:30:00.000Z",
       "updatedBy": "Lorenzo Fontana"
     },
     {
@@ -631,6 +744,7 @@
       },
       "createdAt": "2026-09-29T20:30:00.000Z",
       "updatedAt": "2026-09-29T20:30:00.000Z",
+      "attendanceUpdatedAt": "2026-09-29T20:30:00.000Z",
       "updatedBy": "Lorenzo Fontana"
     },
     {
@@ -657,6 +771,7 @@
       ],
       "createdAt": "2026-10-01T20:30:00.000Z",
       "updatedAt": "2026-10-01T20:30:00.000Z",
+      "attendanceUpdatedAt": "2026-10-01T20:30:00.000Z",
       "updatedBy": "Lorenzo Fontana"
     },
     {
@@ -683,6 +798,7 @@
       ],
       "createdAt": "2026-10-03T20:30:00.000Z",
       "updatedAt": "2026-10-03T20:30:00.000Z",
+      "attendanceUpdatedAt": "2026-10-03T20:30:00.000Z",
       "updatedBy": "Lorenzo Fontana"
     },
     {
@@ -709,6 +825,7 @@
       ],
       "createdAt": "2026-10-06T20:30:00.000Z",
       "updatedAt": "2026-10-06T20:30:00.000Z",
+      "attendanceUpdatedAt": "2026-10-06T20:30:00.000Z",
       "updatedBy": "Lorenzo Fontana"
     },
     {
@@ -732,6 +849,7 @@
       },
       "createdAt": "2026-10-08T20:30:00.000Z",
       "updatedAt": "2026-10-08T20:30:00.000Z",
+      "attendanceUpdatedAt": "2026-10-08T20:30:00.000Z",
       "updatedBy": "Lorenzo Fontana"
     },
     {
@@ -758,6 +876,7 @@
       ],
       "createdAt": "2026-10-10T20:30:00.000Z",
       "updatedAt": "2026-10-10T20:30:00.000Z",
+      "attendanceUpdatedAt": "2026-10-10T20:30:00.000Z",
       "updatedBy": "Lorenzo Fontana"
     },
     {
@@ -784,6 +903,7 @@
       ],
       "createdAt": "2026-10-13T20:30:00.000Z",
       "updatedAt": "2026-10-13T20:30:00.000Z",
+      "attendanceUpdatedAt": "2026-10-13T20:30:00.000Z",
       "updatedBy": "Lorenzo Fontana"
     },
     {
@@ -807,6 +927,7 @@
       },
       "createdAt": "2026-10-15T20:30:00.000Z",
       "updatedAt": "2026-10-15T20:30:00.000Z",
+      "attendanceUpdatedAt": "2026-10-15T20:30:00.000Z",
       "updatedBy": "Lorenzo Fontana"
     },
     {
@@ -833,6 +954,7 @@
       ],
       "createdAt": "2026-10-17T20:30:00.000Z",
       "updatedAt": "2026-10-17T20:30:00.000Z",
+      "attendanceUpdatedAt": "2026-10-17T20:30:00.000Z",
       "updatedBy": "Lorenzo Fontana"
     },
     {
@@ -859,6 +981,7 @@
       ],
       "createdAt": "2026-10-20T20:30:00.000Z",
       "updatedAt": "2026-10-20T20:30:00.000Z",
+      "attendanceUpdatedAt": "2026-10-20T20:30:00.000Z",
       "updatedBy": "Lorenzo Fontana"
     },
     {
@@ -882,6 +1005,7 @@
       },
       "createdAt": "2026-10-22T20:30:00.000Z",
       "updatedAt": "2026-10-22T20:30:00.000Z",
+      "attendanceUpdatedAt": "2026-10-22T20:30:00.000Z",
       "updatedBy": "Lorenzo Fontana"
     },
     {
@@ -908,6 +1032,7 @@
       ],
       "createdAt": "2026-10-24T20:30:00.000Z",
       "updatedAt": "2026-10-24T20:30:00.000Z",
+      "attendanceUpdatedAt": "2026-10-24T20:30:00.000Z",
       "updatedBy": "Lorenzo Fontana"
     },
     {
@@ -931,6 +1056,7 @@
       },
       "createdAt": "2026-10-27T20:30:00.000Z",
       "updatedAt": "2026-10-27T20:30:00.000Z",
+      "attendanceUpdatedAt": "2026-10-27T20:30:00.000Z",
       "updatedBy": "Lorenzo Fontana"
     },
     {
@@ -957,6 +1083,7 @@
       ],
       "createdAt": "2026-10-29T20:30:00.000Z",
       "updatedAt": "2026-10-29T20:30:00.000Z",
+      "attendanceUpdatedAt": "2026-10-29T20:30:00.000Z",
       "updatedBy": "Lorenzo Fontana"
     },
     {
@@ -980,6 +1107,7 @@
       },
       "createdAt": "2026-10-31T20:30:00.000Z",
       "updatedAt": "2026-10-31T20:30:00.000Z",
+      "attendanceUpdatedAt": "2026-10-31T20:30:00.000Z",
       "updatedBy": "Lorenzo Fontana"
     },
     {
@@ -1003,6 +1131,7 @@
       },
       "createdAt": "2026-11-03T20:30:00.000Z",
       "updatedAt": "2026-11-03T20:30:00.000Z",
+      "attendanceUpdatedAt": "2026-11-03T20:30:00.000Z",
       "updatedBy": "Lorenzo Fontana"
     },
     {
@@ -1026,6 +1155,7 @@
       },
       "createdAt": "2026-11-05T20:30:00.000Z",
       "updatedAt": "2026-11-05T20:30:00.000Z",
+      "attendanceUpdatedAt": "2026-11-05T20:30:00.000Z",
       "updatedBy": "Lorenzo Fontana"
     },
     {
@@ -1049,6 +1179,7 @@
       },
       "createdAt": "2026-11-07T20:30:00.000Z",
       "updatedAt": "2026-11-07T20:30:00.000Z",
+      "attendanceUpdatedAt": "2026-11-07T20:30:00.000Z",
       "updatedBy": "Lorenzo Fontana"
     },
     {
@@ -1072,6 +1203,7 @@
       },
       "createdAt": "2026-11-10T20:30:00.000Z",
       "updatedAt": "2026-11-10T20:30:00.000Z",
+      "attendanceUpdatedAt": "2026-11-10T20:30:00.000Z",
       "updatedBy": "Lorenzo Fontana"
     },
     {
@@ -1098,6 +1230,7 @@
       ],
       "createdAt": "2026-11-12T20:30:00.000Z",
       "updatedAt": "2026-11-12T20:30:00.000Z",
+      "attendanceUpdatedAt": "2026-11-12T20:30:00.000Z",
       "updatedBy": "Lorenzo Fontana"
     },
     {
@@ -1121,6 +1254,7 @@
       },
       "createdAt": "2026-11-14T20:30:00.000Z",
       "updatedAt": "2026-11-14T20:30:00.000Z",
+      "attendanceUpdatedAt": "2026-11-14T20:30:00.000Z",
       "updatedBy": "Lorenzo Fontana"
     },
     {
@@ -1144,6 +1278,7 @@
       },
       "createdAt": "2026-11-17T20:30:00.000Z",
       "updatedAt": "2026-11-17T20:30:00.000Z",
+      "attendanceUpdatedAt": "2026-11-17T20:30:00.000Z",
       "updatedBy": "Lorenzo Fontana"
     },
     {
@@ -1167,6 +1302,7 @@
       },
       "createdAt": "2026-11-19T20:30:00.000Z",
       "updatedAt": "2026-11-19T20:30:00.000Z",
+      "attendanceUpdatedAt": "2026-11-19T20:30:00.000Z",
       "updatedBy": "Lorenzo Fontana"
     },
     {
@@ -1190,6 +1326,7 @@
       },
       "createdAt": "2026-11-21T20:30:00.000Z",
       "updatedAt": "2026-11-21T20:30:00.000Z",
+      "attendanceUpdatedAt": "2026-11-21T20:30:00.000Z",
       "updatedBy": "Lorenzo Fontana"
     },
     {
@@ -1213,6 +1350,7 @@
       },
       "createdAt": "2026-11-24T20:30:00.000Z",
       "updatedAt": "2026-11-24T20:30:00.000Z",
+      "attendanceUpdatedAt": "2026-11-24T20:30:00.000Z",
       "updatedBy": "Lorenzo Fontana"
     },
     {
@@ -1240,6 +1378,7 @@
       ],
       "createdAt": "2026-11-26T20:30:00.000Z",
       "updatedAt": "2026-11-26T20:30:00.000Z",
+      "attendanceUpdatedAt": "2026-11-26T20:30:00.000Z",
       "updatedBy": "Lorenzo Fontana"
     },
     {
@@ -1263,6 +1402,7 @@
       },
       "createdAt": "2026-11-28T20:30:00.000Z",
       "updatedAt": "2026-11-28T20:30:00.000Z",
+      "attendanceUpdatedAt": "2026-11-28T20:30:00.000Z",
       "updatedBy": "Lorenzo Fontana"
     },
     {
@@ -1286,6 +1426,7 @@
       },
       "createdAt": "2026-12-01T20:30:00.000Z",
       "updatedAt": "2026-12-01T20:30:00.000Z",
+      "attendanceUpdatedAt": "2026-12-01T20:30:00.000Z",
       "updatedBy": "Lorenzo Fontana"
     },
     {
@@ -1312,6 +1453,7 @@
       ],
       "createdAt": "2026-12-03T20:30:00.000Z",
       "updatedAt": "2026-12-03T20:30:00.000Z",
+      "attendanceUpdatedAt": "2026-12-03T20:30:00.000Z",
       "updatedBy": "Lorenzo Fontana"
     },
     {
@@ -1338,6 +1480,7 @@
       ],
       "createdAt": "2026-12-05T20:30:00.000Z",
       "updatedAt": "2026-12-05T20:30:00.000Z",
+      "attendanceUpdatedAt": "2026-12-05T20:30:00.000Z",
       "updatedBy": "Lorenzo Fontana"
     },
     {
@@ -1364,6 +1507,7 @@
       ],
       "createdAt": "2026-12-08T20:30:00.000Z",
       "updatedAt": "2026-12-08T20:30:00.000Z",
+      "attendanceUpdatedAt": "2026-12-08T20:30:00.000Z",
       "updatedBy": "Lorenzo Fontana"
     },
     {
@@ -1387,6 +1531,7 @@
       },
       "createdAt": "2026-12-10T20:30:00.000Z",
       "updatedAt": "2026-12-10T20:30:00.000Z",
+      "attendanceUpdatedAt": "2026-12-10T20:30:00.000Z",
       "updatedBy": "Lorenzo Fontana"
     },
     {
@@ -1413,6 +1558,7 @@
       ],
       "createdAt": "2026-12-12T20:30:00.000Z",
       "updatedAt": "2026-12-12T20:30:00.000Z",
+      "attendanceUpdatedAt": "2026-12-12T20:30:00.000Z",
       "updatedBy": "Lorenzo Fontana"
     },
     {
@@ -1436,6 +1582,7 @@
       },
       "createdAt": "2026-12-15T20:30:00.000Z",
       "updatedAt": "2026-12-15T20:30:00.000Z",
+      "attendanceUpdatedAt": "2026-12-15T20:30:00.000Z",
       "updatedBy": "Lorenzo Fontana"
     },
     {
@@ -1459,6 +1606,7 @@
       },
       "createdAt": "2026-12-17T20:30:00.000Z",
       "updatedAt": "2026-12-17T20:30:00.000Z",
+      "attendanceUpdatedAt": "2026-12-17T20:30:00.000Z",
       "updatedBy": "Lorenzo Fontana"
     },
     {
@@ -1482,6 +1630,7 @@
       },
       "createdAt": "2026-12-19T20:30:00.000Z",
       "updatedAt": "2026-12-19T20:30:00.000Z",
+      "attendanceUpdatedAt": "2026-12-19T20:30:00.000Z",
       "updatedBy": "Lorenzo Fontana"
     },
     {
@@ -1508,6 +1657,7 @@
       ],
       "createdAt": "2026-12-22T20:30:00.000Z",
       "updatedAt": "2026-12-22T20:30:00.000Z",
+      "attendanceUpdatedAt": "2026-12-22T20:30:00.000Z",
       "updatedBy": "Lorenzo Fontana"
     },
     {
@@ -1531,6 +1681,7 @@
       },
       "createdAt": "2027-01-07T20:30:00.000Z",
       "updatedAt": "2027-01-07T20:30:00.000Z",
+      "attendanceUpdatedAt": "2027-01-07T20:30:00.000Z",
       "updatedBy": "Lorenzo Fontana"
     },
     {
@@ -1554,6 +1705,7 @@
       },
       "createdAt": "2027-01-09T20:30:00.000Z",
       "updatedAt": "2027-01-09T20:30:00.000Z",
+      "attendanceUpdatedAt": "2027-01-09T20:30:00.000Z",
       "updatedBy": "Lorenzo Fontana"
     },
     {
@@ -1577,6 +1729,7 @@
       },
       "createdAt": "2027-01-12T20:30:00.000Z",
       "updatedAt": "2027-01-12T20:30:00.000Z",
+      "attendanceUpdatedAt": "2027-01-12T20:30:00.000Z",
       "updatedBy": "Lorenzo Fontana"
     },
     {
@@ -1604,6 +1757,7 @@
       ],
       "createdAt": "2027-01-14T20:30:00.000Z",
       "updatedAt": "2027-01-14T20:30:00.000Z",
+      "attendanceUpdatedAt": "2027-01-14T20:30:00.000Z",
       "updatedBy": "Lorenzo Fontana"
     },
     {
@@ -1627,6 +1781,7 @@
       },
       "createdAt": "2027-01-16T20:30:00.000Z",
       "updatedAt": "2027-01-16T20:30:00.000Z",
+      "attendanceUpdatedAt": "2027-01-16T20:30:00.000Z",
       "updatedBy": "Lorenzo Fontana"
     },
     {
@@ -1650,6 +1805,7 @@
       },
       "createdAt": "2027-01-19T20:30:00.000Z",
       "updatedAt": "2027-01-19T20:30:00.000Z",
+      "attendanceUpdatedAt": "2027-01-19T20:30:00.000Z",
       "updatedBy": "Lorenzo Fontana"
     },
     {
@@ -1673,6 +1829,7 @@
       },
       "createdAt": "2027-01-21T20:30:00.000Z",
       "updatedAt": "2027-01-21T20:30:00.000Z",
+      "attendanceUpdatedAt": "2027-01-21T20:30:00.000Z",
       "updatedBy": "Lorenzo Fontana"
     },
     {
@@ -1696,6 +1853,7 @@
       },
       "createdAt": "2027-01-23T20:30:00.000Z",
       "updatedAt": "2027-01-23T20:30:00.000Z",
+      "attendanceUpdatedAt": "2027-01-23T20:30:00.000Z",
       "updatedBy": "Lorenzo Fontana"
     },
     {
@@ -1719,6 +1877,7 @@
       },
       "createdAt": "2027-01-26T20:30:00.000Z",
       "updatedAt": "2027-01-26T20:30:00.000Z",
+      "attendanceUpdatedAt": "2027-01-26T20:30:00.000Z",
       "updatedBy": "Lorenzo Fontana"
     },
     {
@@ -1745,6 +1904,7 @@
       ],
       "createdAt": "2027-01-28T20:30:00.000Z",
       "updatedAt": "2027-01-28T20:30:00.000Z",
+      "attendanceUpdatedAt": "2027-01-28T20:30:00.000Z",
       "updatedBy": "Lorenzo Fontana"
     },
     {
@@ -1768,6 +1928,7 @@
       },
       "createdAt": "2027-01-30T20:30:00.000Z",
       "updatedAt": "2027-01-30T20:30:00.000Z",
+      "attendanceUpdatedAt": "2027-01-30T20:30:00.000Z",
       "updatedBy": "Lorenzo Fontana"
     },
     {
@@ -1791,6 +1952,7 @@
       },
       "createdAt": "2027-02-02T20:30:00.000Z",
       "updatedAt": "2027-02-02T20:30:00.000Z",
+      "attendanceUpdatedAt": "2027-02-02T20:30:00.000Z",
       "updatedBy": "Lorenzo Fontana"
     },
     {
@@ -1814,6 +1976,7 @@
       },
       "createdAt": "2027-02-04T20:30:00.000Z",
       "updatedAt": "2027-02-04T20:30:00.000Z",
+      "attendanceUpdatedAt": "2027-02-04T20:30:00.000Z",
       "updatedBy": "Lorenzo Fontana"
     },
     {
@@ -1837,6 +2000,7 @@
       },
       "createdAt": "2027-02-06T20:30:00.000Z",
       "updatedAt": "2027-02-06T20:30:00.000Z",
+      "attendanceUpdatedAt": "2027-02-06T20:30:00.000Z",
       "updatedBy": "Lorenzo Fontana"
     },
     {
@@ -1863,6 +2027,7 @@
       ],
       "createdAt": "2027-02-09T20:30:00.000Z",
       "updatedAt": "2027-02-09T20:30:00.000Z",
+      "attendanceUpdatedAt": "2027-02-09T20:30:00.000Z",
       "updatedBy": "Lorenzo Fontana"
     },
     {
@@ -1886,6 +2051,7 @@
       },
       "createdAt": "2027-02-11T20:30:00.000Z",
       "updatedAt": "2027-02-11T20:30:00.000Z",
+      "attendanceUpdatedAt": "2027-02-11T20:30:00.000Z",
       "updatedBy": "Lorenzo Fontana"
     },
     {
@@ -1912,6 +2078,7 @@
       ],
       "createdAt": "2027-02-13T20:30:00.000Z",
       "updatedAt": "2027-02-13T20:30:00.000Z",
+      "attendanceUpdatedAt": "2027-02-13T20:30:00.000Z",
       "updatedBy": "Lorenzo Fontana"
     },
     {
@@ -1935,6 +2102,7 @@
       },
       "createdAt": "2027-02-16T20:30:00.000Z",
       "updatedAt": "2027-02-16T20:30:00.000Z",
+      "attendanceUpdatedAt": "2027-02-16T20:30:00.000Z",
       "updatedBy": "Lorenzo Fontana"
     },
     {
@@ -1958,6 +2126,7 @@
       },
       "createdAt": "2027-02-18T20:30:00.000Z",
       "updatedAt": "2027-02-18T20:30:00.000Z",
+      "attendanceUpdatedAt": "2027-02-18T20:30:00.000Z",
       "updatedBy": "Lorenzo Fontana"
     },
     {
@@ -1981,6 +2150,7 @@
       },
       "createdAt": "2027-02-20T20:30:00.000Z",
       "updatedAt": "2027-02-20T20:30:00.000Z",
+      "attendanceUpdatedAt": "2027-02-20T20:30:00.000Z",
       "updatedBy": "Lorenzo Fontana"
     },
     {
@@ -2004,6 +2174,7 @@
       },
       "createdAt": "2027-02-23T20:30:00.000Z",
       "updatedAt": "2027-02-23T20:30:00.000Z",
+      "attendanceUpdatedAt": "2027-02-23T20:30:00.000Z",
       "updatedBy": "Lorenzo Fontana"
     },
     {
@@ -2027,6 +2198,7 @@
       },
       "createdAt": "2027-02-25T20:30:00.000Z",
       "updatedAt": "2027-02-25T20:30:00.000Z",
+      "attendanceUpdatedAt": "2027-02-25T20:30:00.000Z",
       "updatedBy": "Lorenzo Fontana"
     },
     {
@@ -2050,6 +2222,7 @@
       },
       "createdAt": "2027-02-27T20:30:00.000Z",
       "updatedAt": "2027-02-27T20:30:00.000Z",
+      "attendanceUpdatedAt": "2027-02-27T20:30:00.000Z",
       "updatedBy": "Lorenzo Fontana"
     },
     {
@@ -2073,6 +2246,7 @@
       },
       "createdAt": "2027-03-02T20:30:00.000Z",
       "updatedAt": "2027-03-02T20:30:00.000Z",
+      "attendanceUpdatedAt": "2027-03-02T20:30:00.000Z",
       "updatedBy": "Lorenzo Fontana"
     },
     {
@@ -2099,6 +2273,7 @@
       ],
       "createdAt": "2027-03-04T20:30:00.000Z",
       "updatedAt": "2027-03-04T20:30:00.000Z",
+      "attendanceUpdatedAt": "2027-03-04T20:30:00.000Z",
       "updatedBy": "Lorenzo Fontana"
     },
     {
@@ -2122,6 +2297,7 @@
       },
       "createdAt": "2027-03-06T20:30:00.000Z",
       "updatedAt": "2027-03-06T20:30:00.000Z",
+      "attendanceUpdatedAt": "2027-03-06T20:30:00.000Z",
       "updatedBy": "Lorenzo Fontana"
     },
     {
@@ -2145,6 +2321,7 @@
       },
       "createdAt": "2027-03-09T20:30:00.000Z",
       "updatedAt": "2027-03-09T20:30:00.000Z",
+      "attendanceUpdatedAt": "2027-03-09T20:30:00.000Z",
       "updatedBy": "Lorenzo Fontana"
     },
     {
@@ -2168,6 +2345,7 @@
       },
       "createdAt": "2027-03-11T20:30:00.000Z",
       "updatedAt": "2027-03-11T20:30:00.000Z",
+      "attendanceUpdatedAt": "2027-03-11T20:30:00.000Z",
       "updatedBy": "Lorenzo Fontana"
     },
     {
@@ -2194,6 +2372,7 @@
       ],
       "createdAt": "2027-03-13T20:30:00.000Z",
       "updatedAt": "2027-03-13T20:30:00.000Z",
+      "attendanceUpdatedAt": "2027-03-13T20:30:00.000Z",
       "updatedBy": "Lorenzo Fontana"
     },
     {
@@ -2220,6 +2399,7 @@
       ],
       "createdAt": "2027-03-16T20:30:00.000Z",
       "updatedAt": "2027-03-16T20:30:00.000Z",
+      "attendanceUpdatedAt": "2027-03-16T20:30:00.000Z",
       "updatedBy": "Lorenzo Fontana"
     },
     {
@@ -2243,6 +2423,7 @@
       },
       "createdAt": "2027-03-18T20:30:00.000Z",
       "updatedAt": "2027-03-18T20:30:00.000Z",
+      "attendanceUpdatedAt": "2027-03-18T20:30:00.000Z",
       "updatedBy": "Lorenzo Fontana"
     },
     {
@@ -2266,6 +2447,7 @@
       },
       "createdAt": "2027-03-20T20:30:00.000Z",
       "updatedAt": "2027-03-20T20:30:00.000Z",
+      "attendanceUpdatedAt": "2027-03-20T20:30:00.000Z",
       "updatedBy": "Lorenzo Fontana"
     },
     {
@@ -2292,6 +2474,7 @@
       ],
       "createdAt": "2027-03-23T20:30:00.000Z",
       "updatedAt": "2027-03-23T20:30:00.000Z",
+      "attendanceUpdatedAt": "2027-03-23T20:30:00.000Z",
       "updatedBy": "Lorenzo Fontana"
     },
     {
@@ -2315,6 +2498,7 @@
       },
       "createdAt": "2027-03-25T20:30:00.000Z",
       "updatedAt": "2027-03-25T20:30:00.000Z",
+      "attendanceUpdatedAt": "2027-03-25T20:30:00.000Z",
       "updatedBy": "Lorenzo Fontana"
     },
     {
@@ -2338,6 +2522,7 @@
       },
       "createdAt": "2027-03-27T20:30:00.000Z",
       "updatedAt": "2027-03-27T20:30:00.000Z",
+      "attendanceUpdatedAt": "2027-03-27T20:30:00.000Z",
       "updatedBy": "Lorenzo Fontana"
     },
     {
@@ -2364,6 +2549,7 @@
       ],
       "createdAt": "2027-03-30T20:30:00.000Z",
       "updatedAt": "2027-03-30T20:30:00.000Z",
+      "attendanceUpdatedAt": "2027-03-30T20:30:00.000Z",
       "updatedBy": "Lorenzo Fontana"
     },
     {
@@ -2387,6 +2573,7 @@
       },
       "createdAt": "2027-04-01T20:30:00.000Z",
       "updatedAt": "2027-04-01T20:30:00.000Z",
+      "attendanceUpdatedAt": "2027-04-01T20:30:00.000Z",
       "updatedBy": "Lorenzo Fontana"
     },
     {
@@ -2410,6 +2597,7 @@
       },
       "createdAt": "2027-04-06T20:30:00.000Z",
       "updatedAt": "2027-04-06T20:30:00.000Z",
+      "attendanceUpdatedAt": "2027-04-06T20:30:00.000Z",
       "updatedBy": "Lorenzo Fontana"
     },
     {
@@ -2433,6 +2621,7 @@
       },
       "createdAt": "2027-04-08T20:30:00.000Z",
       "updatedAt": "2027-04-08T20:30:00.000Z",
+      "attendanceUpdatedAt": "2027-04-08T20:30:00.000Z",
       "updatedBy": "Lorenzo Fontana"
     },
     {
@@ -2461,6 +2650,7 @@
       ],
       "createdAt": "2027-04-10T20:30:00.000Z",
       "updatedAt": "2027-04-10T20:30:00.000Z",
+      "attendanceUpdatedAt": "2027-04-10T20:30:00.000Z",
       "updatedBy": "Lorenzo Fontana"
     },
     {
@@ -2484,6 +2674,7 @@
       },
       "createdAt": "2027-04-13T20:30:00.000Z",
       "updatedAt": "2027-04-13T20:30:00.000Z",
+      "attendanceUpdatedAt": "2027-04-13T20:30:00.000Z",
       "updatedBy": "Lorenzo Fontana"
     },
     {
@@ -2507,6 +2698,7 @@
       },
       "createdAt": "2027-04-15T20:30:00.000Z",
       "updatedAt": "2027-04-15T20:30:00.000Z",
+      "attendanceUpdatedAt": "2027-04-15T20:30:00.000Z",
       "updatedBy": "Lorenzo Fontana"
     },
     {
@@ -2530,6 +2722,7 @@
       },
       "createdAt": "2027-04-17T20:30:00.000Z",
       "updatedAt": "2027-04-17T20:30:00.000Z",
+      "attendanceUpdatedAt": "2027-04-17T20:30:00.000Z",
       "updatedBy": "Lorenzo Fontana"
     },
     {
@@ -2553,6 +2746,7 @@
       },
       "createdAt": "2027-04-20T20:30:00.000Z",
       "updatedAt": "2027-04-20T20:30:00.000Z",
+      "attendanceUpdatedAt": "2027-04-20T20:30:00.000Z",
       "updatedBy": "Lorenzo Fontana"
     },
     {
@@ -2579,6 +2773,7 @@
       ],
       "createdAt": "2027-04-22T20:30:00.000Z",
       "updatedAt": "2027-04-22T20:30:00.000Z",
+      "attendanceUpdatedAt": "2027-04-22T20:30:00.000Z",
       "updatedBy": "Lorenzo Fontana"
     },
     {
@@ -2602,6 +2797,7 @@
       },
       "createdAt": "2027-04-24T20:30:00.000Z",
       "updatedAt": "2027-04-24T20:30:00.000Z",
+      "attendanceUpdatedAt": "2027-04-24T20:30:00.000Z",
       "updatedBy": "Lorenzo Fontana"
     },
     {
@@ -2625,6 +2821,7 @@
       },
       "createdAt": "2027-04-27T20:30:00.000Z",
       "updatedAt": "2027-04-27T20:30:00.000Z",
+      "attendanceUpdatedAt": "2027-04-27T20:30:00.000Z",
       "updatedBy": "Lorenzo Fontana"
     },
     {
@@ -2648,6 +2845,7 @@
       },
       "createdAt": "2027-04-29T20:30:00.000Z",
       "updatedAt": "2027-04-29T20:30:00.000Z",
+      "attendanceUpdatedAt": "2027-04-29T20:30:00.000Z",
       "updatedBy": "Lorenzo Fontana"
     },
     {
@@ -2674,6 +2872,7 @@
       ],
       "createdAt": "2027-05-01T20:30:00.000Z",
       "updatedAt": "2027-05-01T20:30:00.000Z",
+      "attendanceUpdatedAt": "2027-05-01T20:30:00.000Z",
       "updatedBy": "Lorenzo Fontana"
     },
     {
@@ -2700,6 +2899,7 @@
       ],
       "createdAt": "2027-05-04T20:30:00.000Z",
       "updatedAt": "2027-05-04T20:30:00.000Z",
+      "attendanceUpdatedAt": "2027-05-04T20:30:00.000Z",
       "updatedBy": "Lorenzo Fontana"
     },
     {
@@ -2728,6 +2928,7 @@
       ],
       "createdAt": "2027-05-06T20:30:00.000Z",
       "updatedAt": "2027-05-06T20:30:00.000Z",
+      "attendanceUpdatedAt": "2027-05-06T20:30:00.000Z",
       "updatedBy": "Lorenzo Fontana"
     },
     {
@@ -2756,6 +2957,7 @@
       ],
       "createdAt": "2027-05-08T20:30:00.000Z",
       "updatedAt": "2027-05-08T20:30:00.000Z",
+      "attendanceUpdatedAt": "2027-05-08T20:30:00.000Z",
       "updatedBy": "Lorenzo Fontana"
     },
     {
@@ -2779,6 +2981,7 @@
       },
       "createdAt": "2027-05-11T20:30:00.000Z",
       "updatedAt": "2027-05-11T20:30:00.000Z",
+      "attendanceUpdatedAt": "2027-05-11T20:30:00.000Z",
       "updatedBy": "Lorenzo Fontana"
     },
     {
@@ -2805,6 +3008,7 @@
       ],
       "createdAt": "2027-05-13T20:30:00.000Z",
       "updatedAt": "2027-05-13T20:30:00.000Z",
+      "attendanceUpdatedAt": "2027-05-13T20:30:00.000Z",
       "updatedBy": "Lorenzo Fontana"
     },
     {
@@ -2828,6 +3032,7 @@
       },
       "createdAt": "2027-05-15T20:30:00.000Z",
       "updatedAt": "2027-05-15T20:30:00.000Z",
+      "attendanceUpdatedAt": "2027-05-15T20:30:00.000Z",
       "updatedBy": "Lorenzo Fontana"
     },
     {
@@ -2854,6 +3059,7 @@
       ],
       "createdAt": "2027-05-18T20:30:00.000Z",
       "updatedAt": "2027-05-18T20:30:00.000Z",
+      "attendanceUpdatedAt": "2027-05-18T20:30:00.000Z",
       "updatedBy": "Lorenzo Fontana"
     },
     {
@@ -2877,6 +3083,7 @@
       },
       "createdAt": "2027-05-20T20:30:00.000Z",
       "updatedAt": "2027-05-20T20:30:00.000Z",
+      "attendanceUpdatedAt": "2027-05-20T20:30:00.000Z",
       "updatedBy": "Lorenzo Fontana"
     },
     {
@@ -2900,6 +3107,7 @@
       },
       "createdAt": "2027-05-22T20:30:00.000Z",
       "updatedAt": "2027-05-22T20:30:00.000Z",
+      "attendanceUpdatedAt": "2027-05-22T20:30:00.000Z",
       "updatedBy": "Lorenzo Fontana"
     },
     {
@@ -2926,6 +3134,7 @@
       ],
       "createdAt": "2027-05-25T20:30:00.000Z",
       "updatedAt": "2027-05-25T20:30:00.000Z",
+      "attendanceUpdatedAt": "2027-05-25T20:30:00.000Z",
       "updatedBy": "Lorenzo Fontana"
     },
     {
@@ -2953,6 +3162,7 @@
       ],
       "createdAt": "2027-05-27T20:30:00.000Z",
       "updatedAt": "2027-05-27T20:30:00.000Z",
+      "attendanceUpdatedAt": "2027-05-27T20:30:00.000Z",
       "updatedBy": "Lorenzo Fontana"
     },
     {
@@ -2976,6 +3186,7 @@
       },
       "createdAt": "2027-05-29T20:30:00.000Z",
       "updatedAt": "2027-05-29T20:30:00.000Z",
+      "attendanceUpdatedAt": "2027-05-29T20:30:00.000Z",
       "updatedBy": "Lorenzo Fontana"
     },
     {
@@ -2999,6 +3210,7 @@
       },
       "createdAt": "2027-06-01T20:30:00.000Z",
       "updatedAt": "2027-06-01T20:30:00.000Z",
+      "attendanceUpdatedAt": "2027-06-01T20:30:00.000Z",
       "updatedBy": "Lorenzo Fontana"
     },
     {
@@ -3022,6 +3234,7 @@
       },
       "createdAt": "2027-06-03T20:30:00.000Z",
       "updatedAt": "2027-06-03T20:30:00.000Z",
+      "attendanceUpdatedAt": "2027-06-03T20:30:00.000Z",
       "updatedBy": "Lorenzo Fontana"
     },
     {
@@ -3045,6 +3258,7 @@
       },
       "createdAt": "2027-06-05T20:30:00.000Z",
       "updatedAt": "2027-06-05T20:30:00.000Z",
+      "attendanceUpdatedAt": "2027-06-05T20:30:00.000Z",
       "updatedBy": "Lorenzo Fontana"
     },
     {
@@ -3068,6 +3282,7 @@
       },
       "createdAt": "2027-06-08T20:30:00.000Z",
       "updatedAt": "2027-06-08T20:30:00.000Z",
+      "attendanceUpdatedAt": "2027-06-08T20:30:00.000Z",
       "updatedBy": "Lorenzo Fontana"
     },
     {
@@ -3091,6 +3306,7 @@
       },
       "createdAt": "2027-06-10T20:30:00.000Z",
       "updatedAt": "2027-06-10T20:30:00.000Z",
+      "attendanceUpdatedAt": "2027-06-10T20:30:00.000Z",
       "updatedBy": "Lorenzo Fontana"
     },
     {
@@ -3117,6 +3333,7 @@
       ],
       "createdAt": "2027-06-12T20:30:00.000Z",
       "updatedAt": "2027-06-12T20:30:00.000Z",
+      "attendanceUpdatedAt": "2027-06-12T20:30:00.000Z",
       "updatedBy": "Lorenzo Fontana"
     },
     {
@@ -3144,6 +3361,7 @@
       ],
       "createdAt": "2027-06-15T20:30:00.000Z",
       "updatedAt": "2027-06-15T20:30:00.000Z",
+      "attendanceUpdatedAt": "2027-06-15T20:30:00.000Z",
       "updatedBy": "Lorenzo Fontana"
     },
     {
@@ -3167,6 +3385,7 @@
       },
       "createdAt": "2027-06-17T20:30:00.000Z",
       "updatedAt": "2027-06-17T20:30:00.000Z",
+      "attendanceUpdatedAt": "2027-06-17T20:30:00.000Z",
       "updatedBy": "Lorenzo Fontana"
     },
     {
@@ -3190,6 +3409,7 @@
       },
       "createdAt": "2027-06-19T20:30:00.000Z",
       "updatedAt": "2027-06-19T20:30:00.000Z",
+      "attendanceUpdatedAt": "2027-06-19T20:30:00.000Z",
       "updatedBy": "Lorenzo Fontana"
     },
     {
@@ -3213,6 +3433,7 @@
       },
       "createdAt": "2027-06-22T20:30:00.000Z",
       "updatedAt": "2027-06-22T20:30:00.000Z",
+      "attendanceUpdatedAt": "2027-06-22T20:30:00.000Z",
       "updatedBy": "Lorenzo Fontana"
     },
     {
@@ -3236,6 +3457,7 @@
       },
       "createdAt": "2027-06-24T20:30:00.000Z",
       "updatedAt": "2027-06-24T20:30:00.000Z",
+      "attendanceUpdatedAt": "2027-06-24T20:30:00.000Z",
       "updatedBy": "Lorenzo Fontana"
     },
     {
@@ -3263,6 +3485,7 @@
       ],
       "createdAt": "2027-06-26T20:30:00.000Z",
       "updatedAt": "2027-06-26T20:30:00.000Z",
+      "attendanceUpdatedAt": "2027-06-26T20:30:00.000Z",
       "updatedBy": "Lorenzo Fontana"
     },
     {
@@ -3286,6 +3509,7 @@
       },
       "createdAt": "2027-06-29T20:30:00.000Z",
       "updatedAt": "2027-06-29T20:30:00.000Z",
+      "attendanceUpdatedAt": "2027-06-29T20:30:00.000Z",
       "updatedBy": "Lorenzo Fontana"
     },
     {
@@ -3312,6 +3536,7 @@
       ],
       "createdAt": "2027-07-01T20:30:00.000Z",
       "updatedAt": "2027-07-01T20:30:00.000Z",
+      "attendanceUpdatedAt": "2027-07-01T20:30:00.000Z",
       "updatedBy": "Lorenzo Fontana"
     },
     {
@@ -3338,6 +3563,7 @@
       ],
       "createdAt": "2027-07-03T20:30:00.000Z",
       "updatedAt": "2027-07-03T20:30:00.000Z",
+      "attendanceUpdatedAt": "2027-07-03T20:30:00.000Z",
       "updatedBy": "Lorenzo Fontana"
     },
     {
@@ -3361,6 +3587,7 @@
       },
       "createdAt": "2027-07-06T20:30:00.000Z",
       "updatedAt": "2027-07-06T20:30:00.000Z",
+      "attendanceUpdatedAt": "2027-07-06T20:30:00.000Z",
       "updatedBy": "Lorenzo Fontana"
     },
     {
@@ -3387,6 +3614,7 @@
       ],
       "createdAt": "2027-07-08T20:30:00.000Z",
       "updatedAt": "2027-07-08T20:30:00.000Z",
+      "attendanceUpdatedAt": "2027-07-08T20:30:00.000Z",
       "updatedBy": "Lorenzo Fontana"
     },
     {
@@ -3410,6 +3638,7 @@
       },
       "createdAt": "2027-07-10T20:30:00.000Z",
       "updatedAt": "2027-07-10T20:30:00.000Z",
+      "attendanceUpdatedAt": "2027-07-10T20:30:00.000Z",
       "updatedBy": "Lorenzo Fontana"
     },
     {
@@ -3436,6 +3665,7 @@
       ],
       "createdAt": "2027-07-13T20:30:00.000Z",
       "updatedAt": "2027-07-13T20:30:00.000Z",
+      "attendanceUpdatedAt": "2027-07-13T20:30:00.000Z",
       "updatedBy": "Lorenzo Fontana"
     },
     {
@@ -3455,6 +3685,7 @@
       },
       "createdAt": "2027-07-15T20:30:00.000Z",
       "updatedAt": "2027-07-15T20:30:00.000Z",
+      "attendanceUpdatedAt": "2027-07-15T20:30:00.000Z",
       "updatedBy": "Lorenzo Fontana"
     }
   ]

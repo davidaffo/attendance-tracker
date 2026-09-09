@@ -10,6 +10,7 @@ import {
   LoaderCircle,
   Settings,
   ShieldCheck,
+  Trophy,
   Users
 } from 'lucide-react'
 import { AttendanceEditor } from './components/AttendanceEditor'
@@ -26,6 +27,7 @@ import { ResetAppDataButton } from './components/ResetAppDataButton'
 import { SharedTeamSetup } from './components/SharedTeamSetup'
 import { SyncSettings } from './components/SyncSettings'
 import { TeamSettings } from './components/TeamSettings'
+import { Scores } from './components/Scores'
 import { ThemeSelector } from './components/ThemeSelector'
 import {
   COACH_ONBOARDING_VERSION
@@ -34,7 +36,12 @@ import {
   allowsCoachBackgroundSync,
   hasStoredSetupForMode
 } from './domain/accessPolicy'
-import { deleteSession, ignorePlannedTrainingDate, saveSession } from './domain/document'
+import {
+  deleteSession,
+  ignorePlannedTrainingDate,
+  saveSession,
+  saveSessionScore
+} from './domain/document'
 import {
   metaForManualSync,
   metaForRestoredBackup,
@@ -47,6 +54,7 @@ import type {
   LocalSyncMeta,
   SyncConfig,
   SyncIndicator,
+  SessionScore,
   TeamDocument,
   TeamSummary,
   TrainingSession
@@ -88,7 +96,7 @@ import {
   storeSyncMeta
 } from './storage/database'
 
-type CoachView = 'home' | 'register' | 'team' | 'settings'
+type CoachView = 'home' | 'register' | 'scores' | 'team' | 'settings'
 type SyncOutcome =
   | { status: 'synced' | 'skipped' | 'cancelled' }
   | { status: 'error'; message: string }
@@ -101,6 +109,7 @@ const navigation = [
     label: 'Registro',
     icon: CalendarRange
   },
+  { id: 'scores' as const, path: '/allenatore/punteggi', label: 'Punteggi', icon: Trophy },
   { id: 'team' as const, path: '/allenatore/squadra', label: 'Squadra', icon: Users },
   {
     id: 'settings' as const,
@@ -675,6 +684,16 @@ export default function App() {
     await commitDocument(deleteSession(document, sessionId, document.coachName))
   }
 
+  const handleScoreSave = async (
+    sessionId: string,
+    score: Pick<SessionScore, 'teamPoints' | 'assignments' | 'adjustments'>
+  ) => {
+    if (!document) return
+    await commitDocument(
+      saveSessionScore(document, sessionId, score, document.coachName)
+    )
+  }
+
   const handleIgnorePlannedSession = async (date: string) => {
     if (!document) return
     await commitDocument(
@@ -1110,6 +1129,10 @@ export default function App() {
         }
         onSave={handleSessionSave}
         onDelete={handleSessionDelete}
+        onOpenScores={(sessionId) => navigate(
+          `/allenatore/punteggi?${new URLSearchParams({ session: sessionId }).toString()}`,
+          { replace: true }
+        )}
         onClose={closeEditor}
       />
     )
@@ -1231,6 +1254,13 @@ export default function App() {
               onNewSession={() =>
                 navigate('/allenatore/sessione/nuova', { from: pathname })
               }
+            />
+          )}
+          {view === 'scores' && (
+            <Scores
+              document={document}
+              initialSessionId={currentRouteSearchParams().get('session') ?? undefined}
+              onSave={handleScoreSave}
             />
           )}
           {view === 'team' && (

@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react'
-import { ArrowLeft, DoorOpen, Eraser, Save, Trash2, UserCheck, UserX } from 'lucide-react'
+import { ArrowLeft, DoorOpen, Eraser, Save, Trash2, Trophy, UserCheck, UserX } from 'lucide-react'
 import type { TeamDocument, TrainingSession } from '../domain/types'
 import { compareAthletesByName } from '../domain/document'
 
@@ -9,6 +9,7 @@ interface AttendanceEditorProps {
   initialDate?: string
   onSave: (input: Pick<TrainingSession, 'id' | 'date' | 'attendances' | 'earlyDepartures'>) => Promise<void>
   onDelete?: (sessionId: string) => Promise<void>
+  onOpenScores?: (sessionId: string) => void
   onClose: () => void
 }
 
@@ -24,6 +25,7 @@ export function AttendanceEditor({
   initialDate,
   onSave,
   onDelete,
+  onOpenScores,
   onClose
 }: AttendanceEditorProps) {
   const athletes = useMemo(
@@ -39,6 +41,7 @@ export function AttendanceEditor({
   )
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
+  const [sessionId] = useState(() => initialSession?.id ?? crypto.randomUUID())
   const completed = athletes.filter((athlete) => attendances[athlete.id]).length
 
   const presentStatus = document.statuses.find((status) => status.code === 'P')
@@ -59,17 +62,17 @@ export function AttendanceEditor({
     })
   }
 
-  const save = async () => {
+  const save = async (afterSave: () => void = onClose) => {
     setSaving(true)
     setError('')
     try {
       await onSave({
-        id: initialSession?.id ?? crypto.randomUUID(),
+        id: sessionId,
         date,
         attendances,
         earlyDepartures
       })
-      onClose()
+      afterSave()
     } catch (caught) {
       setError(caught instanceof Error ? caught.message : 'Non è stato possibile salvare.')
     } finally {
@@ -93,10 +96,23 @@ export function AttendanceEditor({
         <div>
           <h1>{initialSession ? 'Modifica allenamento' : 'Nuovo allenamento'}</h1>
         </div>
-        <button className="button primary compact" onClick={save} disabled={saving}>
-          <Save size={17} />
-          <span>{saving ? 'Salvo…' : 'Salva'}</span>
-        </button>
+        <div className="editor-header-actions">
+          {onOpenScores && (
+            <button
+              className="button secondary compact"
+              type="button"
+              onClick={() => void save(() => onOpenScores(sessionId))}
+              disabled={saving}
+            >
+              <Trophy size={17} />
+              <span>Punteggi</span>
+            </button>
+          )}
+          <button className="button primary compact" onClick={() => void save()} disabled={saving}>
+            <Save size={17} />
+            <span>{saving ? 'Salvo…' : 'Salva'}</span>
+          </button>
+        </div>
       </header>
 
       <section className="editor-toolbar">
