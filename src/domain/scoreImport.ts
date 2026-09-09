@@ -19,10 +19,17 @@ export function matchAthleteByName(
   if (exact.length === 1) return { athlete: exact[0], ambiguous: false }
   if (exact.length > 1) return { ambiguous: true }
 
-  const matches = athletes.filter((athlete) => {
-    const parts = normalizeName(athlete.name).split(' ')
-    return parts.includes(normalizedQuery) || normalizeName(athlete.name).includes(normalizedQuery)
-  })
+  const exactPartMatches = athletes.filter((athlete) =>
+    normalizeName(athlete.name).split(' ').includes(normalizedQuery)
+  )
+  if (exactPartMatches.length === 1) {
+    return { athlete: exactPartMatches[0], ambiguous: false }
+  }
+  if (exactPartMatches.length > 1) return { ambiguous: true }
+
+  const matches = athletes.filter((athlete) =>
+    normalizeName(athlete.name).includes(normalizedQuery)
+  )
   return matches.length === 1
     ? { athlete: matches[0], ambiguous: false }
     : { ambiguous: matches.length > 1 }

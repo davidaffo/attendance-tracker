@@ -20,7 +20,8 @@ import { matchAthleteByName, parseTeamAssignments } from '../domain/scoreImport'
 interface ScoresProps {
   document: TeamDocument
   initialSessionId?: string
-  onSave: (
+  readOnly?: boolean
+  onSave?: (
     sessionId: string,
     score: Pick<SessionScore, 'teamPoints' | 'assignments' | 'adjustments'>
   ) => Promise<void>
@@ -55,7 +56,7 @@ function emptyScore(): Pick<SessionScore, 'teamPoints' | 'assignments' | 'adjust
   return { teamPoints: { a: [], b: [] }, assignments: {}, adjustments: {} }
 }
 
-export function Scores({ document, initialSessionId, onSave }: ScoresProps) {
+export function Scores({ document, initialSessionId, readOnly = false, onSave }: ScoresProps) {
   const [selectedSessionId, setSelectedSessionId] = useState<string | undefined>(
     initialSessionId
   )
@@ -74,6 +75,15 @@ export function Scores({ document, initialSessionId, onSave }: ScoresProps) {
   const scoredSessions = document.sessions.filter((session) => session.score).length
 
   if (selectedSession) {
+    if (readOnly || !onSave) {
+      return (
+        <ScoreSessionViewer
+          document={document}
+          session={selectedSession}
+          onBack={() => setSelectedSessionId(undefined)}
+        />
+      )
+    }
     return (
       <ScoreEditor
         document={document}
@@ -159,15 +169,66 @@ export function Scores({ document, initialSessionId, onSave }: ScoresProps) {
               >
                 <span>{formatDate(session.date)}</span>
                 <small>{session.score ? 'Punteggio inserito' : 'Da compilare'}</small>
-                {session.score && (
-                  <b>A {scoreTeamTotal(session.score, 'a')} · B {scoreTeamTotal(session.score, 'b')}</b>
-                )}
                 <ChevronRight size={18} />
               </button>
             ))}
           </div>
         )}
       </section>
+    </div>
+  )
+}
+
+function ScoreSessionViewer({
+  document,
+  session,
+  onBack
+}: {
+  document: TeamDocument
+  session: TrainingSession
+  onBack: () => void
+}) {
+  const athletes = athletesForReport(document).filter(
+    (athlete) => athlete.active || athlete.id in session.attendances
+  )
+  const absentStatusId = document.statuses.find(
+    (status) => status.code.toLocaleUpperCase() === 'A'
+  )?.id
+
+  return (
+    <div className="page-content score-editor-page score-viewer-page">
+      <div className="score-editor-header">
+        <button className="button ghost" type="button" onClick={onBack}>
+          <ArrowLeft size={17} /> Punteggi
+        </button>
+        <div><h1>{formatDate(session.date)}</h1></div>
+      </div>
+
+      {!session.score ? (
+        <section className="panel empty-state">
+          <Trophy size={30} />
+          <h3>Punteggi non ancora inseriti</h3>
+        </section>
+      ) : (
+        <section className="panel score-athletes-panel">
+          <div className="panel-heading"><div><h2>Punteggi individuali</h2></div></div>
+          <div className="score-athlete-list">
+            {athletes.map((athlete) => {
+              const absent = session.attendances[athlete.id] === absentStatusId
+              return (
+                <div
+                  className={`score-athlete-row read-only${absent ? ' absent' : ''}`}
+                  key={athlete.id}
+                >
+                  <strong>{athlete.name}</strong>
+                  <b>{athleteScoreForSession(document, session, athlete.id)} pt</b>
+                  {absent && <small>Assente: punteggio zero</small>}
+                </div>
+              )
+            })}
+          </div>
+        </section>
+      )}
     </div>
   )
 }
@@ -187,7 +248,6 @@ function RankingList({
             {index + 1}
           </span>
           <strong>{athletesById.get(entry.athleteId)?.name}</strong>
-          <small>{entry.scoredSessions} allenamenti</small>
           <b>{entry.points} pt</b>
         </div>
       ))}

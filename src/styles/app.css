@@ -1582,7 +1582,7 @@ h2 {
 
 .score-ranking-row {
   display: grid;
-  grid-template-columns: 36px minmax(0, 1fr) auto minmax(70px, auto);
+  grid-template-columns: 36px minmax(0, 1fr) minmax(70px, auto);
   align-items: center;
   gap: 0.75rem;
   min-height: 48px;
@@ -1646,7 +1646,7 @@ h2 {
 
 .score-session-row {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) auto auto 20px;
+  grid-template-columns: minmax(0, 1fr) auto 20px;
   align-items: center;
   gap: 0.8rem;
   min-height: 54px;
@@ -1968,6 +1968,15 @@ h2 {
 .score-athlete-row > small {
   grid-column: 2 / -1;
   margin-top: -0.55rem;
+}
+
+.score-athlete-row.read-only {
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+}
+
+.score-athlete-row.read-only > small {
+  grid-column: 1 / -1;
 }
 
 .password-dialog .password-dialog-error {
@@ -3854,6 +3863,10 @@ html[data-theme='dark'] .sharing-cors-help code {
 }
 
 .sharing-panel + .coordinator-report-shell {
+  margin-top: 1rem;
+}
+
+.coordinator-scores-shell {
   margin-top: 1rem;
 }
 

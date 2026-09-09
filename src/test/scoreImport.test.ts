@@ -13,6 +13,18 @@ describe('assegnazione rapida delle squadre', () => {
     expect(matchAthleteByName(athletes, 'Rossi').ambiguous).toBe(true)
   })
 
+  it('preferisce un nome esatto alla radice di un altro nome', () => {
+    const similarNames = ['Gottero Isabel', 'Bertozzi Isabella'].map(
+      (name, order): Athlete => ({
+        id: String(order), name, order, active: true, createdAt: '2026-08-01T00:00:00.000Z'
+      })
+    )
+
+    expect(matchAthleteByName(similarNames, 'Isabel').athlete?.name).toBe('Gottero Isabel')
+    expect(matchAthleteByName(similarNames, 'Isabella').athlete?.name).toBe('Bertozzi Isabella')
+    expect(matchAthleteByName(similarNames, 'Isa').ambiguous).toBe(true)
+  })
+
   it('legge due righe semplici', () => {
     expect(parseTeamAssignments('Anna Rossi, Bianca Verdi\nCarla Rossi')).toEqual({
       a: ['Anna Rossi', 'Bianca Verdi'], b: ['Carla Rossi']

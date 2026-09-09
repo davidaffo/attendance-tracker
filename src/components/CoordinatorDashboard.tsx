@@ -59,6 +59,7 @@ import { NextcloudQuickAccessButtons } from './NextcloudQuickAccessButton'
 import { prepareTeamSettingsDocument, TeamSettings } from './TeamSettings'
 import { PlannedSessionsPanel } from './PlannedSessionsPanel'
 import { ConflictResolutionDialog } from './ConflictResolutionDialog'
+import { Scores } from './Scores'
 
 interface CoordinatorDashboardProps {
   accessMode: 'coordinator' | 'viewer'
@@ -931,6 +932,9 @@ export function CoordinatorDashboard({
           />
           <section className="coordinator-report-shell">
             <MonthlyRegister document={selectedTeam.document} compactHeader />
+          </section>
+          <section className="coordinator-report-shell coordinator-scores-shell">
+            <Scores document={selectedTeam.document} readOnly />
           </section>
           {!isViewer && canWriteTeam(selectedTeam) && (
             <TeamSettings
