@@ -46,7 +46,8 @@ import {
   metaForManualSync,
   metaForRestoredBackup,
   nextcloudLinkFromRouteHash,
-  nextcloudModeFromRouteHash
+  nextcloudModeFromRouteHash,
+  withSharedNextcloudConnection
 } from './domain/syncConfig'
 import type {
   AppMode,
@@ -323,6 +324,35 @@ export default function App() {
     setSyncConfig(next)
   }
 
+  const storeSharedConnection = async (
+    source: SyncConfig,
+    owner: CredentialOwner
+  ) => {
+    const coach = owner === 'coach'
+      ? source
+      : syncConfig
+        ? withSharedNextcloudConnection(syncConfig, source)
+        : undefined
+    const coordinator = owner === 'coordinator'
+      ? source
+      : coordinatorSyncConfig
+        ? withSharedNextcloudConnection(coordinatorSyncConfig, source)
+        : undefined
+    const viewer = owner === 'viewer'
+      ? source
+      : viewerSyncConfig
+        ? withSharedNextcloudConnection(viewerSyncConfig, source)
+        : undefined
+    const writes: Promise<void>[] = []
+    if (coach) writes.push(storeSyncConfig(coach))
+    if (coordinator) writes.push(storeCoordinatorSyncConfig(coordinator))
+    if (viewer) writes.push(storeViewerSyncConfig(viewer))
+    await Promise.all(writes)
+    if (coach) applyConfig(coach)
+    if (coordinator) setCoordinatorSyncConfig(coordinator)
+    if (viewer) setViewerSyncConfig(viewer)
+  }
+
   const applyMeta = (next: LocalSyncMeta) => {
     metaRef.current = next
     setSyncMeta(next)
@@ -435,12 +465,10 @@ export default function App() {
       ]) => {
         if (!active) return
         applyDocument(storedDocument)
-        applyConfig(storedConfig)
         const resolvedDocumentOrigin =
           storedDocumentOrigin ?? (storedDocument ? 'self-managed' : undefined)
         applyCoachDocumentOrigin(resolvedDocumentOrigin)
         coachFileHandleRef.current = storedCoachFileHandle
-        setCoordinatorSyncConfig(storedCoordinatorConfig)
         const legacyReadOnlyConfig =
           storedMode === 'coordinator' &&
           !storedViewerConfig &&
@@ -453,7 +481,36 @@ export default function App() {
             : undefined
         const resolvedViewerConfig = storedViewerConfig ?? legacyReadOnlyConfig
         const resolvedMode = legacyReadOnlyConfig ? 'viewer' : storedMode
-        setViewerSyncConfig(resolvedViewerConfig)
+        const sharedConnection =
+          (resolvedMode === 'coach'
+            ? storedConfig
+            : resolvedMode === 'coordinator'
+              ? storedCoordinatorConfig
+              : resolvedMode === 'viewer'
+                ? resolvedViewerConfig
+                : undefined) ??
+          storedConfig ?? storedCoordinatorConfig ?? resolvedViewerConfig
+        const unifiedCoachConfig = storedConfig && sharedConnection
+          ? withSharedNextcloudConnection(storedConfig, sharedConnection)
+          : storedConfig
+        const unifiedCoordinatorConfig = storedCoordinatorConfig && sharedConnection
+          ? withSharedNextcloudConnection(storedCoordinatorConfig, sharedConnection)
+          : storedCoordinatorConfig
+        const unifiedViewerConfig = resolvedViewerConfig && sharedConnection
+          ? withSharedNextcloudConnection(resolvedViewerConfig, sharedConnection)
+          : resolvedViewerConfig
+        applyConfig(unifiedCoachConfig)
+        setCoordinatorSyncConfig(unifiedCoordinatorConfig)
+        setViewerSyncConfig(unifiedViewerConfig)
+        if (sharedConnection) {
+          const migrations: Promise<void>[] = []
+          if (unifiedCoachConfig) migrations.push(storeSyncConfig(unifiedCoachConfig))
+          if (unifiedCoordinatorConfig) {
+            migrations.push(storeCoordinatorSyncConfig(unifiedCoordinatorConfig))
+          }
+          if (unifiedViewerConfig) migrations.push(storeViewerSyncConfig(unifiedViewerConfig))
+          void Promise.all(migrations)
+        }
         if (legacyReadOnlyConfig) {
           void Promise.all([
             storeViewerSyncConfig(legacyReadOnlyConfig),
@@ -474,9 +531,9 @@ export default function App() {
         const requestedMode = nextcloudModeFromRouteHash(window.location.hash)
         const hasStoredSetup = hasStoredSetupForMode(resolvedMode, {
           coachDocument: storedDocument,
-          coachConfig: storedConfig,
-          coordinatorConfig: storedCoordinatorConfig,
-          viewerConfig: resolvedViewerConfig
+          coachConfig: unifiedCoachConfig,
+          coordinatorConfig: unifiedCoordinatorConfig,
+          viewerConfig: unifiedViewerConfig
         })
         if (sharedNextcloudLink && hasStoredSetup && resolvedMode) {
           const initialPath = resolvedMode === 'coach'
@@ -508,12 +565,12 @@ export default function App() {
           (currentRoutePath() === '/' && resolvedMode === 'coach')
         if (
           storedDocument &&
-          storedConfig &&
+          unifiedCoachConfig &&
           navigator.onLine &&
           shouldSyncCoach &&
           allowsCoachBackgroundSync(resolvedDocumentOrigin)
         ) {
-          void performSync(storedDocument, storedMeta, storedConfig)
+          void performSync(storedDocument, storedMeta, unifiedCoachConfig)
         }
       },
       (error) => {
@@ -580,21 +637,27 @@ export default function App() {
 
   const commitDocument = async (next: TeamDocument, syncNow = true) => {
     const localFileHandle = coachFileHandleRef.current
-    const localCoordinatorDocument =
-      coachDocumentOriginRef.current === 'coordinator-local'
+    const localOnlyDocument =
+      coachDocumentOriginRef.current === 'coordinator-local' ||
+      coachDocumentOriginRef.current === 'development-demo'
     const documentToStore = localFileHandle
       ? await writeTeamDocumentToFile(localFileHandle, next)
       : next
     const nextMeta = {
       ...metaRef.current,
-      dirty: !(localFileHandle || localCoordinatorDocument),
+      dirty: !(localFileHandle || localOnlyDocument),
       lastError: undefined
     }
     await Promise.all([storeDocument(documentToStore), storeSyncMeta(nextMeta)])
     applyDocument(documentToStore)
     applyMeta(nextMeta)
     setSyncIndicator(configRef.current ? 'pending' : 'local')
-    if (syncNow && configRef.current && navigator.onLine) {
+    if (
+      syncNow &&
+      configRef.current &&
+      navigator.onLine &&
+      allowsCoachBackgroundSync(coachDocumentOriginRef.current)
+    ) {
       void performSync(documentToStore, nextMeta, configRef.current)
     }
   }
@@ -606,8 +669,7 @@ export default function App() {
     const reopening = Boolean(document)
     await commitDocument(next, false)
     if (nextSyncConfig) {
-      await storeSyncConfig(nextSyncConfig)
-      applyConfig(nextSyncConfig)
+      await storeSharedConnection(nextSyncConfig, 'coach')
       if (navigator.onLine) {
         void performSync(next, metaRef.current, nextSyncConfig)
       }
@@ -702,11 +764,11 @@ export default function App() {
   }
 
   const saveConfig = async (config: SyncConfig) => {
-    await storeSyncConfig(config)
-    applyConfig(config)
+    await storeSharedConnection(config, 'coach')
     if (
       coachDocumentOriginRef.current === 'coordinator-managed' ||
-      coachDocumentOriginRef.current === 'coordinator-local'
+      coachDocumentOriginRef.current === 'coordinator-local' ||
+      coachDocumentOriginRef.current === 'development-demo'
     ) return
     if (documentRef.current) {
       if (syncPromiseRef.current) await syncPromiseRef.current
@@ -727,18 +789,15 @@ export default function App() {
   }
 
   const persistCoachConnectionDetails = async (config: SyncConfig) => {
-    await storeSyncConfig(config)
-    applyConfig({ ...config, appPassword: '' })
+    await storeSharedConnection({ ...config, appPassword: '' }, 'coach')
   }
 
   const persistCoordinatorConnectionDetails = async (config: SyncConfig) => {
-    await storeCoordinatorSyncConfig(config)
-    setCoordinatorSyncConfig({ ...config, appPassword: '' })
+    await storeSharedConnection({ ...config, appPassword: '' }, 'coordinator')
   }
 
   const persistViewerConnectionDetails = async (config: SyncConfig) => {
-    await storeViewerSyncConfig(config)
-    setViewerSyncConfig({ ...config, appPassword: '' })
+    await storeSharedConnection({ ...config, appPassword: '' }, 'viewer')
   }
 
   const openSharedCoachTeam = async (
@@ -768,15 +827,14 @@ export default function App() {
     rememberSessionPassword('coach', config)
     await Promise.all([
       storeDocument(result.document),
-      storeSyncConfig(config),
       storeSyncMeta(result.meta),
       storeCoachOnboardingVersion(COACH_ONBOARDING_VERSION),
       storeCoachDocumentOrigin('coordinator-managed')
     ])
+    await storeSharedConnection(config, 'coach')
     await removeCoachFileHandle()
     coachFileHandleRef.current = undefined
     applyDocument(result.document)
-    applyConfig(config)
     applyMeta(result.meta)
     applyCoachDocumentOrigin('coordinator-managed')
     setSyncIndicator('synced')
@@ -835,7 +893,7 @@ export default function App() {
   }
 
   const loadCoachTeamChoices = async () => {
-    const currentConfig = configRef.current
+    const currentConfig = configRef.current ?? coordinatorSyncConfig ?? viewerSyncConfig
     if (!currentConfig) {
       setCoachTeamsError('Collegamento Nextcloud non configurato.')
       return
@@ -865,7 +923,7 @@ export default function App() {
   }
 
   const selectCoachTeam = async (team: TeamSummary) => {
-    const currentConfig = configRef.current
+    const currentConfig = configRef.current ?? coordinatorSyncConfig ?? viewerSyncConfig
     if (!currentConfig) throw new Error('Collegamento Nextcloud non configurato.')
     await openSharedCoachTeam(team, {
       ...currentConfig,
@@ -926,6 +984,25 @@ export default function App() {
 
   const initialNextcloudLink = nextcloudLinkFromRouteHash(window.location.hash)
   const initialNextcloudMode = nextcloudModeFromRouteHash(window.location.hash)
+  const sharedConnection = syncConfig ?? coordinatorSyncConfig ?? viewerSyncConfig
+  const effectiveRoleConfig = (
+    roleConfig: SyncConfig | undefined,
+    owner: CredentialOwner
+  ): SyncConfig | undefined => {
+    if (!roleConfig && !sharedConnection) return undefined
+    const target = roleConfig ?? { ...sharedConnection!, remoteFolder: '' }
+    const merged = sharedConnection
+      ? withSharedNextcloudConnection(target, sharedConnection)
+      : target
+    const password = merged.appPassword || loadSessionPassword(owner, merged)
+    return password ? { ...merged, appPassword: password } : merged
+  }
+  const effectiveCoachConfig = effectiveRoleConfig(syncConfig, 'coach')
+  const effectiveCoordinatorConfig = effectiveRoleConfig(
+    coordinatorSyncConfig,
+    'coordinator'
+  )
+  const effectiveViewerConfig = effectiveRoleConfig(viewerSyncConfig, 'viewer')
 
   if (sharedAccessBootstrap && initialNextcloudLink) {
     return renderPage(
@@ -967,7 +1044,7 @@ export default function App() {
             initialNextcloudLink &&
             !initialNextcloudMode &&
             viewerMode &&
-            !viewerSyncConfig
+            !effectiveViewerConfig
           ) {
             setSharedAccessBootstrap(true)
             navigate(
@@ -991,15 +1068,9 @@ export default function App() {
         creatingTeam={creatingCoordinatorTeam}
         managingTeams={managingCoordinatorTeams}
         onNavigate={navigate}
-        config={viewerMode ? viewerSyncConfig : coordinatorSyncConfig}
+        config={viewerMode ? effectiveViewerConfig : effectiveCoordinatorConfig}
         onSaveConfig={async (config) => {
-          if (viewerMode) {
-            await storeViewerSyncConfig(config)
-            setViewerSyncConfig(config)
-          } else {
-            await storeCoordinatorSyncConfig(config)
-            setCoordinatorSyncConfig(config)
-          }
+          await storeSharedConnection(config, viewerMode ? 'viewer' : 'coordinator')
         }}
         onPersistConnectionDetails={
           viewerMode
@@ -1037,7 +1108,7 @@ export default function App() {
   if (pathname === '/allenatore/squadra-condivisa') {
     return renderPage(
       <SharedTeamSetup
-        initialConfig={syncConfig}
+        initialConfig={effectiveCoachConfig}
         initialNextcloudLink={initialNextcloudLink}
         onRequestPassword={(config) => requestPassword('coach', config)}
         onOpen={openSharedCoachTeam}
@@ -1066,7 +1137,7 @@ export default function App() {
     return renderPage(
       <CoachOnboarding
         document={document}
-        syncConfig={syncConfig}
+        syncConfig={effectiveCoachConfig}
         onComplete={completeCoachOnboarding}
         onSkip={skipCoachOnboarding}
         onRestoreBackup={restoreCoachBackup}
@@ -1143,7 +1214,9 @@ export default function App() {
   const SyncIcon =
     syncIndicator === 'syncing' ? LoaderCircle : syncIndicator === 'pending' ? CloudOff : Cloud
   const canSwitchManagedCoachTeam =
-    coachDocumentOrigin === 'coordinator-managed' && Boolean(syncConfig)
+    (coachDocumentOrigin === 'coordinator-managed' ||
+      coachDocumentOrigin === 'development-demo') &&
+    Boolean(effectiveCoachConfig)
   const managedByCoordinator =
     coachDocumentOrigin === 'coordinator-managed' ||
     coachDocumentOrigin === 'coordinator-local'
@@ -1273,7 +1346,7 @@ export default function App() {
           {view === 'settings' && (
             <SyncSettings
               document={document}
-              config={syncConfig}
+              config={effectiveCoachConfig}
               meta={syncMeta}
               indicator={syncIndicator}
               onSaveConfig={saveConfig}
@@ -1286,7 +1359,7 @@ export default function App() {
               }
               managedByCoordinator={managedByCoordinator}
               onChooseTeam={
-                syncConfig
+                effectiveCoachConfig
                   ? () => navigate('/allenatore/squadra-condivisa')
                   : undefined
               }

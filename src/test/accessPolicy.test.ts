@@ -12,10 +12,11 @@ const cloudConfig = {
 }
 
 describe('politiche di accesso ai registri', () => {
-  it('attiva la sincronizzazione in background per ogni origine del registro', () => {
+  it('attiva la sincronizzazione solo per i registri collegati al cloud', () => {
     expect(allowsCoachBackgroundSync('coordinator-managed')).toBe(true)
     expect(allowsCoachBackgroundSync('self-managed')).toBe(true)
     expect(allowsCoachBackgroundSync('coordinator-local')).toBe(false)
+    expect(allowsCoachBackgroundSync('development-demo')).toBe(false)
   })
 
   it('considera soltanto i dati salvati per la modalità attiva', () => {

@@ -14,6 +14,7 @@ export type CoachDocumentOrigin =
   | 'self-managed'
   | 'coordinator-managed'
   | 'coordinator-local'
+  | 'development-demo'
 
 export interface AttendanceStatus {
   id: string

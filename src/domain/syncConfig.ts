@@ -104,6 +104,19 @@ export function configForLocalStorage(config: SyncConfig): SyncConfig {
   return { ...config, appPassword: '' }
 }
 
+export function withSharedNextcloudConnection(
+  target: SyncConfig,
+  source: SyncConfig
+): SyncConfig {
+  return {
+    ...target,
+    baseUrl: source.baseUrl,
+    username: source.username,
+    appPassword: source.appPassword,
+    folderLink: source.folderLink
+  }
+}
+
 export function metaForRestoredBackup(): LocalSyncMeta {
   return {
     dirty: true,

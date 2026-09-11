@@ -328,12 +328,24 @@ export function CoordinatorDashboard({
     let active = true
     loadCoordinatorTeamCache().then(async (cache) => {
       if (!active || freshTeamsLoaded.current) return
-      if (cache && cacheMatchesConfig(cache, config, accessMode)) {
+      const cloudConfigured = Boolean(config?.baseUrl && config.username)
+      const developmentCache = Boolean(
+        cache?.teams.length && cache.teams.every(isDevelopmentDemoTeam)
+      )
+      if (
+        cache &&
+        !(cloudConfigured && developmentCache) &&
+        cacheMatchesConfig(cache, config, accessMode)
+      ) {
         setTeams(cache.teams)
         setMessage(cachedDataMessage(cache))
         return
       }
-      if (import.meta.env.DEV && import.meta.env.VITE_DEV_DEMO_DATA !== 'false') {
+      if (
+        import.meta.env.DEV &&
+        import.meta.env.VITE_DEV_DEMO_DATA !== 'false' &&
+        !cloudConfigured
+      ) {
         const { developmentTeamSummaries } = await import('../dev/developmentData')
         if (!active || freshTeamsLoaded.current) return
         const demoTeams = developmentTeamSummaries()

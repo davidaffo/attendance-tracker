@@ -4,6 +4,7 @@ import { serializeTeamDocument } from '../domain/document'
 import { detailsFromNextcloudFolderLink } from '../domain/syncConfig'
 import {
   createRemoteTeamDocument,
+  deduplicateRemoteTeams,
   deleteRemoteTeamDocument,
   discoverAttendanceTrackerFolders,
   discoverRemoteTeamDocuments,
@@ -162,6 +163,31 @@ describe('scoperta dei registri in sola lettura', () => {
       'https://cloud.example.it/remote.php/dav/files/coordinatore/Condivisi/attendance-tracker'
     )
     expect(init?.method).toBe('PROPFIND')
+  })
+
+  it('unifica lo stesso registro restituito tramite più percorsi condivisi', async () => {
+    const document = createTeamDocument({
+      teamName: 'Under 14',
+      organizationName: 'Volley Club',
+      coachName: 'Mario',
+      startYear: 2026,
+      athleteNames: ['Anna']
+    })
+    const found = deduplicateRemoteTeams([
+      {
+        source: 'u14.attendance.json',
+        remoteFolder: '',
+        document
+      },
+      {
+        source: 'Condivisi/u14.attendance.json',
+        remoteFolder: 'Condivisi',
+        document: structuredClone(document)
+      }
+    ])
+
+    expect(found).toHaveLength(1)
+    expect(found[0].document.teamId).toBe(document.teamId)
   })
 })
 

@@ -1,6 +1,7 @@
 import { COACH_ONBOARDING_VERSION } from '../domain/defaults'
 import {
   loadCoordinatorTeamCache,
+  loadCoachDocumentOrigin,
   loadDocument,
   storeCoachDocumentOrigin,
   storeCoachOnboardingVersion,
@@ -14,9 +15,10 @@ import {
 } from './developmentData'
 
 export async function seedDevelopmentData(): Promise<void> {
-  const [storedDocument, storedTeamCache] = await Promise.all([
+  const [storedDocument, storedTeamCache, storedOrigin] = await Promise.all([
     loadDocument(),
-    loadCoordinatorTeamCache()
+    loadCoordinatorTeamCache(),
+    loadCoachDocumentOrigin()
   ])
   const writes: Promise<void>[] = []
 
@@ -25,8 +27,15 @@ export async function seedDevelopmentData(): Promise<void> {
       storeDocument(developmentCoachDocument()),
       storeSyncMeta({ dirty: false }),
       storeCoachOnboardingVersion(COACH_ONBOARDING_VERSION),
-      storeCoachDocumentOrigin('self-managed')
+      storeCoachDocumentOrigin('development-demo')
     )
+  } else if (
+    storedOrigin === 'self-managed' &&
+    developmentTeamSummaries().some(
+      (team) => team.document.teamId === storedDocument.teamId
+    )
+  ) {
+    writes.push(storeCoachDocumentOrigin('development-demo'))
   }
 
   if (!storedTeamCache) {

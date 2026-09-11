@@ -9,6 +9,7 @@ interface SessionCredential {
 }
 
 const storagePrefix = 'registro-presenze:nextcloud-session:v1:'
+const sharedCredentialKey = `${storagePrefix}account`
 
 function credentialKey(owner: CredentialOwner): string {
   return `${storagePrefix}${owner}`
@@ -34,14 +35,15 @@ export function loadSessionPassword(
   const storage = sessionStorageIfAvailable()
   if (!storage) return undefined
   try {
-    const owners: CredentialOwner[] = [
-      owner,
-      ...(['coach', 'coordinator', 'viewer'] as const).filter(
-        (candidate) => candidate !== owner
-      )
+    const keys = [
+      sharedCredentialKey,
+      credentialKey(owner),
+      ...(['coach', 'coordinator', 'viewer'] as const)
+        .filter((candidate) => candidate !== owner)
+        .map(credentialKey)
     ]
-    for (const candidate of owners) {
-      const serialized = storage.getItem(credentialKey(candidate))
+    for (const key of keys) {
+      const serialized = storage.getItem(key)
       if (!serialized) continue
       const credential = JSON.parse(serialized) as Partial<SessionCredential>
       if (
@@ -68,7 +70,7 @@ export function rememberSessionPassword(
   if (!storage) return
   try {
     storage.setItem(
-      credentialKey(owner),
+      sharedCredentialKey,
       JSON.stringify({
         baseUrl: normalizedBaseUrl(config.baseUrl),
         username: config.username.trim(),
@@ -80,11 +82,14 @@ export function rememberSessionPassword(
   }
 }
 
-export function forgetSessionPassword(owner: CredentialOwner): void {
+export function forgetSessionPassword(_owner: CredentialOwner): void {
   const storage = sessionStorageIfAvailable()
   if (!storage) return
   try {
-    storage.removeItem(credentialKey(owner))
+    storage.removeItem(sharedCredentialKey)
+    for (const candidate of ['coach', 'coordinator', 'viewer'] as const) {
+      storage.removeItem(credentialKey(candidate))
+    }
   } catch {
     // Nessuna sessione da cancellare se lo storage non è disponibile.
   }
@@ -94,6 +99,7 @@ export function clearSessionPasswords(): void {
   const storage = sessionStorageIfAvailable()
   if (!storage) return
   try {
+    storage.removeItem(sharedCredentialKey)
     for (const owner of ['coach', 'coordinator', 'viewer'] as const) {
       storage.removeItem(credentialKey(owner))
     }

@@ -7,6 +7,17 @@ import { isTeamDocument } from '../domain/document'
 import type { TeamDocument, TeamSummary } from '../domain/types'
 
 const rawDocuments: unknown[] = [serieD, under12, under14, under16, under18]
+const developmentTeamIds = new Set([
+  'serie-d-aurora',
+  'under-12-blu',
+  'under-14-rossa',
+  'under-16-verde',
+  'under-18-gialla'
+])
+
+export function isDevelopmentTeamDocument(document: TeamDocument): boolean {
+  return developmentTeamIds.has(document.teamId)
+}
 
 function demoDocuments(): TeamDocument[] {
   if (!rawDocuments.every(isTeamDocument)) {

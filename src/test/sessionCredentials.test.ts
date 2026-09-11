@@ -2,6 +2,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import type { SyncConfig } from '../domain/types'
 import {
   clearSessionPasswords,
+  forgetSessionPassword,
   loadSessionPassword,
   rememberSessionPassword
 } from '../services/sessionCredentials'
@@ -71,6 +72,13 @@ describe('password Nextcloud della sessione browser', () => {
         appPassword: ''
       })
     ).toBeUndefined()
+  })
+
+  it('dimentica la password condivisa da qualunque modalità', () => {
+    rememberSessionPassword('coach', config)
+    forgetSessionPassword('viewer')
+
+    expect(loadSessionPassword('coordinator', { ...config, appPassword: '' })).toBeUndefined()
   })
 
   it('cancella tutte le password quando si resetta la PWA', () => {

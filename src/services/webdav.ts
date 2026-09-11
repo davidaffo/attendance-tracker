@@ -135,6 +135,45 @@ function documentsAreEqual(first: TeamDocument, second: TeamDocument): boolean {
   return serializeTeamDocument(first) === serializeTeamDocument(second)
 }
 
+function teamDocumentIdentity(team: TeamSummary): string {
+  return [
+    team.document.teamId,
+    team.document.season.startYear,
+    team.document.season.endYear
+  ].join('|')
+}
+
+export function deduplicateRemoteTeams(teams: TeamSummary[]): TeamSummary[] {
+  const unique: TeamSummary[] = []
+  const aliases = new Map<string, string[]>()
+  for (const team of teams) {
+    const identity = teamDocumentIdentity(team)
+    const duplicate = unique.find(
+      (candidate) =>
+        teamDocumentIdentity(candidate) === identity &&
+        documentsAreEqual(candidate.document, team.document)
+    )
+    if (!duplicate) {
+      unique.push(team)
+      aliases.set(identity, [team.source])
+      continue
+    }
+    aliases.get(identity)?.push(team.source)
+  }
+
+  if (import.meta.env.DEV) {
+    for (const [identity, sources] of aliases) {
+      if (sources.length > 1) {
+        console.warn('Registro Nextcloud duplicato nella risposta WebDAV', {
+          identity,
+          sources
+        })
+      }
+    }
+  }
+  return unique
+}
+
 function syncedMeta(
   etag: string | undefined,
   conditionalWrites: boolean | undefined
@@ -274,13 +313,15 @@ async function teamDocumentsFromDavResponse(
       }
     })
     .map((href) => new URL(href, config.baseUrl).toString())
+  const uniqueFileUrls = [...new Set(fileUrls)]
 
   const documents = await Promise.all(
-    fileUrls.map(async (url): Promise<TeamSummary | undefined> => {
+    uniqueFileUrls.map(async (url): Promise<TeamSummary | undefined> => {
       const file = await davFetch(config, url, { method: 'GET' })
       if (!file.ok) return undefined
       try {
-        const source = decodeURIComponent(new URL(url).pathname.split('/').pop() ?? url)
+        const source = remoteResourcePath(config, url) ??
+          decodeURIComponent(new URL(url).pathname.split('/').pop() ?? url)
         return {
           source,
           remoteFolder: remoteFolderFromDocumentUrl(config, url),
@@ -292,8 +333,9 @@ async function teamDocumentsFromDavResponse(
     })
   )
 
-  return documents
-    .filter((entry): entry is TeamSummary => Boolean(entry))
+  return deduplicateRemoteTeams(
+    documents.filter((entry): entry is TeamSummary => Boolean(entry))
+  )
     .sort((a, b) => a.document.teamName.localeCompare(b.document.teamName))
 }
 

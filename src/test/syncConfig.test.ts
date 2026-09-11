@@ -8,7 +8,8 @@ import {
   metaForRestoredBackup,
   nextcloudLinkFromRouteHash,
   nextcloudModeFromRouteHash,
-  nextcloudQuickAccessUrl
+  nextcloudQuickAccessUrl,
+  withSharedNextcloudConnection
 } from '../domain/syncConfig'
 
 const config = {
@@ -34,6 +35,24 @@ describe('persistenza configurazione cloud', () => {
       username: config.username,
       remoteFolder: config.remoteFolder,
       folderLink: config.folderLink
+    })
+  })
+
+  it('condivide account e link conservando la cartella specifica del ruolo', () => {
+    expect(withSharedNextcloudConnection(
+      { ...config, remoteFolder: 'squadra-u14' },
+      {
+        ...config,
+        baseUrl: 'https://nuovo-cloud.example.it',
+        username: 'account-unico',
+        appPassword: 'nuova-password',
+        remoteFolder: 'cartella-coordinatore'
+      }
+    )).toMatchObject({
+      baseUrl: 'https://nuovo-cloud.example.it',
+      username: 'account-unico',
+      appPassword: 'nuova-password',
+      remoteFolder: 'squadra-u14'
     })
   })
 })
