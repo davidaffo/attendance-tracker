@@ -254,8 +254,8 @@ export function athleteScoreForSession(
   const status = document.statuses.find((candidate) => candidate.id === statusId)
   if (status?.code.toLocaleUpperCase() === 'A') return 0
   const team = session.score?.assignments[athleteId]
-  if (!team) return 0
-  return scoreTeamTotal(session.score, team) + (session.score?.adjustments[athleteId] ?? 0)
+  return (team ? scoreTeamTotal(session.score, team) : 0) +
+    (session.score?.adjustments[athleteId] ?? 0)
 }
 
 export interface AthleteScoreTotal {
@@ -273,7 +273,11 @@ export function scoreRanking(
     : document.sessions
   return document.athletes
     .map((athlete) => {
-      const scored = sessions.filter((session) => session.score?.assignments[athlete.id])
+      const scored = sessions.filter(
+        (session) =>
+          Boolean(session.score?.assignments[athlete.id]) ||
+          Object.prototype.hasOwnProperty.call(session.score?.adjustments ?? {}, athlete.id)
+      )
       return {
         athleteId: athlete.id,
         points: scored.reduce(

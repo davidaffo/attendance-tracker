@@ -325,21 +325,11 @@ function ScoreEditor({
     setDraft((current) => {
       const teamPoints = { ...current.teamPoints }
       delete teamPoints[team]
-      const removedAthletes = new Set(
-        Object.entries(current.assignments)
-          .filter(([, assignedTeam]) => assignedTeam === team)
-          .map(([athleteId]) => athleteId)
-      )
       return {
         ...current,
         teamPoints,
         assignments: Object.fromEntries(
           Object.entries(current.assignments).filter(([, assignedTeam]) => assignedTeam !== team)
-        ),
-        adjustments: Object.fromEntries(
-          Object.entries(current.adjustments).filter(
-            ([athleteId]) => !removedAthletes.has(athleteId)
-          )
         )
       }
     })
@@ -647,11 +637,11 @@ function ScoreEditor({
                   </select>
                 </label>
                 <label>
-                  <span>Correzione</span>
+                  <span>Punti individuali</span>
                   <input
                     type="number"
                     step="1"
-                    disabled={absent || !draft.assignments[athlete.id]}
+                    disabled={absent}
                     value={draft.adjustments[athlete.id] ?? 0}
                     onChange={(event) => setDraft((current) => ({
                       ...current,
