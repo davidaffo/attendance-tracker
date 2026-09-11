@@ -43,7 +43,7 @@ export interface TrainingSession {
   updatedBy?: string
 }
 
-export type ScoreTeam = 'a' | 'b'
+export type ScoreTeam = string
 
 export interface SessionScore {
   teamPoints: Record<ScoreTeam, number[]>

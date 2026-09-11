@@ -3,7 +3,9 @@ import {
   ArrowLeft,
   ChevronLeft,
   ChevronRight,
+  Plus,
   Save,
+  Trash2,
   Trophy,
   Users,
   X
@@ -54,6 +56,23 @@ function seasonMonths(document: TeamDocument): Array<{ value: string; label: str
 
 function emptyScore(): Pick<SessionScore, 'teamPoints' | 'assignments' | 'adjustments'> {
   return { teamPoints: { a: [], b: [] }, assignments: {}, adjustments: {} }
+}
+
+function scoreTeamLabel(team: ScoreTeam): string {
+  return team.toLocaleUpperCase('it-IT')
+}
+
+function nextScoreTeamId(teams: ScoreTeam[]): ScoreTeam {
+  for (let index = 0; ; index += 1) {
+    let value = index + 1
+    let label = ''
+    while (value > 0) {
+      value -= 1
+      label = String.fromCharCode(97 + (value % 26)) + label
+      value = Math.floor(value / 26)
+    }
+    if (!teams.includes(label)) return label
+  }
 }
 
 export function Scores({ document, initialSessionId, readOnly = false, onSave }: ScoresProps) {
@@ -284,6 +303,57 @@ function ScoreEditor({
   const absentStatusId = document.statuses.find(
     (status) => status.code.toLocaleUpperCase() === 'A'
   )?.id
+  const scoreTeams = Object.keys(draft.teamPoints)
+
+  const addTeam = () => {
+    const team = nextScoreTeamId(scoreTeams)
+    setDraft((current) => ({
+      ...current,
+      teamPoints: { ...current.teamPoints, [team]: [] }
+    }))
+    setQuickNames((current) => ({ ...current, [team]: '' }))
+    setPartialInputs((current) => ({ ...current, [team]: '' }))
+  }
+
+  const removeTeam = (team: ScoreTeam) => {
+    if (scoreTeams.length <= 1) return
+    const hasData = draft.teamPoints[team].length > 0 ||
+      Object.values(draft.assignments).some((assignedTeam) => assignedTeam === team)
+    if (hasData && !window.confirm(
+      `Rimuovere la Squadra ${scoreTeamLabel(team)} e tutti i suoi dati da questa sessione?`
+    )) return
+    setDraft((current) => {
+      const teamPoints = { ...current.teamPoints }
+      delete teamPoints[team]
+      const removedAthletes = new Set(
+        Object.entries(current.assignments)
+          .filter(([, assignedTeam]) => assignedTeam === team)
+          .map(([athleteId]) => athleteId)
+      )
+      return {
+        ...current,
+        teamPoints,
+        assignments: Object.fromEntries(
+          Object.entries(current.assignments).filter(([, assignedTeam]) => assignedTeam !== team)
+        ),
+        adjustments: Object.fromEntries(
+          Object.entries(current.adjustments).filter(
+            ([athleteId]) => !removedAthletes.has(athleteId)
+          )
+        )
+      }
+    })
+    setQuickNames((current) => {
+      const next = { ...current }
+      delete next[team]
+      return next
+    })
+    setPartialInputs((current) => {
+      const next = { ...current }
+      delete next[team]
+      return next
+    })
+  }
 
   const setTeamPoints = (team: ScoreTeam, points: number[]) => {
     setDraft((current) => ({
@@ -293,7 +363,7 @@ function ScoreEditor({
   }
 
   const addPartial = (team: ScoreTeam) => {
-    const rawValue = partialInputs[team].trim().replace(',', '.')
+    const rawValue = (partialInputs[team] ?? '').trim().replace(',', '.')
     if (!rawValue) return
     const points = Number(rawValue)
     if (!Number.isFinite(points)) return
@@ -326,16 +396,16 @@ function ScoreEditor({
     }
     assign(match.athlete.id, team)
     setQuickNames((current) => ({ ...current, [team]: '' }))
-    setAssignmentMessage(`${match.athlete.name} inserita nella Squadra ${team.toUpperCase()}.`)
+    setAssignmentMessage(`${match.athlete.name} inserita nella Squadra ${scoreTeamLabel(team)}.`)
     return true
   }
 
   const applyPastedAssignments = () => {
-    const parsed = parseTeamAssignments(pasteText)
+    const parsed = parseTeamAssignments(pasteText, scoreTeams)
     const assignments = { ...draft.assignments }
     const problems: string[] = []
     let assigned = 0
-    for (const team of ['a', 'b'] as const) {
+    for (const team of scoreTeams) {
       for (const query of parsed[team]) {
         const match = matchAthleteByName(athletes, query)
         if (!match.athlete) {
@@ -390,11 +460,18 @@ function ScoreEditor({
         </button>
       </div>
 
+      <div className="score-teams-toolbar">
+        <h2>Squadre</h2>
+        <button className="button secondary compact" type="button" onClick={addTeam}>
+          <Plus size={17} /> Aggiungi squadra
+        </button>
+      </div>
       <section className="score-teams-grid">
-        {(['a', 'b'] as const).map((team) => (
+        {scoreTeams.map((team, teamIndex) => (
           <div
             className={`panel score-team-card team-${team}${draggedAthleteId ? ' drag-active' : ''}`}
             key={team}
+            style={{ borderTopColor: `hsl(${(215 + teamIndex * 83) % 360} 48% 50%)` }}
             onDragOver={(event) => event.preventDefault()}
             onDrop={(event) => {
               event.preventDefault()
@@ -406,14 +483,24 @@ function ScoreEditor({
             }}
           >
             <div className="score-team-heading">
-              <div><Users size={19} /><h2>Squadra {team.toUpperCase()}</h2></div>
-              <strong>{scoreTeamTotal(draft as SessionScore, team)} pt</strong>
+              <div><Users size={19} /><h2>Squadra {scoreTeamLabel(team)}</h2></div>
+              <div className="score-team-heading-actions">
+                <strong>{scoreTeamTotal(draft as SessionScore, team)} pt</strong>
+                {scoreTeams.length > 1 && (
+                  <button
+                    className="icon-button quiet"
+                    type="button"
+                    onClick={() => removeTeam(team)}
+                    aria-label={`Rimuovi Squadra ${scoreTeamLabel(team)}`}
+                  ><Trash2 size={16} /></button>
+                )}
+              </div>
             </div>
             <label className="score-quick-add">
               <span>Aggiungi rapidamente</span>
               <input
                 list={`score-athletes-${team}`}
-                value={quickNames[team]}
+                value={quickNames[team] ?? ''}
                 placeholder="Nome o cognome, poi Invio"
                 onChange={(event) => {
                   const value = event.target.value
@@ -430,14 +517,14 @@ function ScoreEditor({
                 onKeyDown={(event) => {
                   if (event.key !== 'Enter') return
                   event.preventDefault()
-                  assignByName(quickNames[team], team)
+                  assignByName(quickNames[team] ?? '', team)
                 }}
               />
               <datalist id={`score-athletes-${team}`}>
                 {athletes.map((athlete) => <option key={athlete.id} value={athlete.name} />)}
               </datalist>
             </label>
-            <div className="score-team-members" aria-label={`Atlete Squadra ${team.toUpperCase()}`}>
+            <div className="score-team-members" aria-label={`Atlete Squadra ${scoreTeamLabel(team)}`}>
               {athletes.filter((athlete) =>
                 draft.assignments[athlete.id] === team &&
                 session.attendances[athlete.id] !== absentStatusId
@@ -456,7 +543,7 @@ function ScoreEditor({
                   {athlete.name}
                   <button
                     type="button"
-                    aria-label={`Rimuovi ${athlete.name} dalla Squadra ${team.toUpperCase()}`}
+                    aria-label={`Rimuovi ${athlete.name} dalla Squadra ${scoreTeamLabel(team)}`}
                     onClick={() => assign(athlete.id, '')}
                   ><X size={13} /></button>
                 </span>
@@ -472,9 +559,9 @@ function ScoreEditor({
                 <input
                   type="text"
                   inputMode="decimal"
-                  value={partialInputs[team]}
+                  value={partialInputs[team] ?? ''}
                   placeholder="0"
-                  aria-label={`Nuovo parziale Squadra ${team.toUpperCase()}`}
+                  aria-label={`Nuovo parziale Squadra ${scoreTeamLabel(team)}`}
                   onChange={(event) => setPartialInputs((current) => ({
                     ...current,
                     [team]: event.target.value
@@ -487,8 +574,8 @@ function ScoreEditor({
                 />
                 <small>Premi Invio</small>
               </label>
-              <div className="score-partial-toasts" aria-label={`Parziali Squadra ${team.toUpperCase()}`}>
-                {draft.teamPoints[team].map((points, index) => (
+              <div className="score-partial-toasts" aria-label={`Parziali Squadra ${scoreTeamLabel(team)}`}>
+                {(draft.teamPoints[team] ?? []).map((points, index) => (
                   <span className="score-partial-toast" key={index}>
                     <b>{points}</b>
                     <button
@@ -510,10 +597,10 @@ function ScoreEditor({
 
       <section className="panel score-bulk-assignment">
         <div>
-          <h2>Incolla le due squadre</h2>
+          <h2>Incolla le squadre</h2>
           <p>
-            Prima riga Squadra A, seconda riga Squadra B. Separa i nomi con virgole,
-            punto e virgola o tab. Sono accettate anche tabelle Markdown con colonne A/B.
+            Una riga per ogni squadra, nello stesso ordine mostrato sopra. Separa i nomi
+            con virgole, punto e virgola o tab. Sono accettate anche tabelle Markdown.
           </p>
         </div>
         <textarea
@@ -554,8 +641,9 @@ function ScoreEditor({
                     onChange={(event) => assign(athlete.id, event.target.value as ScoreTeam | '')}
                   >
                     <option value="">—</option>
-                    <option value="a">A</option>
-                    <option value="b">B</option>
+                    {scoreTeams.map((team) => (
+                      <option key={team} value={team}>{scoreTeamLabel(team)}</option>
+                    ))}
                   </select>
                 </label>
                 <label>

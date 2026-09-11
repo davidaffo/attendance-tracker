@@ -1681,6 +1681,22 @@ h2 {
   gap: 1rem;
 }
 
+.score-teams-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 0.75rem;
+}
+
+.score-teams-toolbar h2 {
+  margin: 0;
+}
+
+.score-team-card {
+  border-top: 4px solid var(--green-2);
+}
+
 .score-team-card.team-a {
   border-top: 4px solid #4d70b7;
 }
@@ -1702,6 +1718,16 @@ h2 {
 }
 
 .score-team-heading > strong {
+  font-size: 1.35rem;
+}
+
+.score-team-heading-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.score-team-heading-actions > strong {
   font-size: 1.35rem;
 }
 
@@ -4389,6 +4415,11 @@ html[data-theme='dark'] .sharing-cors-help code {
 }
 
 @media (max-width: 580px) {
+  .score-teams-toolbar {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
   .scores-title-row,
   .score-ranking-heading,
   .score-editor-header {

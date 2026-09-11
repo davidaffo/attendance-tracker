@@ -192,6 +192,31 @@ describe('documento squadra', () => {
     expect(isTeamDocument(document)).toBe(true)
   })
 
+  it('salva e valida più di due squadre nei punteggi', () => {
+    let document = createTeamDocument({
+      teamName: 'U14',
+      organizationName: 'Volley Club',
+      coachName: 'Mario',
+      startYear: 2026,
+      athleteNames: ['Anna']
+    })
+    const athlete = document.athletes[0]
+    document = saveSession(document, {
+      id: 'session-1',
+      date: '2026-09-07',
+      attendances: { [athlete.id]: 'present' }
+    }, 'Mario')
+    document = saveSessionScore(document, 'session-1', {
+      teamPoints: { a: [], b: [], c: [21] },
+      assignments: { [athlete.id]: 'c' },
+      adjustments: {}
+    }, 'Mario')
+
+    expect(document.sessions[0].score?.teamPoints.c).toEqual([21])
+    expect(athleteScoreForSession(document, document.sessions[0], athlete.id)).toBe(21)
+    expect(isTeamDocument(document)).toBe(true)
+  })
+
   it('conserva i punteggi quando vengono corrette le presenze della sessione', () => {
     let document = createTeamDocument({
       teamName: 'U14',

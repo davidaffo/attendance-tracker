@@ -49,47 +49,54 @@ function isSeparatorRow(cells: string[]): boolean {
   return cells.length > 0 && cells.every((cell) => /^:?-{3,}:?$/.test(cell))
 }
 
-function teamLabel(value: string): ScoreTeam | undefined {
+function teamLabel(value: string, teams: ScoreTeam[]): ScoreTeam | undefined {
   const normalized = normalizeName(value).replace(/^squadra\s+/, '')
-  return normalized === 'a' ? 'a' : normalized === 'b' ? 'b' : undefined
+  return teams.find((team) => normalizeName(team) === normalized)
 }
 
-export function parseTeamAssignments(text: string): Record<ScoreTeam, string[]> {
+export function parseTeamAssignments(
+  text: string,
+  teams: ScoreTeam[] = ['a', 'b']
+): Record<ScoreTeam, string[]> {
   const rows = text
     .split(/\r?\n/)
     .map(cellsForLine)
     .filter((cells) => cells.length && !isSeparatorRow(cells))
-  const result: Record<ScoreTeam, string[]> = { a: [], b: [] }
+  const result: Record<ScoreTeam, string[]> = Object.fromEntries(
+    teams.map((team) => [team, []])
+  )
   if (!rows.length) return result
 
-  const headerA = rows[0].findIndex((cell) => teamLabel(cell) === 'a')
-  const headerB = rows[0].findIndex((cell) => teamLabel(cell) === 'b')
-  if (headerA >= 0 && headerB >= 0) {
+  const headers = rows[0]
+    .map((cell, index) => ({ team: teamLabel(cell, teams), index }))
+    .filter((header): header is { team: ScoreTeam; index: number } => Boolean(header.team))
+  if (headers.length >= 2) {
     for (const cells of rows.slice(1)) {
-      if (cells[headerA]) result.a.push(cells[headerA])
-      if (cells[headerB]) result.b.push(cells[headerB])
+      for (const header of headers) {
+        if (cells[header.index]) result[header.team].push(cells[header.index])
+      }
     }
     return result
   }
 
-  const labelledRows = rows.filter((cells) => teamLabel(cells[0]))
+  const labelledRows = rows.filter((cells) => teamLabel(cells[0], teams))
   if (labelledRows.length) {
     for (const cells of labelledRows) {
-      const team = teamLabel(cells[0])!
+      const team = teamLabel(cells[0], teams)!
       result[team].push(...cells.slice(1))
     }
     return result
   }
 
-  if (rows.length === 2) {
-    result.a.push(...rows[0])
-    result.b.push(...rows[1])
+  if (rows.length === teams.length) {
+    rows.forEach((cells, index) => result[teams[index]].push(...cells))
     return result
   }
 
   for (const cells of rows) {
-    if (cells[0]) result.a.push(cells[0])
-    if (cells[1]) result.b.push(cells[1])
+    teams.forEach((team, index) => {
+      if (cells[index]) result[team].push(cells[index])
+    })
   }
   return result
 }

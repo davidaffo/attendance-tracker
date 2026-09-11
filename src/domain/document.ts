@@ -62,11 +62,15 @@ function isSessionScore(value: unknown): value is SessionScore {
   if (!isRecord(value) || !isRecord(value.teamPoints)) return false
   const validPoints = (points: unknown) =>
     Array.isArray(points) && points.every((point) => typeof point === 'number' && Number.isFinite(point))
+  const teamIds = Object.keys(value.teamPoints)
   return (
-    validPoints(value.teamPoints.a) &&
-    validPoints(value.teamPoints.b) &&
+    teamIds.length > 0 &&
+    teamIds.every((team) => team.trim().length > 0) &&
+    Object.values(value.teamPoints).every(validPoints) &&
     isRecord(value.assignments) &&
-    Object.values(value.assignments).every((team) => team === 'a' || team === 'b') &&
+    Object.values(value.assignments).every(
+      (team) => typeof team === 'string' && teamIds.includes(team)
+    ) &&
     isRecord(value.adjustments) &&
     Object.values(value.adjustments).every(
       (adjustment) => typeof adjustment === 'number' && Number.isFinite(adjustment)
@@ -210,10 +214,9 @@ export function saveSessionScore(
   if (!existing) throw new Error('L’allenamento non esiste più.')
   const now = new Date().toISOString()
   const score: SessionScore = {
-    teamPoints: {
-      a: [...input.teamPoints.a],
-      b: [...input.teamPoints.b]
-    },
+    teamPoints: Object.fromEntries(
+      Object.entries(input.teamPoints).map(([team, points]) => [team, [...points]])
+    ),
     assignments: { ...input.assignments },
     adjustments: { ...input.adjustments },
     updatedAt: now,

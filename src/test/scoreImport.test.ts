@@ -42,4 +42,11 @@ describe('assegnazione rapida delle squadre', () => {
       '| Squadra A | Anna Rossi | Bianca Verdi |\n| Squadra B | Carla Rossi |'
     )).toEqual({ a: ['Anna Rossi', 'Bianca Verdi'], b: ['Carla Rossi'] })
   })
+
+  it('legge anche squadre aggiuntive', () => {
+    expect(parseTeamAssignments(
+      '| Squadra A | Squadra B | Squadra C |\n|---|---|---|\n| Anna | Bianca | Carla |',
+      ['a', 'b', 'c']
+    )).toEqual({ a: ['Anna'], b: ['Bianca'], c: ['Carla'] })
+  })
 })
