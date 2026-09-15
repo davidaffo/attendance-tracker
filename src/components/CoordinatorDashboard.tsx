@@ -910,12 +910,10 @@ export function CoordinatorDashboard({
           <div className="coordinator-detail-actions">
             <button
               className="button ghost report-back"
-              onClick={() =>
-                onNavigate(isViewer ? basePath : '/coordinatore/gestione-squadre')
-              }
+              onClick={() => onNavigate(basePath)}
             >
               <ArrowLeft size={17} />
-              Torna ai registri
+              {isViewer ? 'Torna ai registri' : 'Torna ai riepiloghi'}
             </button>
             {!isViewer && canWriteTeam(selectedTeam) && (
               <button

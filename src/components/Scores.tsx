@@ -370,6 +370,28 @@ function ScoreEditor({
     })
   }
 
+  const assignRemaining = (team: ScoreTeam) => {
+    const remaining = athletes.filter(
+      (athlete) =>
+        !draft.assignments[athlete.id] &&
+        session.attendances[athlete.id] !== absentStatusId
+    )
+    if (!remaining.length) {
+      setAssignmentMessage('Non ci sono atlete rimaste senza squadra.')
+      return
+    }
+    setDraft((current) => ({
+      ...current,
+      assignments: {
+        ...current.assignments,
+        ...Object.fromEntries(remaining.map((athlete) => [athlete.id, team]))
+      }
+    }))
+    setAssignmentMessage(
+      `${remaining.length} ${remaining.length === 1 ? 'atleta aggiunta' : 'atlete aggiunte'} alla Squadra ${scoreTeamLabel(team)}.`
+    )
+  }
+
   const assignByName = (query: string, team: ScoreTeam): boolean => {
     const match = matchAthleteByName(athletes, query)
     if (!match.athlete) {
@@ -514,6 +536,18 @@ function ScoreEditor({
                 {athletes.map((athlete) => <option key={athlete.id} value={athlete.name} />)}
               </datalist>
             </label>
+            <button
+              className="button secondary compact score-add-remaining"
+              type="button"
+              disabled={!athletes.some(
+                (athlete) =>
+                  !draft.assignments[athlete.id] &&
+                  session.attendances[athlete.id] !== absentStatusId
+              )}
+              onClick={() => assignRemaining(team)}
+            >
+              <Users size={16} /> Aggiungi atlete rimanenti
+            </button>
             <div className="score-team-members" aria-label={`Atlete Squadra ${scoreTeamLabel(team)}`}>
               {athletes.filter((athlete) =>
                 draft.assignments[athlete.id] === team &&

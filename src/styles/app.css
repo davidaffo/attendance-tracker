@@ -1769,6 +1769,11 @@ h2 {
   box-shadow: 0 0 0 3px rgba(47, 125, 104, 0.12);
 }
 
+.score-add-remaining {
+  width: 100%;
+  margin-top: 0.55rem;
+}
+
 .score-team-members {
   display: flex;
   min-height: 42px;
