@@ -2570,12 +2570,21 @@ h2 {
 }
 
 .color-scale-cell {
-  color: #17201c;
+  color: var(--ink);
 }
 
 .attendance-matrix .color-scale-cell strong,
 .attendance-matrix .color-scale-cell span {
-  color: #17201c;
+  color: var(--ink);
+}
+
+.attendance-matrix :is(.total-cell, .season-total-cell).color-scale-cell,
+.team-status-totals span.color-scale-cell {
+  background-color: color-mix(
+    in srgb,
+    var(--paper) 76%,
+    var(--percentage-scale-color) 24%
+  );
 }
 
 .attendance-matrix .season-status-head {

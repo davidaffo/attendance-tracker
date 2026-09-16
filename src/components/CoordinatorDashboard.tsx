@@ -1,4 +1,11 @@
-import { useEffect, useRef, useState, type ChangeEvent, type FormEvent } from 'react'
+import {
+  useEffect,
+  useRef,
+  useState,
+  type ChangeEvent,
+  type CSSProperties,
+  type FormEvent
+} from 'react'
 import {
   ArrowLeft,
   ChevronRight,
@@ -1211,7 +1218,11 @@ export function CoordinatorDashboard({
                                 className={scaleColor ? 'color-scale-cell' : undefined}
                                 key={status.id}
                                 title={`${status.label}: ${Math.round(percentage)}%`}
-                                style={scaleColor ? { backgroundColor: scaleColor } : undefined}
+                                style={
+                                  scaleColor
+                                    ? ({ '--percentage-scale-color': scaleColor } as CSSProperties)
+                                    : undefined
+                                }
                               >
                                 <i style={{ background: status.color }}>{status.code}</i>
                                 <b>{Math.round(percentage)}%</b>

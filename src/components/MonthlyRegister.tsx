@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useMemo, useState, type CSSProperties } from 'react'
 import { CalendarDays, CalendarRange, Plus, Users } from 'lucide-react'
 import type { TeamDocument, TrainingSession } from '../domain/types'
 import {
@@ -263,7 +263,11 @@ function MonthMatrix({ document, sessions, athletes, onEditSession }: MatrixProp
                       <td
                         className={`total-cell${scaleColor ? ' color-scale-cell' : ''}`}
                         key={status.id}
-                        style={scaleColor ? { backgroundColor: scaleColor } : undefined}
+                        style={
+                          scaleColor
+                            ? ({ '--percentage-scale-color': scaleColor } as CSSProperties)
+                            : undefined
+                        }
                       >
                         <strong>{totals[status.id]}</strong>
                         <span>{Math.round(percentage)}%</span>
@@ -354,7 +358,11 @@ function SeasonOverview({
                       <td
                         className={`season-total-cell${scaleColor ? ' color-scale-cell' : ''}`}
                         key={status.id}
-                        style={scaleColor ? { backgroundColor: scaleColor } : undefined}
+                        style={
+                          scaleColor
+                            ? ({ '--percentage-scale-color': scaleColor } as CSSProperties)
+                            : undefined
+                        }
                       >
                         <strong>{count}</strong>
                         <span>{Math.round(percentage)}%</span>
