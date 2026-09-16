@@ -62,7 +62,7 @@ export function AttendanceEditor({
     })
   }
 
-  const save = async (afterSave: () => void = onClose) => {
+  const save = async (afterSave?: () => void) => {
     setSaving(true)
     setError('')
     try {
@@ -72,7 +72,7 @@ export function AttendanceEditor({
         attendances,
         earlyDepartures
       })
-      afterSave()
+      afterSave?.()
     } catch (caught) {
       setError(caught instanceof Error ? caught.message : 'Non è stato possibile salvare.')
     } finally {
@@ -105,7 +105,7 @@ export function AttendanceEditor({
               disabled={saving}
             >
               <Trophy size={17} />
-              <span>Punteggi</span>
+              <span>Salva e punteggi</span>
             </button>
           )}
           <button className="button primary compact" onClick={() => void save()} disabled={saving}>
