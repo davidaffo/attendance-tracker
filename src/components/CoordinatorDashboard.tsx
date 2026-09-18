@@ -1185,7 +1185,7 @@ export function CoordinatorDashboard({
                   const { source, document } = team
                   const totals = totalsForDocument(document)
                   const athletes = document.athletes.filter((athlete) => athlete.active).length
-                  const possibleAttendances = totals.sessions * document.athletes.length
+                  const possibleAttendances = totals.sessions * athletes
                   return (
                     <article className="team-summary-card" key={source}>
                         <div className="team-card-heading">

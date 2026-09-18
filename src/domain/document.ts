@@ -272,6 +272,7 @@ export function scoreRanking(
     ? document.sessions.filter((session) => session.date.startsWith(`${month}-`))
     : document.sessions
   return document.athletes
+    .filter((athlete) => athlete.active)
     .map((athlete) => {
       const scored = sessions.filter(
         (session) =>
@@ -376,12 +377,18 @@ function mergeTrainingSession(
 
 export function totalsForDocument(document: TeamDocument): TeamTotals {
   const byStatus = Object.fromEntries(document.statuses.map((status) => [status.id, 0]))
+  const activeAthleteIds = new Set(
+    document.athletes.filter((athlete) => athlete.active).map((athlete) => athlete.id)
+  )
   let earlyDepartures = 0
   for (const session of document.sessions) {
-    for (const statusId of Object.values(session.attendances)) {
+    for (const [athleteId, statusId] of Object.entries(session.attendances)) {
+      if (!activeAthleteIds.has(athleteId)) continue
       byStatus[statusId] = (byStatus[statusId] ?? 0) + 1
     }
-    earlyDepartures += (session.earlyDepartures ?? []).length
+    earlyDepartures += (session.earlyDepartures ?? []).filter((athleteId) =>
+      activeAthleteIds.has(athleteId)
+    ).length
   }
   return { sessions: document.sessions.length, byStatus, earlyDepartures }
 }
@@ -480,7 +487,7 @@ export function sessionsInMonth(
 }
 
 export function athletesForReport(document: TeamDocument): Athlete[] {
-  return [...document.athletes].sort(compareAthletesByName)
+  return document.athletes.filter((athlete) => athlete.active).sort(compareAthletesByName)
 }
 
 export function compareAthletesByName(a: Athlete, b: Athlete): number {

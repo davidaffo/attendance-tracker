@@ -207,9 +207,7 @@ function ScoreSessionViewer({
   session: TrainingSession
   onBack: () => void
 }) {
-  const athletes = athletesForReport(document).filter(
-    (athlete) => athlete.active || athlete.id in session.attendances
-  )
+  const athletes = athletesForReport(document)
   const absentStatusId = document.statuses.find(
     (status) => status.code.toLocaleUpperCase() === 'A'
   )?.id
@@ -295,10 +293,8 @@ function ScoreEditor({
   const [draggedAthleteId, setDraggedAthleteId] = useState<string>()
   useEffect(() => setDraft(session.score ?? emptyScore()), [session.id, session.score])
   const athletes = useMemo(
-    () => athletesForReport(document).filter(
-      (athlete) => athlete.active || athlete.id in session.attendances
-    ),
-    [document, session.attendances]
+    () => athletesForReport(document),
+    [document]
   )
   const absentStatusId = document.statuses.find(
     (status) => status.code.toLocaleUpperCase() === 'A'

@@ -20,7 +20,8 @@ import {
   saveSessionScore,
   scoreRanking,
   scoreTeamTotal,
-  serializeTeamDocument
+  serializeTeamDocument,
+  totalsForDocument
 } from '../domain/document'
 
 describe('documento squadra', () => {
@@ -84,7 +85,7 @@ describe('documento squadra', () => {
     expect(isTeamDocument(document)).toBe(false)
   })
 
-  it('mantiene le atlete archiviate nei riepiloghi ma non nei conteggi operativi', () => {
+  it('esclude le atlete archiviate dai riepiloghi e dai conteggi operativi', () => {
     const document = createTeamDocument({
       teamName: 'U18',
       organizationName: 'Volley Club',
@@ -107,9 +108,23 @@ describe('documento squadra', () => {
       createdAt: document.updatedAt,
       updatedAt: document.updatedAt
     }
+    document.sessions = [{
+      ...session,
+      score: {
+        teamPoints: { a: [5], b: [] },
+        assignments: {
+          [document.athletes[0].id]: 'a',
+          [document.athletes[1].id]: 'a'
+        },
+        adjustments: {},
+        updatedAt: document.updatedAt
+      }
+    }]
 
-    expect(athletesForReport(document)).toHaveLength(2)
+    expect(athletesForReport(document)).toHaveLength(1)
     expect(completedAttendancesForAthletes(session, document.athletes.filter((a) => a.active))).toBe(1)
+    expect(totalsForDocument(document).byStatus.present).toBe(1)
+    expect(scoreRanking(document)).toHaveLength(1)
   })
 
   it('calcola i totali partendo dalle sessioni', () => {

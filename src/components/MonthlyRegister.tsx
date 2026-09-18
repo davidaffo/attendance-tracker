@@ -229,7 +229,7 @@ function MonthMatrix({ document, sessions, athletes, onEditSession }: MatrixProp
               return (
                 <tr key={athlete.id}>
                   <th className="sticky-name">
-                    {athlete.name}{athlete.active ? '' : ' (archiviata)'}
+                    {athlete.name}
                   </th>
                   {sessions.map((session) => {
                     const status = document.statuses.find(
@@ -346,7 +346,7 @@ function SeasonOverview({
               return (
                 <tr key={athlete.id}>
                   <th className="sticky-name">
-                    {athlete.name}{athlete.active ? '' : ' (archiviata)'}
+                    {athlete.name}
                   </th>
                   {document.statuses.map((status) => {
                     const count = totals[status.id]
@@ -404,7 +404,6 @@ function MobileAthleteSummary({ document, sessions, athletes }: MatrixProps) {
           return (
             <article className="mobile-summary-card" key={athlete.id}>
               <strong>{athlete.name}</strong>
-              {!athlete.active && <small>Archiviata</small>}
               <div>
                 {document.statuses.map((status) => {
                   const percentage = sessions.length
