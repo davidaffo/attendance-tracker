@@ -105,7 +105,7 @@ export function AttendanceEditor({
               disabled={saving}
             >
               <Trophy size={17} />
-              <span>Salva e punteggi</span>
+              <span>Salva e aggiungi punteggi</span>
             </button>
           )}
           <button className="button primary compact" onClick={() => void save()} disabled={saving}>
