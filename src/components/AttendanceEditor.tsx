@@ -1,5 +1,16 @@
-import { useMemo, useState } from 'react'
-import { ArrowLeft, DoorOpen, Eraser, Save, Trash2, Trophy, UserCheck, UserX } from 'lucide-react'
+import { useEffect, useMemo, useRef, useState } from 'react'
+import {
+  ArrowLeft,
+  Check,
+  DoorOpen,
+  Eraser,
+  LoaderCircle,
+  Save,
+  Trash2,
+  Trophy,
+  UserCheck,
+  UserX
+} from 'lucide-react'
 import type { TeamDocument, TrainingSession } from '../domain/types'
 import { compareAthletesByName } from '../domain/document'
 
@@ -40,12 +51,20 @@ export function AttendanceEditor({
     initialSession?.earlyDepartures ?? []
   )
   const [saving, setSaving] = useState(false)
+  const [saved, setSaved] = useState(false)
   const [error, setError] = useState('')
+  const savedTimer = useRef<ReturnType<typeof setTimeout>>(undefined)
   const [sessionId] = useState(() => initialSession?.id ?? crypto.randomUUID())
   const completed = athletes.filter((athlete) => attendances[athlete.id]).length
 
   const presentStatus = document.statuses.find((status) => status.code === 'P')
   const absentStatus = document.statuses.find((status) => status.code === 'A')
+
+  useEffect(() => () => clearTimeout(savedTimer.current), [])
+
+  useEffect(() => {
+    setSaved(false)
+  }, [date, attendances, earlyDepartures])
 
   const markAll = (statusId: string) => {
     setAttendances((current) => ({
@@ -63,6 +82,8 @@ export function AttendanceEditor({
   }
 
   const save = async (afterSave?: () => void) => {
+    clearTimeout(savedTimer.current)
+    setSaved(false)
     setSaving(true)
     setError('')
     try {
@@ -72,6 +93,8 @@ export function AttendanceEditor({
         attendances,
         earlyDepartures
       })
+      setSaved(true)
+      savedTimer.current = setTimeout(() => setSaved(false), 2000)
       afterSave?.()
     } catch (caught) {
       setError(caught instanceof Error ? caught.message : 'Non è stato possibile salvare.')
@@ -109,8 +132,16 @@ export function AttendanceEditor({
             </button>
           )}
           <button className="button primary compact" onClick={() => void save()} disabled={saving}>
-            <Save size={17} />
-            <span>{saving ? 'Salvo…' : 'Salva'}</span>
+            {saving ? (
+              <LoaderCircle className="spin" size={17} />
+            ) : saved ? (
+              <Check size={17} />
+            ) : (
+              <Save size={17} />
+            )}
+            <span aria-live="polite">
+              {saving ? 'Salvataggio…' : saved ? 'Salvato' : 'Salva'}
+            </span>
           </button>
         </div>
       </header>
