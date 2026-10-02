@@ -2480,8 +2480,8 @@ h2 {
   min-width: 46px;
   height: 49px;
   padding: 0.4rem;
-  border-right: 1px solid #ecebe5;
-  border-bottom: 1px solid #ecebe5;
+  border-right: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
   text-align: center;
 }
 
@@ -2489,8 +2489,8 @@ h2 {
   position: sticky;
   z-index: 5;
   top: 0;
-  color: #65716c;
-  background: #f7f6f1;
+  color: var(--muted);
+  background: color-mix(in srgb, var(--paper) 86%, var(--cream));
 }
 
 .attendance-matrix th.sticky-name {
@@ -2505,7 +2505,7 @@ h2 {
 
 .attendance-matrix thead th.sticky-name {
   z-index: 8;
-  background: #f7f6f1;
+  background: color-mix(in srgb, var(--paper) 86%, var(--cream));
 }
 
 .attendance-matrix thead button {
@@ -2521,7 +2521,7 @@ h2 {
 
 .attendance-matrix thead button small,
 .attendance-matrix .session-day-heading small {
-  color: #929b97;
+  color: var(--muted);
   font-size: 0.56rem;
   font-weight: 700;
   text-transform: uppercase;
@@ -2540,7 +2540,7 @@ h2 {
 .attendance-matrix .total-head,
 .attendance-matrix .total-cell,
 .attendance-matrix .percentage-cell {
-  background: #f7f6f1;
+  background: color-mix(in srgb, var(--paper) 86%, var(--cream));
   font-weight: 800;
 }
 
@@ -2557,7 +2557,7 @@ h2 {
 
 .attendance-matrix .total-head small {
   margin-top: 0.12rem;
-  color: #929b97;
+  color: var(--muted);
   font-size: 0.54rem;
   font-weight: 650;
 }
