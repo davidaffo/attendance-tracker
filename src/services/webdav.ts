@@ -1,3 +1,4 @@
+import { mergeDocumentsFromBase, type SyncConflictChoice } from '../domain/syncMerge'
 import { mergeDocuments, parseTeamDocument, serializeTeamDocument } from '../domain/document'
 import { isBackupPath } from '../domain/backup'
 import { remoteFileName } from '../domain/defaults'
@@ -16,11 +17,13 @@ interface RemoteFile {
 }
 
 export class RemoteDocumentConflictError extends Error {
+  readonly conflicts: string[]
   readonly localDocument: TeamDocument
   readonly remoteDocument: TeamDocument
 
-  constructor(localDocument: TeamDocument, remoteDocument: TeamDocument) {
-    super('Il registro è stato modificato da un altro utente.')
+  constructor(localDocument: TeamDocument, remoteDocument: TeamDocument, conflicts: string[] = []) {
+    super('Conflitto: il registro è stato modificato da un altro utente.')
+    this.conflicts = conflicts
     this.name = 'RemoteDocumentConflictError'
     this.localDocument = localDocument
     this.remoteDocument = remoteDocument
@@ -176,10 +179,12 @@ export function deduplicateRemoteTeams(teams: TeamSummary[]): TeamSummary[] {
 
 function syncedMeta(
   etag: string | undefined,
-  conditionalWrites: boolean | undefined
+  conditionalWrites: boolean | undefined,
+  baseDocument: TeamDocument
 ): LocalSyncMeta {
   return {
     dirty: false,
+    baseDocument,
     etag,
     lastSyncedAt: new Date().toISOString(),
     ...(conditionalWrites === false ? { conditionalWrites: false } : {})
@@ -644,97 +649,53 @@ async function writeAndVerifyWithoutCondition(
 export async function synchronizeDocument(
   local: TeamDocument,
   meta: LocalSyncMeta,
-  config: SyncConfig
+  config: SyncConfig,
+  choice?: SyncConflictChoice
 ): Promise<SyncResult> {
   await testWebDavConnection(config)
   let remote = await readRemote(config, local)
-
+  const complete = (document: TeamDocument, etag: string | undefined, merged: boolean): SyncResult => ({
+    document, merged, meta: syncedMeta(etag, meta.conditionalWrites, document)
+  })
   if (!remote.exists) {
+    if (meta.baseDocument) throw new Error('Conflitto: il registro è stato eliminato dal cloud. La copia locale è conservata.')
     const etag = await writeRemote(config, local, undefined, true)
-    return {
-      document: local,
-      merged: false,
-      meta: syncedMeta(etag, meta.conditionalWrites)
-    }
+    return complete(local, etag, false)
   }
-
   if (!remote.document) throw new Error('Il file remoto è vuoto.')
+  if (!meta.dirty) return complete(remote.document, remote.etag, false)
 
-  if (!meta.dirty) {
-    return {
-      document: remote.document,
-      merged: false,
-      meta: syncedMeta(remote.etag, meta.conditionalWrites)
+  for (let attempt = 0; attempt < 3; attempt++) {
+    const result = documentsAreEqual(local, remote.document!)
+      ? { document: local, conflicts: [] }
+      : mergeDocumentsFromBase(local, remote.document!, meta.baseDocument ??
+          (meta.etag && normalizeEtag(meta.etag) === remote.etag ? remote.document : undefined), choice)
+    if (result.conflicts.length && !choice) {
+      throw new RemoteDocumentConflictError(local, remote.document!, result.conflicts)
     }
-  }
-
-  let document = local
-  let merged = false
-  const localEtag = normalizeEtag(meta.etag)
-  if (localEtag && remote.etag && localEtag !== remote.etag) {
-    document = mergeDocuments(local, remote.document)
-    merged = true
-  }
-
-  if (meta.conditionalWrites === false) {
-    const confirmed = await writeAndVerifyWithoutCondition(config, document)
-    return {
-      document,
-      merged,
-      meta: syncedMeta(confirmed.etag, false)
-    }
-  }
-
-  try {
-    const etag = await writeRemote(config, document, remote.etag)
-    return {
-      document,
-      merged,
-      meta: syncedMeta(etag, meta.conditionalWrites)
-    }
-  } catch (error) {
-    if (error instanceof Error && error.message === 'CONFLICT') {
-      remote = await readRemote(config, local)
-      if (!remote.document) throw new Error('Conflitto remoto non risolvibile.')
-      if (documentsAreEqual(remote.document, document)) {
-        return {
-          document,
-          merged,
-          meta: syncedMeta(remote.etag, meta.conditionalWrites)
-        }
-      }
-      document = mergeDocuments(document, remote.document)
-      try {
-        const etag = await writeRemote(config, document, remote.etag)
-        return {
-          document,
-          merged: true,
-          meta: syncedMeta(etag, meta.conditionalWrites)
-        }
-      } catch (retryError) {
-        if (!(retryError instanceof Error) || retryError.message !== 'CONFLICT') {
-          throw retryError
-        }
-        const latest = await readRemote(config, local)
-        if (latest.document && documentsAreEqual(latest.document, document)) {
-          return {
-            document,
-            merged: true,
-            meta: syncedMeta(latest.etag, meta.conditionalWrites)
-          }
-        }
-        if (!latest.document) {
-          throw new Error('Il file remoto è vuoto dopo il conflitto.')
-        }
-        document = mergeDocuments(document, latest.document)
+    const document = result.document
+    if (documentsAreEqual(document, remote.document!)) return complete(document, remote.etag, false)
+    try {
+      if (meta.conditionalWrites === false) {
         const confirmed = await writeAndVerifyWithoutCondition(config, document)
-        return {
-          document,
-          merged: true,
-          meta: syncedMeta(confirmed.etag, false)
-        }
+        return complete(document, confirmed.etag, true)
+      }
+      if (!remote.etag) throw new Error('Sincronizzazione sospesa: Nextcloud non fornisce un ETag per proteggere le modifiche concorrenti.')
+      const etag = await writeRemote(config, document, remote.etag)
+      return complete(document, etag, !documentsAreEqual(document, local))
+    } catch (error) {
+      if (!(error instanceof Error) || error.message !== 'CONFLICT') throw error
+      const previousRemote = remote.document!
+      remote = await readRemote(config, local)
+      if (!remote.document) throw new Error('Conflitto: il registro remoto non è più disponibile.')
+      if (documentsAreEqual(remote.document, document)) return complete(document, remote.etag, true)
+      // Some Nextcloud configurations reject every If-Match. Only use the existing
+      // verified fallback after repeated rejections with unchanged remote content.
+      if (attempt === 1 && documentsAreEqual(previousRemote, remote.document)) {
+        const confirmed = await writeAndVerifyWithoutCondition(config, document)
+        return { document, merged: true, meta: syncedMeta(confirmed.etag, false, document) }
       }
     }
-    throw error
   }
+  throw new Error('Conflitto: il cloud continua a cambiare. Le modifiche locali sono conservate; riprova la sincronizzazione.')
 }

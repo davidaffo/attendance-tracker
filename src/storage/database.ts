@@ -198,3 +198,13 @@ export async function storeCoachDocumentOrigin(
 export async function clearLocalData(): Promise<void> {
   await (await database).clear('state')
 }
+
+// One transaction keeps the local content and its synchronization ancestor consistent.
+export async function storeDocumentAndSyncMeta(document: TeamDocument, meta: LocalSyncMeta): Promise<void> {
+  const transaction = (await database).transaction('state', 'readwrite')
+  await Promise.all([
+    transaction.store.put(document, 'document'),
+    transaction.store.put(meta, 'sync-meta')
+  ])
+  await transaction.done
+}

@@ -141,6 +141,10 @@ export function SyncSettings({
           <Cloud size={24} />
         </div>
         <p className="section-copy">
+          Puoi aprire il registro salvato e registrare allenamenti senza Internet.
+          Le modifiche restano sul dispositivo e si sincronizzano al ritorno della connessione.
+        </p>
+        <p className="section-copy">
           Usa una password applicativa revocabile creata in Nextcloud, non la password principale.
           WebAppPassword deve autorizzare il dominio di questa PWA.
         </p>
@@ -200,7 +204,7 @@ export function SyncSettings({
               <Save size={17} />
               {testing ? 'Verifica…' : 'Verifica e salva'}
             </button>
-            {config && !managedByCoordinator && (
+            {config && (
               <button
                 className="button secondary"
                 type="button"

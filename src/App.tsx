@@ -13,6 +13,8 @@ import {
   Trophy,
   Users
 } from 'lucide-react'
+import { ConflictResolutionDialog } from './components/ConflictResolutionDialog'
+import { mergeDocumentsFromBase, type SyncConflictChoice } from './domain/syncMerge'
 import { AttendanceEditor } from './components/AttendanceEditor'
 import { AppBrand } from './components/AppBrand'
 import { AppModeControls } from './components/AppModeControls'
@@ -61,6 +63,7 @@ import type {
   TrainingSession
 } from './domain/types'
 import {
+  RemoteDocumentConflictError,
   discoverRemoteTeamDocuments,
   synchronizeDocument,
   testNextcloudCredentials
@@ -93,6 +96,7 @@ import {
   storeCoordinatorSyncConfig,
   storeViewerSyncConfig,
   storeDocument,
+  storeDocumentAndSyncMeta,
   storeSyncConfig,
   storeSyncMeta
 } from './storage/database'
@@ -246,6 +250,9 @@ export default function App() {
   const coachDocumentOriginRef = useRef<CoachDocumentOrigin | undefined>(undefined)
   const coachFileHandleRef = useRef<FileSystemFileHandle | undefined>(undefined)
   const syncPromiseRef = useRef<Promise<SyncOutcome> | undefined>(undefined)
+  const [coachConflict, setCoachConflict] = useState<RemoteDocumentConflictError>()
+  const coachConflictRef = useRef<RemoteDocumentConflictError | undefined>(undefined)
+  const [resolvingConflict, setResolvingConflict] = useState(false)
   const resettingRef = useRef(false)
   const passwordRequestRef = useRef<{
     owner: CredentialOwner
@@ -367,7 +374,9 @@ export default function App() {
     (
       currentDocument = documentRef.current,
       currentMeta = metaRef.current,
-      currentConfig = configRef.current
+      currentConfig = configRef.current,
+      conflictChoice?: SyncConflictChoice,
+      requestCredentials = false
     ): Promise<SyncOutcome> => {
       if (!currentDocument || !currentConfig) {
         return Promise.resolve({ status: 'skipped' })
@@ -380,6 +389,10 @@ export default function App() {
         setSyncIndicator(currentMeta.dirty ? 'pending' : 'local')
         return Promise.resolve({ status: 'skipped' })
       }
+      if (coachConflictRef.current && !conflictChoice) {
+        setCoachConflict(coachConflictRef.current)
+        return Promise.resolve({ status: 'skipped' })
+      }
       if (syncPromiseRef.current) return syncPromiseRef.current
 
       const operation = (async (): Promise<SyncOutcome> => {
@@ -387,7 +400,8 @@ export default function App() {
           let readyConfig = currentConfig
           if (!readyConfig.appPassword) {
             setSyncIndicator(currentMeta.dirty ? 'pending' : 'local')
-            const password = await requestPassword('coach', readyConfig)
+            const password = loadSessionPassword('coach', readyConfig) ||
+              (requestCredentials ? await requestPassword('coach', readyConfig) : undefined)
             if (!password) return { status: 'cancelled' }
             readyConfig = { ...readyConfig, appPassword: password }
             applyConfig(readyConfig)
@@ -397,14 +411,26 @@ export default function App() {
           const result = await synchronizeDocument(
             currentDocument,
             currentMeta,
-            readyConfig
+            readyConfig,
+            conflictChoice
           )
           rememberSessionPassword('coach', readyConfig)
           if (resettingRef.current) return { status: 'skipped' }
-          await Promise.all([storeDocument(result.document), storeSyncMeta(result.meta)])
-          applyDocument(result.document)
-          applyMeta(result.meta)
-          setSyncIndicator('synced')
+          const latestLocal = documentRef.current
+          if (!latestLocal || latestLocal.teamId !== currentDocument.teamId ||
+              latestLocal.season.startYear !== currentDocument.season.startYear) return { status: 'skipped' }
+          const editedDuringSync = latestLocal !== currentDocument
+          const nextDocument = editedDuringSync
+            ? mergeDocumentsFromBase(latestLocal, result.document, currentDocument, 'local').document
+            : result.document
+          const nextMeta = { ...result.meta, dirty: editedDuringSync }
+          applyDocument(nextDocument)
+          applyMeta(nextMeta)
+          coachConflictRef.current = undefined
+          setCoachConflict(undefined)
+          await storeDocumentAndSyncMeta(nextDocument, nextMeta)
+          setSyncIndicator(metaRef.current.dirty ? 'pending' : 'synced')
+          if (metaRef.current.dirty) window.setTimeout(() => void performSync(), 0)
           return { status: 'synced' }
         } catch (error) {
           if (resettingRef.current) return { status: 'skipped' }
@@ -419,9 +445,13 @@ export default function App() {
             const current = configRef.current
             if (current) applyConfig({ ...current, appPassword: '' })
           }
-          const nextMeta = { ...currentMeta, dirty: true, lastError: message }
-          await storeSyncMeta(nextMeta)
+          if (error instanceof RemoteDocumentConflictError) {
+            coachConflictRef.current = error
+            setCoachConflict(error)
+          }
+          const nextMeta = { ...metaRef.current, lastError: message }
           applyMeta(nextMeta)
+          await storeSyncMeta(nextMeta)
           setSyncIndicator(
             message.toLocaleLowerCase().includes('conflitto') ? 'conflict' : 'error'
           )
@@ -645,12 +675,14 @@ export default function App() {
       : next
     const nextMeta = {
       ...metaRef.current,
+      baseDocument: metaRef.current.baseDocument ??
+        (!metaRef.current.dirty ? documentRef.current : undefined),
       dirty: !(localFileHandle || localOnlyDocument),
       lastError: undefined
     }
-    await Promise.all([storeDocument(documentToStore), storeSyncMeta(nextMeta)])
     applyDocument(documentToStore)
     applyMeta(nextMeta)
+    await storeDocumentAndSyncMeta(documentToStore, nextMeta)
     setSyncIndicator(configRef.current ? 'pending' : 'local')
     if (
       syncNow &&
@@ -705,6 +737,8 @@ export default function App() {
     if (syncPromiseRef.current) await syncPromiseRef.current
     const wasEmpty = !documentRef.current
     const restoredMeta = metaForRestoredBackup()
+    coachConflictRef.current = undefined
+    setCoachConflict(undefined)
     await Promise.all([
       storeDocument(restoredDocument),
       storeSyncMeta(restoredMeta),
@@ -727,7 +761,7 @@ export default function App() {
       await storeSyncMeta(currentMeta)
       applyMeta(currentMeta)
     }
-    await performSync(documentRef.current, currentMeta, configRef.current)
+    await performSync(documentRef.current, currentMeta, configRef.current, undefined, true)
   }
 
   const handleSessionSave = async (
@@ -823,11 +857,24 @@ export default function App() {
         )
       }
     }
-    const result = await synchronizeDocument(team.document, { dirty: false }, config)
+    // Opening a previously downloaded register must never wait for Nextcloud.
+    const sameRegister = currentDocument &&
+      currentDocument.teamId === team.document.teamId &&
+      currentDocument.season.startYear === team.document.season.startYear &&
+      currentDocument.season.endYear === team.document.season.endYear &&
+      configRef.current?.baseUrl === config.baseUrl &&
+      configRef.current?.username === config.username &&
+      configRef.current?.remoteFolder === config.remoteFolder
+    if (!sameRegister) {
+      coachConflictRef.current = undefined
+      setCoachConflict(undefined)
+    }
+    const result = sameRegister
+      ? { document: currentDocument, meta: metaRef.current }
+      : { document: team.document, meta: { dirty: false, baseDocument: team.document } }
     rememberSessionPassword('coach', config)
     await Promise.all([
-      storeDocument(result.document),
-      storeSyncMeta(result.meta),
+      storeDocumentAndSyncMeta(result.document, result.meta),
       storeCoachOnboardingVersion(COACH_ONBOARDING_VERSION),
       storeCoachDocumentOrigin('coordinator-managed')
     ])
@@ -837,8 +884,9 @@ export default function App() {
     applyDocument(result.document)
     applyMeta(result.meta)
     applyCoachDocumentOrigin('coordinator-managed')
-    setSyncIndicator('synced')
+    setSyncIndicator(result.meta.dirty ? 'pending' : 'local')
     navigate(destination, { replace: true })
+    void performSync(result.document, result.meta, config)
   }
 
   const openCoordinatorTeamAsCoach = async (
@@ -934,6 +982,21 @@ export default function App() {
   const renderPage = (page: ReactNode) => (
     <>
       {page}
+      {coachConflict && (
+        <ConflictResolutionDialog
+          teamName={coachConflict.localDocument.teamName}
+          busy={resolvingConflict}
+          error={syncMeta.lastError}
+          syncConflicts={coachConflict.conflicts}
+          onResolve={(resolution) => {
+            if (resolution === 'merge') return
+            setResolvingConflict(true)
+            void performSync(documentRef.current, metaRef.current, configRef.current, resolution, true)
+              .finally(() => setResolvingConflict(false))
+          }}
+          onClose={() => setCoachConflict(undefined)}
+        />
+      )}
       {passwordPrompt && (
         <PasswordPrompt
           key={`${passwordPrompt.owner}-${passwordPrompt.config.username}`}
@@ -1110,6 +1173,8 @@ export default function App() {
       <SharedTeamSetup
         initialConfig={effectiveCoachConfig}
         initialNextcloudLink={initialNextcloudLink}
+        offlineDocument={coachDocumentOrigin === 'coordinator-managed' ? document : undefined}
+        onOpenOffline={() => navigate('/allenatore', { replace: true })}
         onRequestPassword={(config) => requestPassword('coach', config)}
         onOpen={openSharedCoachTeam}
         onBack={() => {

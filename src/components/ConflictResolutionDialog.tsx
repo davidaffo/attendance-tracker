@@ -2,6 +2,7 @@ import { AlertTriangle, CloudDownload, GitMerge, Upload } from 'lucide-react'
 import type { ConflictResolution } from '../services/webdav'
 
 interface ConflictResolutionDialogProps {
+  syncConflicts?: string[]
   teamName: string
   busy?: boolean
   error?: string
@@ -10,6 +11,7 @@ interface ConflictResolutionDialogProps {
 }
 
 export function ConflictResolutionDialog({
+  syncConflicts,
   teamName,
   busy = false,
   error,
@@ -30,27 +32,28 @@ export function ConflictResolutionDialog({
         <div>
           <h2 id="conflict-dialog-title">Modifiche contemporanee</h2>
           <p>
-            Il registro di <strong>{teamName}</strong> è cambiato su Nextcloud mentre lo
-            stavi salvando. Scegli quale versione mantenere.
+            Il registro di <strong>{teamName}</strong> contiene modifiche contemporanee.
+            Scegli quale versione mantenere{syncConflicts ? ' per i dati in conflitto; le altre modifiche vengono unite automaticamente' : ''}.
           </p>
         </div>
+        {syncConflicts && <p className="section-copy">{[...new Set(syncConflicts.map(path => path.startsWith('sessions.') ? path.split('.')[1] : 'Impostazioni del registro'))].join(', ')}</p>}
         {error && <p className="password-dialog-error" role="alert">{error}</p>}
         <div className="conflict-options">
-          <button className="button primary" disabled={busy} onClick={() => onResolve('merge')}>
+          {!syncConflicts && <><button className="button primary" disabled={busy} onClick={() => onResolve('merge')}>
             <GitMerge size={17} />
             Unisci e salva
           </button>
-          <small>Mantiene le modifiche più recenti e tutte le sessioni compatibili.</small>
+          <small>Mantiene le modifiche più recenti e tutte le sessioni compatibili.</small></>}
           <button className="button secondary" disabled={busy} onClick={() => onResolve('remote')}>
             <CloudDownload size={17} />
-            Usa versione cloud
+            {syncConflicts ? 'Mantieni i dati cloud in conflitto' : 'Usa versione cloud'}
           </button>
-          <small>Scarta le modifiche appena fatte in questa schermata.</small>
+          <small>{syncConflicts ? 'Conserva anche le modifiche locali compatibili.' : 'Scarta le modifiche appena fatte in questa schermata.'}</small>
           <button className="button danger" disabled={busy} onClick={() => onResolve('local')}>
             <Upload size={17} />
-            Sovrascrivi il cloud
+            {syncConflicts ? 'Mantieni i dati locali in conflitto' : 'Sovrascrivi il cloud'}
           </button>
-          <small>Sostituisce la versione cloud con quella modificata qui.</small>
+          <small>{syncConflicts ? 'Conserva anche le modifiche cloud compatibili.' : 'Sostituisce la versione cloud con quella modificata qui.'}</small>
         </div>
         <button className="button ghost" disabled={busy} onClick={onClose}>Annulla</button>
       </section>

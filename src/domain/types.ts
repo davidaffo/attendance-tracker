@@ -87,6 +87,7 @@ export interface SyncConfig {
 }
 
 export interface LocalSyncMeta {
+  baseDocument?: TeamDocument
   dirty: boolean
   etag?: string
   lastSyncedAt?: string

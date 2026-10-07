@@ -1,10 +1,12 @@
 import { useEffect, useRef, useState, type FormEvent } from 'react'
 import { ArrowLeft, Check, ChevronRight, Cloud, LoaderCircle } from 'lucide-react'
-import type { SyncConfig, TeamSummary } from '../domain/types'
+import type { SyncConfig, TeamSummary, TeamDocument } from '../domain/types'
 import { detailsFromNextcloudLink } from '../domain/syncConfig'
 import { discoverRemoteTeamDocuments } from '../services/webdav'
 
 interface SharedTeamSetupProps {
+  offlineDocument?: TeamDocument
+  onOpenOffline: () => void
   initialConfig?: SyncConfig
   initialNextcloudLink?: string
   onRequestPassword: (config: SyncConfig) => Promise<string | undefined>
@@ -20,6 +22,8 @@ const emptyConfig: SyncConfig = {
 }
 
 export function SharedTeamSetup({
+  offlineDocument,
+  onOpenOffline,
   initialConfig,
   initialNextcloudLink,
   onRequestPassword,
@@ -59,6 +63,10 @@ export function SharedTeamSetup({
   })
 
   const loadTeams = async (inputConfig: SyncConfig, openSingle: boolean) => {
+    if (!navigator.onLine) {
+      setMessage('Sei offline. Puoi lavorare sul registro già salvato su questo dispositivo.')
+      return
+    }
     setLoading(true)
     setMessage('')
     try {
@@ -96,6 +104,7 @@ export function SharedTeamSetup({
   useEffect(() => {
     if (!reuseConnection || !initialConfig || automaticLoadStarted.current) return
     automaticLoadStarted.current = true
+    if (offlineDocument && !initialConfig.appPassword) return
     void loadTeams({ ...initialConfig, remoteFolder: '' }, false)
   }, [initialConfig, reuseConnection])
 
@@ -145,6 +154,15 @@ export function SharedTeamSetup({
               : 'Inserisci il server Nextcloud o il link della cartella condivisa. Squadra, stagione e rosa verranno lette direttamente dal registro.'}
           </p>
         </div>
+
+        {offlineDocument && (
+          <div className="inline-actions">
+            <button className="button primary" type="button" onClick={onOpenOffline}>
+              Apri copia locale · {offlineDocument.teamName}
+            </button>
+            <p className="section-copy">Puoi registrare allenamenti anche senza Internet. Le modifiche si sincronizzano quando torna la connessione.</p>
+          </div>
+        )}
 
         {!reuseConnection && <form className="form-grid" onSubmit={connect} autoComplete="on">
           <label className="field">
@@ -224,6 +242,12 @@ export function SharedTeamSetup({
             ))}
           </div>
         )}
+
+        {reuseConnection && !loading && <button
+          className="button secondary"
+          type="button"
+          onClick={() => void loadTeams({ ...draft, remoteFolder: '' }, false)}
+        >Aggiorna elenco dal cloud</button>}
 
         {reuseConnection && !loading && (
           <button

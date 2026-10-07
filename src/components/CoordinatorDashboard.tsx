@@ -559,13 +559,6 @@ export function CoordinatorDashboard({
       if (!readyConnection.baseUrl || !readyConnection.username) {
         throw new Error('Configura prima il collegamento Nextcloud del coordinatore.')
       }
-      if (!readyConnection.appPassword) {
-        const password = await onRequestPassword(readyConnection)
-        if (!password) return
-        readyConnection = { ...readyConnection, appPassword: password }
-        setDraft(readyConnection)
-      }
-      onAuthenticated(readyConnection)
       await onOpenAsCoach(team, readyConnection, sessionDate)
     } catch (error) {
       setMessage(
