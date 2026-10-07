@@ -214,12 +214,12 @@ function MonthMatrix({ document, sessions, athletes, onEditSession }: MatrixProp
               {document.statuses.map((status) => (
                 <th className="total-head" key={status.id}>
                   <span>{status.code}</span>
-                  <small>n · %</small>
+                  <small>% · n</small>
                 </th>
               ))}
               <th className="total-head early-departure-head">
                 <span>U</span>
-                <small>n · %</small>
+                <small>% · n</small>
               </th>
             </tr>
           </thead>
@@ -269,21 +269,21 @@ function MonthMatrix({ document, sessions, athletes, onEditSession }: MatrixProp
                             : undefined
                         }
                       >
-                        <strong>{totals[status.id]}</strong>
-                        <span>{Math.round(percentage)}%</span>
+                        <strong>{Math.round(percentage)}%</strong>
+                        <span>{totals[status.id]}</span>
                       </td>
                     )
                   })}
                   <td className="total-cell early-departure-total">
-                    <strong>{earlyDepartureCountForAthlete(document, athlete.id, sessions)}</strong>
-                    <span>
+                    <strong>
                       {sessions.length
                         ? Math.round(
                             (earlyDepartureCountForAthlete(document, athlete.id, sessions) /
                               sessions.length) * 100
                           )
                         : 0}%
-                    </span>
+                    </strong>
+                    <span>{earlyDepartureCountForAthlete(document, athlete.id, sessions)}</span>
                   </td>
                 </tr>
               )
@@ -364,21 +364,21 @@ function SeasonOverview({
                             : undefined
                         }
                       >
-                        <strong>{count}</strong>
-                        <span>{Math.round(percentage)}%</span>
+                        <strong>{Math.round(percentage)}%</strong>
+                        <span>{count}</span>
                       </td>
                     )
                   })}
                   <td className="season-total-cell early-departure-total">
-                    <strong>{earlyDepartureCountForAthlete(document, athlete.id)}</strong>
-                    <span>
+                    <strong>
                       {document.sessions.length
                         ? Math.round(
                             (earlyDepartureCountForAthlete(document, athlete.id) /
                               document.sessions.length) * 100
                           )
                         : 0}%
-                    </span>
+                    </strong>
+                    <span>{earlyDepartureCountForAthlete(document, athlete.id)}</span>
                   </td>
                 </tr>
               )
@@ -412,22 +412,22 @@ function MobileAthleteSummary({ document, sessions, athletes }: MatrixProps) {
                   return (
                     <span className="mobile-status-total" key={status.id}>
                       <i style={{ background: status.color }}>{status.code}</i>
-                      <b>{totals[status.id]}</b>
-                      <small>{percentage}%</small>
+                      <b>{percentage}%</b>
+                      <small>{totals[status.id]}</small>
                     </span>
                   )
                 })}
                 <span className="mobile-status-total early-departure-total">
                   <i>U</i>
-                  <b>{earlyDepartureCountForAthlete(document, athlete.id, sessions)}</b>
-                  <small>
+                  <b>
                     {sessions.length
                       ? Math.round(
                           (earlyDepartureCountForAthlete(document, athlete.id, sessions) /
                             sessions.length) * 100
                         )
                       : 0}%
-                  </small>
+                  </b>
+                  <small>{earlyDepartureCountForAthlete(document, athlete.id, sessions)}</small>
                 </span>
               </div>
             </article>
