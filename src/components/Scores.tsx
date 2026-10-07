@@ -574,7 +574,7 @@ function ScoreEditor({
               ) && <small>Nessuna atleta assegnata</small>}
             </div>
             <div className="score-partials">
-              <label className="score-partial-entry">
+              <div className="score-partial-entry">
                 <span>Nuovo parziale</span>
                 <input
                   type="text"
@@ -592,8 +592,16 @@ function ScoreEditor({
                     addPartial(team)
                   }}
                 />
-                <small>Premi Invio</small>
-              </label>
+                <button
+                  type="button"
+                  className="button primary compact"
+                  aria-label={`Aggiungi parziale Squadra ${scoreTeamLabel(team)}`}
+                  onClick={() => addPartial(team)}
+                >
+                  Aggiungi
+                </button>
+                <small>Oppure premi Invio</small>
+              </div>
               <div className="score-partial-toasts" aria-label={`Parziali Squadra ${scoreTeamLabel(team)}`}>
                 {(draft.teamPoints[team] ?? []).map((points, index) => (
                   <span className="score-partial-toast" key={index}>

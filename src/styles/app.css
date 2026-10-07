@@ -1902,6 +1902,10 @@ h2 {
   box-shadow: 0 0 0 4px rgba(47, 125, 104, 0.14);
 }
 
+.score-partial-entry .button {
+  min-height: 44px;
+}
+
 .score-partial-entry small {
   color: var(--muted);
   font-size: 0.58rem;
