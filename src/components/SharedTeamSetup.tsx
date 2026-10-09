@@ -5,6 +5,7 @@ import { detailsFromNextcloudLink } from '../domain/syncConfig'
 import { discoverRemoteTeamDocuments } from '../services/webdav'
 
 interface SharedTeamSetupProps {
+  startupOnline: boolean
   offlineDocument?: TeamDocument
   onOpenOffline: () => void
   initialConfig?: SyncConfig
@@ -22,6 +23,7 @@ const emptyConfig: SyncConfig = {
 }
 
 export function SharedTeamSetup({
+  startupOnline,
   offlineDocument,
   onOpenOffline,
   initialConfig,
@@ -102,11 +104,11 @@ export function SharedTeamSetup({
   }
 
   useEffect(() => {
-    if (!reuseConnection || !initialConfig || automaticLoadStarted.current) return
+    if (!startupOnline || !reuseConnection || !initialConfig || automaticLoadStarted.current) return
     automaticLoadStarted.current = true
     if (offlineDocument && !initialConfig.appPassword) return
     void loadTeams({ ...initialConfig, remoteFolder: '' }, false)
-  }, [initialConfig, reuseConnection])
+  }, [initialConfig, reuseConnection, startupOnline])
 
   const connect = async (event: FormEvent) => {
     event.preventDefault()

@@ -342,6 +342,18 @@ h2 {
   color: var(--muted);
 }
 
+.connection-notice {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  padding: 0.85rem 1rem;
+  color: var(--ink);
+  background: var(--cream);
+  border-bottom: 1px solid var(--line);
+}
+
 .error-page {
   display: grid;
   min-height: 100vh;

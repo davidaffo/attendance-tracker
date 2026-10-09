@@ -69,6 +69,7 @@ import { ConflictResolutionDialog } from './ConflictResolutionDialog'
 import { Scores } from './Scores'
 
 interface CoordinatorDashboardProps {
+  startupOnline: boolean
   accessMode: 'coordinator' | 'viewer'
   onChooseMode: () => void
   initialNextcloudLink?: string
@@ -140,6 +141,7 @@ function managementTeamKey(team: TeamSummary): string {
 }
 
 export function CoordinatorDashboard({
+  startupOnline,
   accessMode,
   onChooseMode,
   initialNextcloudLink,
@@ -379,6 +381,7 @@ export function CoordinatorDashboard({
     if (
       config.baseUrl &&
       config.username &&
+      startupOnline &&
       navigator.onLine &&
       !initialNextcloudLink &&
       !creatingTeam &&
@@ -387,7 +390,7 @@ export function CoordinatorDashboard({
       loadedOnce.current = true
       void loadCloud(config, !managingTeams)
     }
-  }, [config, creatingTeam, managingTeams])
+  }, [config, creatingTeam, managingTeams, startupOnline])
 
   useEffect(() => {
     if (isViewer) return

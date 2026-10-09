@@ -69,6 +69,7 @@ import {
   testNextcloudCredentials
 } from './services/webdav'
 import { writeTeamDocumentToFile } from './services/localFiles'
+import { prepareStartupConnection, type StartupSyncOutcome as SyncOutcome } from './services/connection'
 import {
   clearSessionPasswords,
   forgetSessionPassword,
@@ -102,9 +103,6 @@ import {
 } from './storage/database'
 
 type CoachView = 'home' | 'register' | 'scores' | 'team' | 'settings'
-type SyncOutcome =
-  | { status: 'synced' | 'skipped' | 'cancelled' }
-  | { status: 'error'; message: string }
 
 const navigation = [
   { id: 'home' as const, path: '/allenatore', label: 'Panoramica', icon: ClipboardCheck },
@@ -227,6 +225,10 @@ function Welcome({
 
 export default function App() {
   const [loading, setLoading] = useState(true)
+  const [loadingMessage, setLoadingMessage] = useState('Apro il registro…')
+  const [connectionNotice, setConnectionNotice] = useState<string>()
+  const [startupOnline, setStartupOnline] = useState(false)
+  const startupReadyRef = useRef(false)
   const [loadingError, setLoadingError] = useState(false)
   const [sharedAccessBootstrap, setSharedAccessBootstrap] = useState(false)
   const [pathname, setPathname] = useState(currentRoutePath)
@@ -589,19 +591,38 @@ export default function App() {
           window.history.replaceState(null, '', routeHref(initialPath))
           setPathname(initialPath)
         }
-        setLoading(false)
         const shouldSyncCoach =
           isCoachSyncRoute(currentRoutePath()) ||
           (currentRoutePath() === '/' && resolvedMode === 'coach')
-        if (
-          storedDocument &&
-          unifiedCoachConfig &&
-          navigator.onLine &&
-          shouldSyncCoach &&
-          allowsCoachBackgroundSync(resolvedDocumentOrigin)
-        ) {
-          void performSync(storedDocument, storedMeta, unifiedCoachConfig)
-        }
+        const startupConfig = shouldSyncCoach
+          ? unifiedCoachConfig
+          : currentRoutePath().startsWith('/consultazione')
+            ? unifiedViewerConfig
+            : currentRoutePath().startsWith('/coordinatore')
+              ? unifiedCoordinatorConfig
+              : undefined
+        setLoadingMessage('Verifico la connessione…')
+        void (async () => {
+          const synchronize = storedDocument && unifiedCoachConfig && shouldSyncCoach &&
+            allowsCoachBackgroundSync(resolvedDocumentOrigin)
+            ? () => active
+              ? performSync(storedDocument, storedMeta, unifiedCoachConfig, undefined, true)
+              : Promise.resolve<SyncOutcome>({ status: 'skipped' })
+            : undefined
+          const result = await prepareStartupConnection(startupConfig?.baseUrl, () => {
+            if (!active) return
+            setConnectionNotice('Connessione disponibile. Puoi sincronizzare con Nextcloud.')
+            if (synchronize) {
+              setLoadingMessage('Connessione disponibile. Attendo la password e sincronizzo il registro…')
+            }
+          }, synchronize)
+          if (!active) return
+          setStartupOnline(result.online)
+          if (!result.online) setSyncIndicator(storedMeta.dirty ? 'pending' : 'local')
+          setConnectionNotice(result.message)
+          startupReadyRef.current = true
+          setLoading(false)
+        })()
       },
       (error) => {
         console.error('Impossibile leggere i dati locali.', error)
@@ -618,6 +639,7 @@ export default function App() {
   useEffect(() => {
     const syncWhenAvailable = () => {
       if (
+        startupReadyRef.current &&
         allowsCoachBackgroundSync(coachDocumentOriginRef.current) &&
         isCoachSyncRoute(currentRoutePath())
       ) {
@@ -626,6 +648,7 @@ export default function App() {
     }
     const syncWhenVisible = () => {
       if (
+        startupReadyRef.current &&
         window.document.visibilityState === 'visible' &&
         allowsCoachBackgroundSync(coachDocumentOriginRef.current) &&
         isCoachSyncRoute(currentRoutePath())
@@ -981,6 +1004,12 @@ export default function App() {
 
   const renderPage = (page: ReactNode) => (
     <>
+      {connectionNotice && (
+        <div className="connection-notice" role="status">
+          <span>{connectionNotice}</span>
+          {!loading && <button className="button secondary" onClick={() => setConnectionNotice(undefined)}>Chiudi avviso</button>}
+        </div>
+      )}
       {page}
       {coachConflict && (
         <ConflictResolutionDialog
@@ -1017,10 +1046,10 @@ export default function App() {
   )
 
   if (loading) {
-    return (
-      <div className="loading-page">
+    return renderPage(
+      <div className="loading-page" role="status" aria-busy="true">
         <LoaderCircle className="spin" size={32} />
-        <span>Apro il registro…</span>
+        <span>{loadingMessage}</span>
       </div>
     )
   }
@@ -1101,6 +1130,7 @@ export default function App() {
     return renderPage(
       <CoordinatorDashboard
         key={dashboardMode}
+        startupOnline={startupOnline}
         accessMode={dashboardMode}
         onChooseMode={() => {
           if (
@@ -1171,6 +1201,7 @@ export default function App() {
   if (pathname === '/allenatore/squadra-condivisa') {
     return renderPage(
       <SharedTeamSetup
+        startupOnline={startupOnline}
         initialConfig={effectiveCoachConfig}
         initialNextcloudLink={initialNextcloudLink}
         offlineDocument={coachDocumentOrigin === 'coordinator-managed' ? document : undefined}

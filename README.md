@@ -134,6 +134,14 @@ principale.
 Gli eventuali archivi cifrati creati dalle precedenti versioni di sviluppo
 vengono eliminati automaticamente all'avvio.
 
+All'apertura l'interfaccia resta bloccata durante una verifica reale della
+connessione, con un timeout di cinque secondi. Se Nextcloud è raggiungibile,
+il registro dell'allenatore viene sincronizzato prima di aprire le schermate:
+quando manca una password nella sessione, viene richiesta subito. Se la rete
+non è disponibile, si apre la copia locale senza chiedere credenziali.
+Un avviso comunica l'esito in entrambi i casi, anche se la sincronizzazione
+fallisce o viene annullata. Le modifiche locali pendenti vengono conservate.
+
 Indirizzo, nome utente e cartella remota vengono invece registrati
 automaticamente durante la digitazione; `Verifica e salva` serve soltanto a
 provare la connessione della sessione corrente.
@@ -242,8 +250,8 @@ vengono mostrati il sommario delle squadre accessibili e, per ciascuna squadra,
 riepilogo stagionale, conteggi e percentuali per atleta e matrici mensili.
 
 L'ultimo insieme di squadre caricato viene conservato in IndexedDB insieme a
-data e sorgente del caricamento. Alla riapertura della PWA l'utente vede
-quindi subito l'ultimo riepilogo come copia provvisoria, anche offline. Quando
+data e sorgente del caricamento. Dopo la verifica iniziale della connessione,
+l'utente vede l'ultimo riepilogo come copia provvisoria, anche offline. Quando
 la rete è disponibile, l’app aggiorna sempre i registri da Nextcloud
 all’apertura della modalità; la password applicativa viene richiesta soltanto
 se non è già disponibile nella sessione della scheda.
