@@ -42,7 +42,8 @@ import {
   deleteSession,
   ignorePlannedTrainingDate,
   saveSession,
-  saveSessionScore
+  saveSessionScore,
+  saveMonthlyScoreAdjustments
 } from './domain/document'
 import {
   metaForManualSync,
@@ -1430,6 +1431,11 @@ export default function App() {
               document={document}
               initialSessionId={currentRouteSearchParams().get('session') ?? undefined}
               onSave={handleScoreSave}
+              onSaveMonthlyAdjustments={async (month, adjustments) => {
+                const current = documentRef.current
+                if (!current) return
+                await commitDocument(saveMonthlyScoreAdjustments(current, month, adjustments, current.coachName))
+              }}
             />
           )}
           {view === 'team' && (

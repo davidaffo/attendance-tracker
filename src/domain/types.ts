@@ -76,6 +76,7 @@ export interface TeamDocument {
   ignoredTrainingDates?: string[]
   athletes: Athlete[]
   sessions: TrainingSession[]
+  monthlyScoreAdjustments?: Record<string, Record<string, number>>
 }
 
 export interface SyncConfig {

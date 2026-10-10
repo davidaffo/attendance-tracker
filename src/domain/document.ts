@@ -115,6 +115,14 @@ export function isTeamDocument(value: unknown): value is TeamDocument {
 
   if (!hasValidShape) return false
 
+  if (value.monthlyScoreAdjustments !== undefined && (
+    !isRecord(value.monthlyScoreAdjustments) ||
+    !Object.entries(value.monthlyScoreAdjustments).every(([month, adjustments]) =>
+      /^\d{4}-(0[1-9]|1[0-2])$/.test(month) && isRecord(adjustments) &&
+      Object.values(adjustments).every((points) => typeof points === 'number' && Number.isFinite(points))
+    )
+  )) return false
+
   const document = value as unknown as TeamDocument
   const statusIds = new Set(document.statuses.map((status) => status.id))
   const statusCodes = new Set(document.statuses.map((status) => status.code))
@@ -123,6 +131,11 @@ export function isTeamDocument(value: unknown): value is TeamDocument {
   const sessionDates = new Set(document.sessions.map((session) => session.date))
   const seasonStart = `${document.season.startYear}-08-01`
   const seasonEnd = `${document.season.endYear}-07-31`
+
+  if (!Object.entries(document.monthlyScoreAdjustments ?? {}).every(([month, adjustments]) =>
+    month >= seasonStart.slice(0, 7) && month <= seasonEnd.slice(0, 7) &&
+    Object.keys(adjustments).every((athleteId) => athleteIds.has(athleteId))
+  )) return false
 
   if (
     statusIds.size !== document.statuses.length ||
@@ -241,6 +254,26 @@ export function saveSessionScore(
   }
 }
 
+export function saveMonthlyScoreAdjustments(
+  document: TeamDocument,
+  month: string,
+  adjustments: Record<string, number>,
+  updatedBy: string
+): TeamDocument {
+  const next: TeamDocument = {
+    ...document,
+    monthlyScoreAdjustments: {
+      ...document.monthlyScoreAdjustments,
+      [month]: { ...adjustments }
+    },
+    revision: document.revision + 1,
+    updatedAt: new Date().toISOString(),
+    updatedBy
+  }
+  if (!isTeamDocument(next)) throw new Error('Controlla il mese e i punti extra inseriti.')
+  return next
+}
+
 export function scoreTeamTotal(score: SessionScore | undefined, team: ScoreTeam): number {
   return (score?.teamPoints[team] ?? []).reduce((total, points) => total + points, 0)
 }
@@ -261,6 +294,8 @@ export function athleteScoreForSession(
 export interface AthleteScoreTotal {
   athleteId: string
   points: number
+  sessionPoints: number
+  bonusPoints: number
   scoredSessions: number
 }
 
@@ -279,12 +314,18 @@ export function scoreRanking(
           Boolean(session.score?.assignments[athlete.id]) ||
           Object.prototype.hasOwnProperty.call(session.score?.adjustments ?? {}, athlete.id)
       )
+      const sessionPoints = scored.reduce(
+        (total, session) => total + athleteScoreForSession(document, session, athlete.id),
+        0
+      )
+      const bonusPoints = Object.entries(document.monthlyScoreAdjustments ?? {})
+        .filter(([entryMonth]) => !month || entryMonth === month)
+        .reduce((total, [, adjustments]) => total + (adjustments[athlete.id] ?? 0), 0)
       return {
         athleteId: athlete.id,
-        points: scored.reduce(
-          (total, session) => total + athleteScoreForSession(document, session, athlete.id),
-          0
-        ),
+        points: sessionPoints + bonusPoints,
+        sessionPoints,
+        bonusPoints,
         scoredSessions: scored.length
       }
     })
@@ -337,6 +378,16 @@ export function mergeDocuments(local: TeamDocument, remote: TeamDocument): TeamD
   }
 
   const newerDocument = local.updatedAt >= remote.updatedAt ? local : remote
+  const olderDocument = newerDocument === local ? remote : local
+  const monthlyScoreAdjustments = Object.fromEntries(
+    [...new Set([
+      ...Object.keys(local.monthlyScoreAdjustments ?? {}),
+      ...Object.keys(remote.monthlyScoreAdjustments ?? {})
+    ])].map((month) => [month, {
+      ...olderDocument.monthlyScoreAdjustments?.[month],
+      ...newerDocument.monthlyScoreAdjustments?.[month]
+    }])
+  )
   const mergedSessionDates = new Set(sessionsByDate.keys())
   const ignoredTrainingDates = [
     ...new Set([
@@ -346,6 +397,8 @@ export function mergeDocuments(local: TeamDocument, remote: TeamDocument): TeamD
   ].filter((date) => !mergedSessionDates.has(date)).sort()
   return {
     ...newerDocument,
+    ...(local.monthlyScoreAdjustments || remote.monthlyScoreAdjustments
+      ? { monthlyScoreAdjustments } : {}),
     revision: Math.max(local.revision, remote.revision) + 1,
     updatedAt: new Date().toISOString(),
     ignoredTrainingDates,

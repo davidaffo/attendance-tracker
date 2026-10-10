@@ -18,6 +18,7 @@ import {
   plannedTrainingSummary,
   saveSession,
   saveSessionScore,
+  saveMonthlyScoreAdjustments,
   scoreRanking,
   scoreTeamTotal,
   serializeTeamDocument,
@@ -25,6 +26,41 @@ import {
 } from '../domain/document'
 
 describe('documento squadra', () => {
+  it('somma i punti extra del mese e della stagione e sostituisce i valori precedenti', () => {
+    let document = createTeamDocument({ teamName: 'U14', organizationName: 'Volley', coachName: 'Coach', startYear: 2026, athleteNames: ['Anna', 'Bea'] })
+    const [anna, bea] = document.athletes
+    document = saveSession(document, { id: 'session', date: '2026-09-01', attendances: {} }, 'Coach')
+    document = saveSessionScore(document, 'session', { teamPoints: { a: [10] }, assignments: { [anna.id]: 'a' }, adjustments: {} }, 'Coach')
+    document = saveMonthlyScoreAdjustments(document, '2026-09', { [anna.id]: 5, [bea.id]: -2.5 }, 'Coach')
+    document = saveMonthlyScoreAdjustments(document, '2026-10', { [anna.id]: -3, [bea.id]: 20 }, 'Coach')
+    expect(scoreRanking(document, '2026-09')[0]).toMatchObject({ athleteId: anna.id, points: 15, sessionPoints: 10, bonusPoints: 5 })
+    expect(scoreRanking(document, '2026-10')[0]).toMatchObject({ athleteId: bea.id, points: 20, scoredSessions: 0 })
+    expect(scoreRanking(document).map((entry) => entry.points)).toEqual([17.5, 12])
+    document = saveMonthlyScoreAdjustments(document, '2026-09', { [anna.id]: 0, [bea.id]: -2.5 }, 'Coach')
+    expect(scoreRanking(document).find((entry) => entry.athleteId === anna.id)?.points).toBe(7)
+    expect(parseTeamDocument(serializeTeamDocument(document))).toEqual(document)
+  })
+
+  it('rifiuta punti extra non numerici, giocatrici sconosciute e mesi fuori stagione', () => {
+    const document = createTeamDocument({ teamName: 'U14', organizationName: 'Volley', coachName: 'Coach', startYear: 2026, athleteNames: ['Anna'] })
+    const athlete = document.athletes[0].id
+    for (const month of ['2026-07', '2027-08', '2026-13', '2026-9']) {
+      expect(() => saveMonthlyScoreAdjustments(document, month, { [athlete]: 1 }, 'Coach')).toThrow()
+    }
+    for (const points of [NaN, Infinity, -Infinity]) {
+      expect(() => saveMonthlyScoreAdjustments(document, '2026-09', { [athlete]: points }, 'Coach')).toThrow()
+    }
+    expect(() => saveMonthlyScoreAdjustments(document, '2026-09', { unknown: 1 }, 'Coach')).toThrow()
+  })
+
+  it('conserva i punti extra nel merge con una copia più recente senza bonus', () => {
+    const base = createTeamDocument({ teamName: 'U14', organizationName: 'Volley', coachName: 'Coach', startYear: 2026, athleteNames: ['Anna'] })
+    const athlete = base.athletes[0].id
+    const local = saveMonthlyScoreAdjustments(base, '2026-09', { [athlete]: 5 }, 'Coach')
+    const remote = { ...base, updatedAt: '2099-01-01T00:00:00.000Z' }
+    expect(mergeDocuments(local, remote).monthlyScoreAdjustments).toEqual(local.monthlyScoreAdjustments)
+  })
+
   it('propone il periodo predefinito dall’ultima settimana completa di agosto', () => {
     expect(defaultTrainingPeriod(2026)).toEqual({
       startDate: '2026-08-24',

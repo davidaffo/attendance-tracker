@@ -23,6 +23,7 @@ interface ScoresProps {
   document: TeamDocument
   initialSessionId?: string
   readOnly?: boolean
+  onSaveMonthlyAdjustments?: (month: string, adjustments: Record<string, number>) => Promise<void>
   onSave?: (
     sessionId: string,
     score: Pick<SessionScore, 'teamPoints' | 'assignments' | 'adjustments'>
@@ -75,10 +76,16 @@ function nextScoreTeamId(teams: ScoreTeam[]): ScoreTeam {
   }
 }
 
-export function Scores({ document, initialSessionId, readOnly = false, onSave }: ScoresProps) {
+export function Scores({ document, initialSessionId, readOnly = false, onSave, onSaveMonthlyAdjustments }: ScoresProps) {
   const [selectedSessionId, setSelectedSessionId] = useState<string | undefined>(
     initialSessionId
   )
+  const [monthlyDirty, setMonthlyDirty] = useState(false)
+  const changeMonth = (offset: number) => {
+    if (monthlyDirty && !window.confirm('Cambiare mese e scartare le modifiche ai punti extra non salvate?')) return
+    setMonthlyDirty(false)
+    setSelectedMonthIndex((index) => Math.max(0, Math.min(months.length - 1, index + offset)))
+  }
   const months = useMemo(() => seasonMonths(document), [document.season.startYear])
   const [selectedMonthIndex, setSelectedMonthIndex] = useState(() => {
     const now = new Date()
@@ -121,7 +128,7 @@ export function Scores({ document, initialSessionId, readOnly = false, onSave }:
       <div className="page-title-row scores-title-row">
         <div>
           <h1>Punteggi</h1>
-          <p>Classifiche calcolate sugli allenamenti già presenti nel registro.</p>
+          <p>Classifiche con i punti degli allenamenti e i punti extra mensili.</p>
         </div>
         <div className="scores-summary"><Trophy size={20} /> {scoredSessions}/{document.sessions.length} compilati</div>
       </div>
@@ -139,14 +146,14 @@ export function Scores({ document, initialSessionId, readOnly = false, onSave }:
                 type="button"
                 disabled={selectedMonthIndex === 0}
                 aria-label="Mese precedente"
-                onClick={() => setSelectedMonthIndex((index) => Math.max(0, index - 1))}
+                onClick={() => changeMonth(-1)}
               ><ChevronLeft size={18} /></button>
               <button
                 className="icon-button quiet"
                 type="button"
                 disabled={selectedMonthIndex === months.length - 1}
                 aria-label="Mese successivo"
-                onClick={() => setSelectedMonthIndex((index) => Math.min(months.length - 1, index + 1))}
+                onClick={() => changeMonth(1)}
               ><ChevronRight size={18} /></button>
             </div>
           </div>
@@ -163,6 +170,17 @@ export function Scores({ document, initialSessionId, readOnly = false, onSave }:
           <RankingList ranking={seasonRanking} athletesById={athletesById} />
         </section>
       </div>
+
+      {selectedMonth && (
+        <MonthlyScoreRegister
+          key={`${document.teamId}-${selectedMonth.value}`}
+          document={document}
+          month={selectedMonth.value}
+          monthLabel={selectedMonth.label}
+          onSave={readOnly ? undefined : onSaveMonthlyAdjustments}
+          onDirtyChange={setMonthlyDirty}
+        />
+      )}
 
       <section className="panel score-sessions-panel">
         <div className="panel-heading">
@@ -264,11 +282,101 @@ function RankingList({
           <span className={`score-position${index < 3 ? ` place-${index + 1}` : ''}`}>
             {index + 1}
           </span>
-          <strong>{athletesById.get(entry.athleteId)?.name}</strong>
+          <div className="score-ranking-name">
+            <strong>{athletesById.get(entry.athleteId)?.name}</strong>
+            <small>{entry.sessionPoints} allenamenti · {entry.bonusPoints > 0 ? '+' : ''}{entry.bonusPoints} extra</small>
+          </div>
           <b>{entry.points} pt</b>
         </div>
       ))}
     </div>
+  )
+}
+
+function MonthlyScoreRegister({ document, month, monthLabel, onSave, onDirtyChange }: {
+  document: TeamDocument
+  month: string
+  monthLabel: string
+  onSave?: (month: string, adjustments: Record<string, number>) => Promise<void>
+  onDirtyChange: (dirty: boolean) => void
+}) {
+  const stored = document.monthlyScoreAdjustments?.[month]
+  const [draft, setDraft] = useState<Record<string, string>>({})
+  const [saving, setSaving] = useState(false)
+  const [error, setError] = useState('')
+  const [saved, setSaved] = useState(false)
+  const athletes = athletesForReport(document)
+  const dirty = Object.keys(draft).length > 0
+  useEffect(() => onDirtyChange(dirty), [dirty, onDirtyChange])
+
+  const save = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault()
+    if (!onSave || saving) return
+    const adjustments = { ...stored }
+    for (const [athleteId, raw] of Object.entries(draft)) {
+      const points = raw.trim() === '' ? 0 : Number(raw.trim().replace(',', '.'))
+      if (!Number.isFinite(points)) {
+        setError('Inserisci un numero valido per ogni giocatrice.')
+        return
+      }
+      adjustments[athleteId] = points
+    }
+    setSaving(true)
+    setError('')
+    try {
+      await onSave(month, adjustments)
+      setDraft({})
+      setSaved(true)
+    } catch (caught) {
+      setError(caught instanceof Error ? caught.message : 'Salvataggio non riuscito.')
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  return (
+    <details className="panel monthly-score-register">
+      <summary>
+        <h2>Punti extra · <span className="capitalize">{monthLabel}</span></h2>
+        <ChevronRight className="monthly-score-chevron" size={20} />
+      </summary>
+      <p className="section-copy">Un punteggio aggiuntivo per giocatrice, anche negativo. Si somma al mese e alla stagione. Modifica il valore per sostituirlo; usa 0 per azzerarlo.</p>
+      {athletes.length === 0 ? <p>Nessuna giocatrice presente.</p> : (
+        <form onSubmit={(event) => void save(event)}>
+          <div className="monthly-score-list">
+            {athletes.map((athlete) => (
+              <label className="monthly-score-row" key={athlete.id}>
+                <strong>{athlete.name}</strong>
+                {onSave ? (
+                  <input
+                    type="text"
+                    inputMode="decimal"
+                    aria-label={`Punti extra di ${athlete.name}`}
+                    value={draft[athlete.id] ?? String(stored?.[athlete.id] ?? 0)}
+                    disabled={saving}
+                    onChange={(event) => {
+                      setDraft((current) => ({ ...current, [athlete.id]: event.target.value }))
+                      setSaved(false)
+                      setError('')
+                    }}
+                  />
+                ) : <b>{stored?.[athlete.id] ?? 0} pt</b>}
+              </label>
+            ))}
+          </div>
+          {error && <p role="alert" className="form-error">{error}</p>}
+          {saved && <p role="status">Punti extra salvati.</p>}
+          {onSave && (
+            <div className="monthly-score-actions">
+              <button className="button primary" type="submit" disabled={saving || !dirty}>
+                <Save size={17} /> {saving ? 'Salvataggio…' : 'Salva punti extra'}
+              </button>
+              {dirty && <button className="button ghost" type="button" disabled={saving} onClick={() => { setDraft({}); setError('') }}>Annulla</button>}
+            </div>
+          )}
+        </form>
+      )}
+    </details>
   )
 }
 

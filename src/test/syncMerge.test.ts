@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { createTeamDocument } from '../domain/defaults'
-import { saveSession, deleteSession, saveSessionScore } from '../domain/document'
+import { saveSession, deleteSession, saveSessionScore, saveMonthlyScoreAdjustments } from '../domain/document'
 import { mergeDocumentsFromBase } from '../domain/syncMerge'
 
 function fixture() {
@@ -13,6 +13,26 @@ function fixture() {
 }
 
 describe('merge dalla copia sincronizzata', () => {
+  it('unisce punti extra modificati per giocatrici diverse nello stesso mese', () => {
+    const { base, athlete } = fixture()
+    const other = base.athletes[1].id
+    const local = saveMonthlyScoreAdjustments(base, '2026-10', { [athlete]: -5 }, 'Locale')
+    const remote = saveMonthlyScoreAdjustments(base, '2026-10', { [other]: 3 }, 'Cloud')
+    const result = mergeDocumentsFromBase(local, remote, base)
+    expect(result.conflicts).toEqual([])
+    expect(result.document.monthlyScoreAdjustments?.['2026-10']).toEqual({ [athlete]: -5, [other]: 3 })
+  })
+
+  it('segnala modifiche incompatibili e conserva gli azzeramenti dei punti extra', () => {
+    const { base, athlete } = fixture()
+    const synced = saveMonthlyScoreAdjustments(base, '2026-10', { [athlete]: 5 }, 'Coach')
+    const local = saveMonthlyScoreAdjustments(synced, '2026-10', { [athlete]: 0 }, 'Locale')
+    const remote = saveMonthlyScoreAdjustments(synced, '2026-10', { [athlete]: -3 }, 'Cloud')
+    expect(mergeDocumentsFromBase(local, remote, synced).conflicts).toEqual([`registro.monthlyScoreAdjustments.2026-10.${athlete}`])
+    expect(mergeDocumentsFromBase(local, synced, synced).document.monthlyScoreAdjustments?.['2026-10'][athlete]).toBe(0)
+    expect(mergeDocumentsFromBase(local, remote, synced, 'remote').document.monthlyScoreAdjustments?.['2026-10'][athlete]).toBe(-3)
+  })
+
   it('aggiunge un allenamento offline alla copia cloud più recente senza perdere il giorno modificato sul cloud', () => {
     const { base, athlete, present, absent } = fixture()
     const local = saveSession(base, { id: 'offline', date: '2026-10-07', attendances: { [athlete]: present } }, 'Locale')

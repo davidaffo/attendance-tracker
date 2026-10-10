@@ -1570,6 +1570,7 @@ h2 {
 }
 
 .score-sessions-panel,
+.monthly-score-register,
 .score-athletes-panel {
   margin-top: 1rem;
 }
@@ -1606,6 +1607,73 @@ h2 {
 .score-session-row:last-child,
 .score-athlete-row:last-child {
   border-bottom: 0;
+}
+
+.score-ranking-name {
+  display: grid;
+  gap: 0.2rem;
+}
+
+.score-ranking-row .score-ranking-name small {
+  display: block;
+}
+
+.monthly-score-register > summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  cursor: pointer;
+  list-style: none;
+}
+
+.monthly-score-register > summary::-webkit-details-marker {
+  display: none;
+}
+
+.monthly-score-chevron {
+  flex-shrink: 0;
+  transition: transform 0.2s ease;
+}
+
+.monthly-score-register[open] .monthly-score-chevron {
+  transform: rotate(90deg);
+}
+
+.monthly-score-register[open] > summary {
+  margin-bottom: 1rem;
+}
+
+.monthly-score-list {
+  border: 1px solid var(--line);
+  border-radius: 13px;
+  overflow: hidden;
+}
+
+.monthly-score-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.65rem 0.75rem;
+  border-bottom: 1px solid var(--line);
+}
+
+.monthly-score-row:last-child {
+  border-bottom: 0;
+}
+
+.monthly-score-row input {
+  width: 100px;
+  flex-shrink: 0;
+  text-align: right;
+}
+
+.monthly-score-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 1rem;
 }
 
 .score-position {

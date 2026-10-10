@@ -292,16 +292,24 @@ installata e su hosting statici privi di fallback, come GitHub Pages.
 
 ## Punteggi degli allenamenti
 
-La sezione `Punteggi` usa esclusivamente gli allenamenti già presenti nel
-registro. Per ogni sessione si assegnano le atlete alla Squadra A o B e si
+La sezione `Punteggi` permette di compilare gli allenamenti già presenti nel
+registro e i punti extra mensili. Per ogni sessione si assegnano le atlete alla Squadra A o B e si
 inseriscono uno o più parziali: il totale viene calcolato automaticamente. Ogni
 atleta riceve il totale della propria squadra, più un’eventuale correzione
-individuale positiva o negativa. Le assenti ricevono sempre zero punti.
+individuale positiva o negativa. Le assenti ricevono sempre zero punti per quella sessione.
 
 La classifica può essere consultata per singolo mese o per l’intera stagione.
-I dati sono opzionali e vengono salvati dentro la sessione corrispondente, così
+I punteggi degli allenamenti sono opzionali e vengono salvati dentro la sessione corrispondente, così
 sincronizzazione e backup continuano a usare lo stesso registro senza creare
 sessioni parallele.
+
+Il registro `Punti extra` mostra un valore modificabile per ogni giocatrice nel
+mese selezionato, anche negativo o decimale. `Salva punti extra` sostituisce i
+valori precedenti; 0 azzera il punteggio aggiuntivo. I punti extra funzionano
+anche nei mesi senza allenamenti e si sommano alla classifica mensile e a quella
+stagionale, dove sono visibili separatamente dai punti degli allenamenti.
+Sono conservati nello stesso documento della squadra, inclusi nei backup e
+nella sincronizzazione; in consultazione il registro è disponibile in sola lettura.
 
 ## Allenamenti previsti e uscite anticipate
 
