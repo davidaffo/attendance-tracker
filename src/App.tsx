@@ -227,7 +227,7 @@ function Welcome({
 export default function App() {
   const [loading, setLoading] = useState(true)
   const [loadingMessage, setLoadingMessage] = useState('Apro il registro…')
-  const [connectionNotice, setConnectionNotice] = useState<string>()
+  const [connectionStatus, setConnectionStatus] = useState<string>()
   const [startupOnline, setStartupOnline] = useState(false)
   const startupReadyRef = useRef(false)
   const [loadingError, setLoadingError] = useState(false)
@@ -400,6 +400,7 @@ export default function App() {
 
       const operation = (async (): Promise<SyncOutcome> => {
         try {
+          setConnectionStatus(undefined)
           let readyConfig = currentConfig
           if (!readyConfig.appPassword) {
             setSyncIndicator(currentMeta.dirty ? 'pending' : 'local')
@@ -612,7 +613,6 @@ export default function App() {
             : undefined
           const result = await prepareStartupConnection(startupConfig?.baseUrl, () => {
             if (!active) return
-            setConnectionNotice('Connessione disponibile. Puoi sincronizzare con Nextcloud.')
             if (synchronize) {
               setLoadingMessage('Connessione disponibile. Attendo la password e sincronizzo il registro…')
             }
@@ -620,7 +620,7 @@ export default function App() {
           if (!active) return
           setStartupOnline(result.online)
           if (!result.online) setSyncIndicator(storedMeta.dirty ? 'pending' : 'local')
-          setConnectionNotice(result.message)
+          setConnectionStatus(result.message)
           startupReadyRef.current = true
           setLoading(false)
         })()
@@ -1005,12 +1005,6 @@ export default function App() {
 
   const renderPage = (page: ReactNode) => (
     <>
-      {connectionNotice && (
-        <div className="connection-notice" role="status">
-          <span>{connectionNotice}</span>
-          {!loading && <button className="button secondary" onClick={() => setConnectionNotice(undefined)}>Chiudi avviso</button>}
-        </div>
-      )}
       {page}
       {coachConflict && (
         <ConflictResolutionDialog
@@ -1385,7 +1379,8 @@ export default function App() {
             <button
               className={`sync-chip ${syncIndicator}`}
               onClick={() => navigate('/allenatore/impostazioni')}
-              title={syncMeta.lastError}
+              title={connectionStatus ?? syncMeta.lastError}
+              aria-label={connectionStatus ? `${syncLabel(syncIndicator)}. ${connectionStatus}` : syncLabel(syncIndicator)}
             >
               <SyncIcon className={syncIndicator === 'syncing' ? 'spin' : ''} size={15} />
               {syncLabel(syncIndicator)}

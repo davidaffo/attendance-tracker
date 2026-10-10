@@ -139,8 +139,9 @@ connessione, con un timeout di cinque secondi. Se Nextcloud è raggiungibile,
 il registro dell'allenatore viene sincronizzato prima di aprire le schermate:
 quando manca una password nella sessione, viene richiesta subito. Se la rete
 non è disponibile, si apre la copia locale senza chiedere credenziali.
-Un avviso comunica l'esito in entrambi i casi, anche se la sincronizzazione
-fallisce o viene annullata. Le modifiche locali pendenti vengono conservate.
+La barra di stato esistente comunica l'esito, con i dettagli nel suggerimento,
+anche se la sincronizzazione fallisce o viene annullata. Le modifiche locali
+pendenti vengono conservate.
 
 Indirizzo, nome utente e cartella remota vengono invece registrati
 automaticamente durante la digitazione; `Verifica e salva` serve soltanto a
