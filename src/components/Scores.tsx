@@ -284,7 +284,6 @@ function RankingList({
           </span>
           <div className="score-ranking-name">
             <strong>{athletesById.get(entry.athleteId)?.name}</strong>
-            <small>{entry.sessionPoints} allenamenti · {entry.bonusPoints > 0 ? '+' : ''}{entry.bonusPoints} extra</small>
           </div>
           <b>{entry.points} pt</b>
         </div>
