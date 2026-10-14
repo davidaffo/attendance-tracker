@@ -867,7 +867,6 @@ export function CoordinatorDashboard({
                 <TeamSettings
                   document={managementDrafts[managementTeamKey(team)]?.document ?? team.document}
                   comparisonDocument={team.document}
-                  deferredSave
                   onDraftChange={(document, dirty) => {
                     const key = managementTeamKey(team)
                     setManagementDrafts((current) => {

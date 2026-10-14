@@ -4,7 +4,7 @@ import { normalizeAthleteName, parseAthleteList } from '../domain/athleteList'
 
 interface AthleteListPasteProps {
   existingNames: string[]
-  onAdd: (names: string[]) => void
+  onAdd: (names: string[]) => void | Promise<boolean>
 }
 
 export function AthleteListPaste({ existingNames, onAdd }: AthleteListPasteProps) {
@@ -18,9 +18,10 @@ export function AthleteListPaste({ existingNames, onAdd }: AthleteListPasteProps
   const newNames = parsedNames.filter((name) => !existing.has(normalizeAthleteName(name)))
   const skippedCount = parsedNames.length - newNames.length
 
-  const addNames = () => {
+  const addNames = async () => {
     if (!newNames.length) return
-    onAdd(newNames)
+    const saved = await onAdd(newNames)
+    if (saved === false) return
     setAddedCount(newNames.length)
     setValue('')
   }

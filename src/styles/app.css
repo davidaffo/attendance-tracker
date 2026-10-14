@@ -5056,3 +5056,10 @@ html[data-theme='dark'] .sharing-cors-help code {
     transition-duration: 0.01ms !important;
   }
 }
+
+.roster-fields {
+  border: 0;
+  padding: 0;
+  margin: 0;
+  min-width: 0;
+}

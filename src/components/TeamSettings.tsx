@@ -7,12 +7,12 @@ import { AthleteListPaste } from './AthleteListPaste'
 import { WeekdayPicker } from './WeekdayPicker'
 import { TrainingPeriodFields } from './TrainingPeriodFields'
 import { defaultTrainingPeriod } from '../domain/defaults'
+import { prepareRosterDocument, refreshTeamSettingsDraft } from '../domain/teamSettings'
 
 interface TeamSettingsProps {
   document: TeamDocument
   onUpdate: (document: TeamDocument) => Promise<void>
   managedByCoordinator?: boolean
-  deferredSave?: boolean
   onDraftChange?: (document: TeamDocument, dirty: boolean) => void
   comparisonDocument?: TeamDocument
 }
@@ -75,7 +75,6 @@ export function TeamSettings({
   document,
   onUpdate,
   managedByCoordinator = false,
-  deferredSave = false,
   onDraftChange,
   comparisonDocument = document
 }: TeamSettingsProps) {
@@ -85,13 +84,18 @@ export function TeamSettings({
   const [newAthlete, setNewAthlete] = useState('')
   const [saving, setSaving] = useState(false)
   const [message, setMessage] = useState('')
+  const savingRef = useRef(false)
+  const previousDocumentRef = useRef(withScheduleDefaults(comparisonDocument, !managedByCoordinator))
   const onDraftChangeRef = useRef(onDraftChange)
   useEffect(() => {
     onDraftChangeRef.current = onDraftChange
   }, [onDraftChange])
   useEffect(() => {
-    setDraft(withScheduleDefaults(document, !managedByCoordinator))
-  }, [document.teamId, document.revision, document.updatedAt, managedByCoordinator])
+    const saved = withScheduleDefaults(comparisonDocument, !managedByCoordinator)
+    const previous = previousDocumentRef.current
+    previousDocumentRef.current = saved
+    setDraft((current) => refreshTeamSettingsDraft(current, previous, saved))
+  }, [comparisonDocument.teamId, comparisonDocument.revision, comparisonDocument.updatedAt, managedByCoordinator])
   useEffect(() => {
     const comparableDocument = withScheduleDefaults(
       comparisonDocument,
@@ -115,64 +119,80 @@ export function TeamSettings({
     setDraft((current) => ({ ...current, [key]: value }))
   }
 
-  const addAthlete = () => {
+  const saveRoster = async (athletes: TeamDocument['athletes']) => {
+    if (savingRef.current) return false
+    if (JSON.stringify(athletes) === JSON.stringify(comparisonDocument.athletes)) return true
+    savingRef.current = true
+    setSaving(true)
+    setMessage('')
+    try {
+      const updated = prepareRosterDocument(comparisonDocument, athletes)
+      await onUpdate(updated)
+      setDraft((current) => ({
+        ...current,
+        athletes: updated.athletes,
+        revision: updated.revision,
+        updatedAt: updated.updatedAt,
+        updatedBy: updated.updatedBy
+      }))
+      return true
+    } catch (error) {
+      setMessage(error instanceof Error ? error.message : 'Salvataggio della rosa non riuscito.')
+      return false
+    } finally {
+      savingRef.current = false
+      setSaving(false)
+    }
+  }
+
+  const addAthlete = async () => {
     const name = formatAthleteName(newAthlete)
     if (!name) return
-    setDraft((current) => ({
-      ...current,
-      athletes: [
-        ...current.athletes,
-        {
-          id: crypto.randomUUID(),
-          name,
-          order: current.athletes.length,
-          active: true,
-          createdAt: new Date().toISOString()
-        }
-      ]
-    }))
-    setNewAthlete('')
+    const saved = await saveRoster([
+      ...draft.athletes,
+      {
+        id: crypto.randomUUID(),
+        name,
+        order: draft.athletes.length,
+        active: true,
+        createdAt: new Date().toISOString()
+      }
+    ])
+    if (saved) setNewAthlete('')
   }
 
   const addAthletes = (names: string[]) => {
     const now = new Date().toISOString()
-    setDraft((current) => ({
-      ...current,
-      athletes: [
-        ...current.athletes,
-        ...names.map((name, index) => ({
-          id: crypto.randomUUID(),
-          name: formatAthleteName(name),
-          order: current.athletes.length + index,
-          active: true,
-          createdAt: now
-        }))
-      ]
-    }))
+    return saveRoster([
+      ...draft.athletes,
+      ...names.map((name, index) => ({
+        id: crypto.randomUUID(),
+        name: formatAthleteName(name),
+        order: draft.athletes.length + index,
+        active: true,
+        createdAt: now
+      }))
+    ])
   }
 
   const archiveAthlete = (athleteId: string) => {
     const now = new Date().toISOString()
-    setDraft((current) => ({
-      ...current,
-      athletes: current.athletes.map((athlete) =>
-        athlete.id === athleteId ? { ...athlete, active: false, archivedAt: now } : athlete
-      )
-    }))
+    return saveRoster(draft.athletes.map((athlete) =>
+      athlete.id === athleteId ? { ...athlete, active: false, archivedAt: now } : athlete
+    ))
   }
 
   const restoreAthlete = (athleteId: string) => {
-    setDraft((current) => ({
-      ...current,
-      athletes: current.athletes.map((athlete) => {
-        if (athlete.id !== athleteId) return athlete
-        const { archivedAt: _, ...rest } = athlete
-        return { ...rest, active: true }
-      })
+    return saveRoster(draft.athletes.map((athlete) => {
+      if (athlete.id !== athleteId) return athlete
+      const { archivedAt: _, ...rest } = athlete
+      return { ...rest, active: true }
     }))
   }
 
   const save = async () => {
+    if (savingRef.current) return
+    savingRef.current = true
     setSaving(true)
     setMessage('')
     try {
@@ -182,6 +202,7 @@ export function TeamSettings({
     } catch (error) {
       setMessage(error instanceof Error ? error.message : 'Salvataggio non riuscito.')
     } finally {
+      savingRef.current = false
       setSaving(false)
     }
   }
@@ -192,12 +213,6 @@ export function TeamSettings({
         <div>
           <h1>Squadra e rosa</h1>
         </div>
-        {!deferredSave && (
-          <button className="button primary" onClick={save} disabled={saving}>
-            <Save size={17} />
-            {saving ? 'Salvo…' : 'Salva modifiche'}
-          </button>
-        )}
       </div>
 
       <section className="panel settings-panel">
@@ -284,6 +299,12 @@ export function TeamSettings({
                 : 'Serve per segnalare gli allenamenti previsti e quelli non ancora registrati.'}
             </p>
           </div>
+          {!managedByCoordinator && (
+            <button className="button primary" type="button" onClick={save} disabled={saving}>
+              <Save size={17} />
+              {saving ? 'Salvo…' : 'Salva modifiche'}
+            </button>
+          )}
         </div>
         <WeekdayPicker
           value={draft.trainingWeekdays ?? []}
@@ -322,78 +343,85 @@ export function TeamSettings({
         <div className="panel-heading">
           <div>
             <h2>Rosa ({activeAthletes.length})</h2>
+            <p className="section-copy">Le modifiche alla rosa vengono salvate automaticamente.</p>
           </div>
         </div>
-        <div className="roster-list">
-          {activeAthletes.map((athlete, index) => (
-            <div className="roster-row" key={athlete.id}>
-              <span className="row-number">{index + 1}</span>
-              <input
-                value={athlete.name}
-                aria-label={`Nome atleta ${index + 1}`}
-                onChange={(event) =>
-                  update(
-                    'athletes',
-                    draft.athletes.map((candidate) =>
-                      candidate.id === athlete.id
-                        ? { ...candidate, name: event.target.value }
-                        : candidate
-                    )
-                  )
-                }
-              />
-              <button
-                className="icon-button quiet"
-                onClick={() => archiveAthlete(athlete.id)}
-                title="Archivia atleta"
-                aria-label={`Archivia ${athlete.name}`}
-              >
-                <Archive size={17} />
-              </button>
-            </div>
-          ))}
-          <div className="roster-row add-row">
-            <span className="row-number">+</span>
-            <input
-              value={newAthlete}
-              placeholder="Nuova atleta"
-              onChange={(event) => setNewAthlete(event.target.value)}
-              onKeyDown={(event) => {
-                if (event.key === 'Enter') {
-                  event.preventDefault()
-                  addAthlete()
-                }
-              }}
-            />
-            <button className="icon-button accent" onClick={addAthlete} aria-label="Aggiungi atleta">
-              <Plus size={18} />
-            </button>
-          </div>
-        </div>
-
-        <AthleteListPaste
-          existingNames={draft.athletes.map((athlete) => athlete.name)}
-          onAdd={addAthletes}
-        />
-
-        {archivedAthletes.length > 0 && (
-          <details className="archived">
-            <summary>Atlete archiviate ({archivedAthletes.length})</summary>
-            {archivedAthletes.map((athlete) => (
+        <fieldset className="roster-fields" disabled={saving}>
+          <div className="roster-list">
+            {activeAthletes.map((athlete, index) => (
               <div className="roster-row" key={athlete.id}>
-                <span className="row-number">—</span>
-                <span className="archived-name">{athlete.name}</span>
+                <span className="row-number">{index + 1}</span>
+                <input
+                  value={athlete.name}
+                  aria-label={`Nome atleta ${index + 1}`}
+                  onBlur={() => void saveRoster(draft.athletes)}
+                  onKeyDown={(event) => {
+                    if (event.key === 'Enter') event.currentTarget.blur()
+                  }}
+                  onChange={(event) =>
+                    update(
+                      'athletes',
+                      draft.athletes.map((candidate) =>
+                        candidate.id === athlete.id
+                          ? { ...candidate, name: event.target.value }
+                          : candidate
+                      )
+                    )
+                  }
+                />
                 <button
                   className="icon-button quiet"
-                  onClick={() => restoreAthlete(athlete.id)}
-                  aria-label={`Ripristina ${athlete.name}`}
+                  onClick={() => archiveAthlete(athlete.id)}
+                  title="Archivia atleta"
+                  aria-label={`Archivia ${athlete.name}`}
                 >
-                  <RotateCcw size={17} />
+                  <Archive size={17} />
                 </button>
               </div>
             ))}
-          </details>
-        )}
+            <div className="roster-row add-row">
+              <span className="row-number">+</span>
+              <input
+                value={newAthlete}
+                placeholder="Nuova atleta"
+                onChange={(event) => setNewAthlete(event.target.value)}
+                onKeyDown={(event) => {
+                  if (event.key === 'Enter') {
+                    event.preventDefault()
+                    addAthlete()
+                  }
+                }}
+              />
+              <button className="icon-button accent" onClick={addAthlete} aria-label="Aggiungi atleta">
+                <Plus size={18} />
+              </button>
+            </div>
+          </div>
+
+          <AthleteListPaste
+            existingNames={draft.athletes.map((athlete) => athlete.name)}
+            onAdd={addAthletes}
+          />
+
+          {archivedAthletes.length > 0 && (
+            <details className="archived">
+              <summary>Atlete archiviate ({archivedAthletes.length})</summary>
+              {archivedAthletes.map((athlete) => (
+                <div className="roster-row" key={athlete.id}>
+                  <span className="row-number">—</span>
+                  <span className="archived-name">{athlete.name}</span>
+                  <button
+                    className="icon-button quiet"
+                    onClick={() => restoreAthlete(athlete.id)}
+                    aria-label={`Ripristina ${athlete.name}`}
+                  >
+                    <RotateCcw size={17} />
+                  </button>
+                </div>
+              ))}
+            </details>
+          )}
+        </fieldset>
       </section>
 
       {!managedByCoordinator && <section className="panel settings-panel">
@@ -455,19 +483,6 @@ export function TeamSettings({
           ))}
         </div>
       </section>}
-
-      {!deferredSave && (
-        <button
-          className="button primary mobile-save-fab"
-          type="button"
-          onClick={save}
-          disabled={saving}
-          aria-label={saving ? 'Salvataggio in corso' : 'Salva modifiche'}
-          title={saving ? 'Salvataggio in corso' : 'Salva modifiche'}
-        >
-          <Save size={22} />
-        </button>
-      )}
     </div>
   )
 }
