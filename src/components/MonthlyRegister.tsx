@@ -59,7 +59,12 @@ export function MonthlyRegister({
   compactHeader = false
 }: MonthlyRegisterProps) {
   const months = useMemo(() => getSeasonMonths(document.season.startYear), [document.season.startYear])
-  const [selectedPeriod, setSelectedPeriod] = useState('season')
+  const [selectedPeriod, setSelectedPeriod] = useState(() => {
+    const today = new Date()
+    return months.find(
+      (month) => month.year === today.getFullYear() && month.monthIndex === today.getMonth()
+    )?.key ?? 'season'
+  })
   const selectedMonth = months.find((month) => month.key === selectedPeriod)
   const sessions = selectedMonth
     ? sessionsInMonth(document, selectedMonth.year, selectedMonth.monthIndex).sort((a, b) =>
