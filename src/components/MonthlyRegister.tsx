@@ -11,6 +11,7 @@ import {
 import { percentageScaleColor } from '../domain/percentageColorScale'
 import { AttendanceLegend } from './AttendanceLegend'
 import { SessionNoteIndicator } from './SessionNoteIndicator'
+import { TeamTotalsFooter } from './TeamTotalsFooter'
 
 interface MonthlyRegisterProps {
   document: TeamDocument
@@ -71,9 +72,12 @@ export function MonthlyRegister({
     0
   )
   const possibleAttendances = sessions.length * athletes.length
-  const completionRate = possibleAttendances
-    ? Math.round((completedAttendances / possibleAttendances) * 100)
-    : 0
+  const complete = possibleAttendances > 0 && completedAttendances === possibleAttendances
+  const completionRate = complete
+    ? 100
+    : possibleAttendances
+      ? Math.min(99, Math.round((completedAttendances / possibleAttendances) * 100))
+      : 0
 
   return (
     <div className={`page-content register-page${compactHeader ? ' compact-header' : ''}`}>
@@ -97,7 +101,6 @@ export function MonthlyRegister({
           onClick={() => setSelectedPeriod('season')}
         >
           <span>Stagione</span>
-          <strong>{document.sessions.length}</strong>
         </button>
         {months.map((month) => {
           const count = sessionsInMonth(document, month.year, month.monthIndex).length
@@ -109,7 +112,6 @@ export function MonthlyRegister({
               title={month.label}
             >
               <span>{month.shortLabel}</span>
-              <strong>{count}</strong>
             </button>
           )
         })}
@@ -130,7 +132,7 @@ export function MonthlyRegister({
             <Users size={16} />
             <strong>{athletes.length}</strong> atlete
           </span>
-          <span>
+          <span className={complete ? 'completion-complete' : 'completion-incomplete'}>
             <strong>{completionRate}%</strong> compilato
           </span>
         </div>
@@ -213,13 +215,18 @@ function MonthMatrix({ document, sessions, athletes, onEditSession }: MatrixProp
               ))}
               {document.statuses.map((status) => (
                 <th className="total-head" key={status.id}>
-                  <span>{status.code}</span>
-                  <small>% · n</small>
+                  <span
+                    className="matrix-status"
+                    style={{ background: status.color }}
+                    title={status.label}
+                    aria-label={status.label}
+                  >
+                    {status.code}
+                  </span>
                 </th>
               ))}
               <th className="total-head early-departure-head">
-                <span>U</span>
-                <small>% · n</small>
+                <span className="matrix-status" title="Uscita anticipata" aria-label="Uscita anticipata">U</span>
               </th>
             </tr>
           </thead>
@@ -289,6 +296,7 @@ function MonthMatrix({ document, sessions, athletes, onEditSession }: MatrixProp
               )
             })}
           </tbody>
+          <TeamTotalsFooter document={document} sessions={sessions} athletes={athletes} showSessions />
         </table>
       </div>
     </>
@@ -310,19 +318,6 @@ function SeasonOverview({
 }: SeasonOverviewProps) {
   return (
     <>
-      <div className="season-month-grid">
-        {months.map((month) => {
-          const count = sessionsInMonth(document, month.year, month.monthIndex).length
-          return (
-            <button key={month.key} onClick={() => onSelectMonth(month.key)}>
-              <span className="capitalize">{month.label}</span>
-              <strong>{count}</strong>
-              <small>{count === 1 ? 'allenamento' : 'allenamenti'}</small>
-            </button>
-          )
-        })}
-      </div>
-
       <div className="matrix-wrap panel season-summary">
         <table className="attendance-matrix">
           <thead>
@@ -384,6 +379,7 @@ function SeasonOverview({
               )
             })}
           </tbody>
+          <TeamTotalsFooter document={document} sessions={document.sessions} athletes={athletes} />
         </table>
       </div>
       <MobileAthleteSummary document={document} sessions={document.sessions} athletes={athletes} />

@@ -5,6 +5,7 @@
     Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
+  --content-width: 1760px;
   --ink: #18332c;
   --muted: #6d7873;
   --green: #173f35;
@@ -1162,9 +1163,9 @@ h2 {
 }
 
 .page-content {
-  width: min(1180px, 100%);
+  width: min(var(--content-width), 100%);
   margin: 0 auto;
-  padding: clamp(1.25rem, 4vw, 3rem);
+  padding: clamp(1rem, 2vw, 2rem);
 }
 
 .page-title-row,
@@ -2124,7 +2125,7 @@ h2 {
   align-items: center;
   gap: 0.9rem;
   min-height: 78px;
-  padding: 0.75rem max(1rem, calc((100vw - 1080px) / 2));
+  padding: 0.75rem max(1rem, calc((100vw - var(--content-width)) / 2));
   border-bottom: 1px solid var(--line);
   background: rgba(245, 242, 234, 0.94);
   backdrop-filter: blur(14px);
@@ -2146,7 +2147,7 @@ h2 {
 
 .editor-toolbar {
   display: grid;
-  width: min(1080px, calc(100% - 2rem));
+  width: min(var(--content-width), calc(100% - 2rem));
   grid-template-columns: minmax(0, 1fr) auto;
   align-items: end;
   gap: 1rem;
@@ -2198,13 +2199,13 @@ h2 {
 }
 
 .editor-legend {
-  width: min(1080px, calc(100% - 2rem));
+  width: min(var(--content-width), calc(100% - 2rem));
   margin: 0 auto;
   padding: 0 1rem;
 }
 
 .attendance-list {
-  width: min(1080px, calc(100% - 2rem));
+  width: min(var(--content-width), calc(100% - 2rem));
   margin: 0 auto;
   border: 1px solid var(--line);
   border-radius: 15px;
@@ -2392,7 +2393,7 @@ h2 {
 }
 
 .editor-error {
-  width: min(1080px, calc(100% - 2rem));
+  width: min(var(--content-width), calc(100% - 2rem));
   margin: 0.8rem auto 0;
   padding: 0.75rem 0.9rem;
   color: #9f4039;
@@ -2405,20 +2406,20 @@ h2 {
 /* Monthly register */
 
 .register-page {
-  width: min(1280px, 100%);
+  width: min(var(--content-width), 100%);
 }
 
 .season-navigation {
   display: grid;
   overflow-x: auto;
   grid-template-columns: minmax(105px, 1.4fr) repeat(12, minmax(66px, 1fr));
-  gap: 0.35rem;
+  /* gap: 0.35rem; */
   margin-bottom: 1.8rem;
-  padding: 0.35rem;
+  /* padding: 0.35rem; */
   border: 1px solid var(--line);
   border-radius: 15px;
   background: rgba(255, 253, 248, 0.75);
-  scrollbar-width: thin;
+  /* scrollbar-width: thin; */
 }
 
 .season-navigation button {
@@ -2482,6 +2483,24 @@ h2 {
   border-radius: 999px;
   background: var(--paper);
   font-size: 0.68rem;
+}
+
+.period-metrics svg {
+  color: color-mix(in srgb, var(--green-2) 68%, var(--paper));
+}
+
+.period-metrics > .completion-incomplete {
+  color: #b54232;
+  border-color: color-mix(in srgb, #b54232 30%, var(--paper));
+}
+
+.period-metrics > .completion-complete {
+  color: var(--green-2);
+  border-color: color-mix(in srgb, var(--green-2) 30%, var(--paper));
+}
+
+html[data-theme='dark'] .period-metrics > .completion-incomplete {
+  color: #f29b8d;
 }
 
 .season-month-grid {
@@ -2661,6 +2680,11 @@ h2 {
   display: block;
 }
 
+.attendance-matrix .total-head .matrix-status {
+  display: inline-grid;
+  margin-inline: auto;
+}
+
 .attendance-matrix .total-head small {
   margin-top: 0.12rem;
   color: var(--muted);
@@ -2733,6 +2757,35 @@ h2 {
   border-radius: 8px;
   font-size: 0.7rem;
   font-weight: 900;
+}
+
+.attendance-matrix .team-totals-footer :is(th, td) {
+  border-top: 2px solid var(--line);
+  background: color-mix(in srgb, var(--paper) 88%, var(--green-2));
+  font-weight: 800;
+}
+
+.session-team-totals {
+  display: grid;
+  justify-content: center;
+  gap: 0.3rem;
+}
+
+.session-team-totals > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.session-team-totals i {
+  display: inline-grid;
+  width: 18px;
+  height: 18px;
+  place-items: center;
+  border-radius: 5px;
+  color: #fff;
+  font-size: 0.55rem;
+  font-style: normal;
 }
 
 .matrix-empty {
@@ -3378,7 +3431,7 @@ html[data-theme='dark'] .sharing-cors-help code {
 
 .coordinator-header {
   display: flex;
-  width: min(1240px, calc(100% - 2rem));
+  width: min(var(--content-width), calc(100% - 2rem));
   min-height: 78px;
   align-items: center;
   justify-content: space-between;
@@ -3386,7 +3439,7 @@ html[data-theme='dark'] .sharing-cors-help code {
 }
 
 .coordinator-main {
-  width: min(1240px, calc(100% - 2rem));
+  width: min(var(--content-width), calc(100% - 2rem));
   margin: 0 auto;
   padding-bottom: 4rem;
 }

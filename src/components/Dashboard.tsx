@@ -32,20 +32,15 @@ export function Dashboard({
   const monthSessions = sessionsInMonth(document, now.getFullYear(), now.getMonth())
   const recent = [...document.sessions].sort((a, b) => b.date.localeCompare(a.date)).slice(0, 4)
   const activeAthletes = document.athletes.filter((athlete) => athlete.active)
-  const presentId = document.statuses.find((status) => status.code === 'P')?.id
-  const presentCount = presentId
+  const absentId = document.statuses.find((status) => status.code === 'A')?.id
+  const absenceCount = absentId
     ? activeAthletes.reduce(
-        (total, athlete) => total + (athleteTotals(document, athlete.id, monthSessions)[presentId] ?? 0),
+        (total, athlete) => total + (athleteTotals(document, athlete.id, monthSessions)[absentId] ?? 0),
         0
       )
     : 0
   const possible = activeAthletes.length * monthSessions.length
-  const presenceRate = possible ? Math.round((presentCount / possible) * 100) : 0
-  const earlyDepartures = activeAthletes.reduce(
-    (total, athlete) => total + earlyDepartureCountForAthlete(document, athlete.id, monthSessions),
-    0
-  )
-  const earlyDepartureRate = possible ? Math.round((earlyDepartures / possible) * 100) : 0
+  const absenceRate = possible ? Math.round((absenceCount / possible) * 100) : 0
 
   return (
     <div className="page-content dashboard">
@@ -83,14 +78,9 @@ export function Dashboard({
           <span>Atlete in rosa</span>
         </article>
         <article className="metric-card accent-metric">
-          <span className="metric-code">P</span>
-          <strong>{presenceRate}%</strong>
-          <span>Presenze del mese</span>
-        </article>
-        <article className="metric-card">
-          <span className="metric-code">U</span>
-          <strong>{earlyDepartureRate}%</strong>
-          <span>Uscite anticipate del mese</span>
+          <span className="metric-code">A</span>
+          <strong>{absenceRate}%</strong>
+          <span>Assenze del mese</span>
         </article>
       </section>
 
