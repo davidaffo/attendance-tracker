@@ -37,6 +37,7 @@ export interface TrainingSession {
   date: string
   attendances: Record<string, string>
   earlyDepartures?: string[]
+  note?: string
   score?: SessionScore
   createdAt: string
   updatedAt: string

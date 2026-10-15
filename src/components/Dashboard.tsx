@@ -116,8 +116,11 @@ export function Dashboard({
                   key={session.id}
                   onClick={() => onEditSession(session)}
                 >
-                  <span className="session-date">
-                    {dateFormatter.format(new Date(`${session.date}T12:00:00`))}
+                  <span className="session-description">
+                    <span className="session-date">
+                      {dateFormatter.format(new Date(`${session.date}T12:00:00`))}
+                    </span>
+                    {session.note && <span className="session-note-preview">{session.note}</span>}
                   </span>
                   <span className="session-completion">
                     {completed}/{activeAthletes.length} compilate

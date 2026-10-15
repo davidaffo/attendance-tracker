@@ -13,6 +13,25 @@ function fixture() {
 }
 
 describe('merge dalla copia sincronizzata', () => {
+  it('unisce annotazione e presenze modificate su dispositivi diversi', () => {
+    const { base, athlete, absent } = fixture()
+    const local = saveSession(base, { ...base.sessions[0], note: 'Lavoro sul servizio' }, 'Locale')
+    const remote = saveSession(base, { ...base.sessions[0], attendances: { [athlete]: absent } }, 'Cloud')
+    const result = mergeDocumentsFromBase(local, remote, base)
+    expect(result.conflicts).toEqual([])
+    expect(result.document.sessions[0]).toMatchObject({ note: 'Lavoro sul servizio', attendances: { [athlete]: absent } })
+  })
+
+  it('propaga la rimozione della nota e segnala annotazioni incompatibili', () => {
+    const { base } = fixture()
+    const synced = saveSession(base, { ...base.sessions[0], note: 'Prima nota' }, 'Coach')
+    const local = saveSession(synced, { ...synced.sessions[0], note: '' }, 'Locale')
+    expect(mergeDocumentsFromBase(local, synced, synced).document.sessions[0].note).toBeUndefined()
+    const remote = saveSession(synced, { ...synced.sessions[0], note: 'Altra nota' }, 'Cloud')
+    expect(mergeDocumentsFromBase(local, remote, synced).conflicts).toEqual(['sessions.2026-10-01.note'])
+    expect(mergeDocumentsFromBase(local, remote, synced, 'remote').document.sessions[0].note).toBe('Altra nota')
+  })
+
   it('unisce punti extra modificati per giocatrici diverse nello stesso mese', () => {
     const { base, athlete } = fixture()
     const other = base.athletes[1].id

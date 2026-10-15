@@ -26,6 +26,29 @@ import {
 } from '../domain/document'
 
 describe('documento squadra', () => {
+  it('salva, esporta e rimuove l’annotazione senza perdere i punteggi', () => {
+    let document = createTeamDocument({ teamName: 'U14', organizationName: 'Volley', coachName: 'Coach', startYear: 2026, athleteNames: ['Anna'] })
+    const input = { id: 'session', date: '2026-09-01', attendances: {} }
+    document = saveSession(document, { ...input, note: '  Lavoro sulla ricezione\nDa riprendere giovedì.  ' }, 'Coach')
+    expect(document.sessions[0].note).toBe('Lavoro sulla ricezione\nDa riprendere giovedì.')
+    document = parseTeamDocument(serializeTeamDocument(document))
+    expect(document.sessions[0].note).toContain('Da riprendere giovedì.')
+    document = saveSessionScore(document, 'session', { teamPoints: { a: [10] }, assignments: {}, adjustments: {} }, 'Coach')
+    expect(document.sessions[0].note).toContain('ricezione')
+    document = saveSession(document, input, 'Coach')
+    expect(document.sessions[0].note).toContain('ricezione')
+    document = saveSession(document, { ...input, note: '   ' }, 'Coach')
+    expect(document.sessions[0].note).toBeUndefined()
+    expect(document.sessions[0].score?.teamPoints.a).toEqual([10])
+    expect(isTeamDocument(parseTeamDocument(serializeTeamDocument(document)))).toBe(true)
+  })
+
+  it('accetta sessioni senza annotazioni e rifiuta annotazioni non testuali', () => {
+    const document = saveSession(createTeamDocument({ teamName: 'U14', organizationName: 'Volley', coachName: 'Coach', startYear: 2026, athleteNames: [] }), { id: 'session', date: '2026-09-01', attendances: {} }, 'Coach')
+    expect(isTeamDocument(document)).toBe(true)
+    expect(isTeamDocument({ ...document, sessions: [{ ...document.sessions[0], note: 42 }] })).toBe(false)
+  })
+
   it('somma i punti extra del mese e della stagione e sostituisce i valori precedenti', () => {
     let document = createTeamDocument({ teamName: 'U14', organizationName: 'Volley', coachName: 'Coach', startYear: 2026, athleteNames: ['Anna', 'Bea'] })
     const [anna, bea] = document.athletes

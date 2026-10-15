@@ -789,7 +789,7 @@ export default function App() {
   }
 
   const handleSessionSave = async (
-    input: Pick<TrainingSession, 'id' | 'date' | 'attendances' | 'earlyDepartures'>
+    input: Pick<TrainingSession, 'id' | 'date' | 'attendances' | 'earlyDepartures' | 'note'>
   ) => {
     if (!document) return
     const otherOnDate = document.sessions.find(

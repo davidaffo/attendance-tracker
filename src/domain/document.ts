@@ -48,6 +48,7 @@ function isSession(value: unknown): value is TrainingSession {
     /^\d{4}-\d{2}-\d{2}$/.test(String(value.date)) &&
     isRecord(value.attendances) &&
     Object.values(value.attendances).every(isString) &&
+    (value.note === undefined || isString(value.note)) &&
     (value.earlyDepartures === undefined ||
       (Array.isArray(value.earlyDepartures) && value.earlyDepartures.every(isString))) &&
     (value.score === undefined || isSessionScore(value.score)) &&
@@ -187,13 +188,14 @@ export function serializeTeamDocument(document: TeamDocument): string {
 
 export function saveSession(
   document: TeamDocument,
-  input: Pick<TrainingSession, 'id' | 'date' | 'attendances' | 'earlyDepartures'>,
+  input: Pick<TrainingSession, 'id' | 'date' | 'attendances' | 'earlyDepartures' | 'note'>,
   updatedBy: string
 ): TeamDocument {
   const now = new Date().toISOString()
   const existing = document.sessions.find((session) => session.id === input.id)
   const session: TrainingSession = {
     ...input,
+    note: (input.note ?? existing?.note)?.trim() || undefined,
     ...(existing?.score ? { score: existing.score } : {}),
     createdAt: existing?.createdAt ?? now,
     updatedAt: now,

@@ -9,6 +9,8 @@ import {
   sessionsInMonth
 } from '../domain/document'
 import { percentageScaleColor } from '../domain/percentageColorScale'
+import { AttendanceLegend } from './AttendanceLegend'
+import { SessionNoteIndicator } from './SessionNoteIndicator'
 
 interface MonthlyRegisterProps {
   document: TeamDocument
@@ -134,18 +136,7 @@ export function MonthlyRegister({
         </div>
       </section>
 
-      <div className="legend">
-        {document.statuses.map((status) => (
-          <span key={status.id}>
-            <i style={{ background: status.color }} />
-            <strong>{status.code}</strong> {status.label}
-          </span>
-        ))}
-        <span>
-          <i className="early-departure-dot" />
-          <strong>U</strong> Uscita anticipata
-        </span>
-      </div>
+      <AttendanceLegend statuses={document.statuses} />
 
       {selectedMonth ? (
         <MonthMatrix
@@ -197,18 +188,27 @@ function MonthMatrix({ document, sessions, athletes, onEditSession }: MatrixProp
             <tr>
               <th className="sticky-name">Atleta</th>
               {sessions.map((session) => (
-                <th key={session.id}>
-                  {onEditSession ? (
-                    <button onClick={() => onEditSession(session)} title="Modifica sessione">
-                      <small>{weekdayForSession(session.date)}</small>
-                      <strong>{session.date.slice(-2)}</strong>
-                    </button>
-                  ) : (
-                    <span className="session-day-heading">
-                      <small>{weekdayForSession(session.date)}</small>
-                      <strong>{session.date.slice(-2)}</strong>
-                    </span>
-                  )}
+                <th key={session.id} className={session.note ? 'session-has-note' : undefined}>
+                  <div className="session-heading-content">
+                    {session.note ? (
+                      <SessionNoteIndicator
+                        note={session.note}
+                        date={session.date}
+                        weekday={weekdayForSession(session.date)}
+                        onEdit={onEditSession ? () => onEditSession(session) : undefined}
+                      />
+                    ) : onEditSession ? (
+                      <button onClick={() => onEditSession(session)} title="Modifica sessione">
+                        <small>{weekdayForSession(session.date)}</small>
+                        <strong>{session.date.slice(-2)}</strong>
+                      </button>
+                    ) : (
+                      <span className="session-day-heading">
+                        <small>{weekdayForSession(session.date)}</small>
+                        <strong>{session.date.slice(-2)}</strong>
+                      </span>
+                    )}
+                  </div>
                 </th>
               ))}
               {document.statuses.map((status) => (

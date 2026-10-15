@@ -13,12 +13,13 @@ import {
 } from 'lucide-react'
 import type { TeamDocument, TrainingSession } from '../domain/types'
 import { compareAthletesByName } from '../domain/document'
+import { AttendanceLegend } from './AttendanceLegend'
 
 interface AttendanceEditorProps {
   document: TeamDocument
   initialSession?: TrainingSession
   initialDate?: string
-  onSave: (input: Pick<TrainingSession, 'id' | 'date' | 'attendances' | 'earlyDepartures'>) => Promise<void>
+  onSave: (input: Pick<TrainingSession, 'id' | 'date' | 'attendances' | 'earlyDepartures' | 'note'>) => Promise<void>
   onDelete?: (sessionId: string) => Promise<void>
   onOpenScores?: (sessionId: string) => void
   onClose: () => void
@@ -51,6 +52,7 @@ export function AttendanceEditor({
     initialSession?.earlyDepartures ?? []
   )
   const [saving, setSaving] = useState(false)
+  const [note, setNote] = useState(initialSession?.note ?? '')
   const [saved, setSaved] = useState(false)
   const [error, setError] = useState('')
   const savedTimer = useRef<ReturnType<typeof setTimeout>>(undefined)
@@ -64,7 +66,7 @@ export function AttendanceEditor({
 
   useEffect(() => {
     setSaved(false)
-  }, [date, attendances, earlyDepartures])
+  }, [date, attendances, earlyDepartures, note])
 
   const markAll = (statusId: string) => {
     setAttendances((current) => ({
@@ -91,7 +93,8 @@ export function AttendanceEditor({
         id: sessionId,
         date,
         attendances,
-        earlyDepartures
+        earlyDepartures,
+        note
       })
       setSaved(true)
       savedTimer.current = setTimeout(() => setSaved(false), 2000)
@@ -147,10 +150,21 @@ export function AttendanceEditor({
       </header>
 
       <section className="editor-toolbar">
-        <label className="field date-field">
-          <span>Data</span>
-          <input type="date" value={date} onChange={(event) => setDate(event.target.value)} />
-        </label>
+        <div className="editor-session-fields">
+          <label className="field date-field">
+            <span>Data</span>
+            <input type="date" value={date} onChange={(event) => setDate(event.target.value)} />
+          </label>
+          <label className="field">
+            <span>Annotazione</span>
+            <input
+              type="text"
+              value={note}
+              onChange={(event) => setNote(event.target.value)}
+              placeholder="Aggiungi un’annotazione (facoltativa)"
+            />
+          </label>
+        </div>
         <div className="completion">
           <strong>
             {completed}/{athletes.length}
@@ -182,6 +196,10 @@ export function AttendanceEditor({
           </button>
         </div>
       </section>
+
+      <div className="editor-legend">
+        <AttendanceLegend statuses={document.statuses} />
+      </div>
 
       <section className="attendance-list" aria-label="Presenze atlete">
         {athletes.length === 0 ? (
