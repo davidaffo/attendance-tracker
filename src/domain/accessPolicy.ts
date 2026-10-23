@@ -3,7 +3,7 @@ import type {
   CoachDocumentOrigin,
   SyncConfig,
   TeamDocument
-} from './types'
+} from '../../packages/attendance/src/domain/types'
 
 export function allowsCoachBackgroundSync(
   origin: CoachDocumentOrigin | undefined

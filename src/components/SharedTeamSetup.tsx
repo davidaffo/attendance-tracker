@@ -1,8 +1,8 @@
 import { useEffect, useRef, useState, type FormEvent } from 'react'
 import { ArrowLeft, Check, ChevronRight, Cloud, LoaderCircle } from 'lucide-react'
-import type { SyncConfig, TeamSummary, TeamDocument } from '../domain/types'
+import type { SyncConfig, TeamSummary, TeamDocument } from '../../packages/attendance/src/domain/types'
 import { detailsFromNextcloudLink } from '../domain/syncConfig'
-import { discoverRemoteTeamDocuments } from '../services/webdav'
+import { discoverRemoteTeamDocuments } from '../adapters/nextcloud'
 
 interface SharedTeamSetupProps {
   startupOnline: boolean

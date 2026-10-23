@@ -1,8 +1,8 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
-import { createTeamDocument } from '../domain/defaults'
-import { saveSession, serializeTeamDocument } from '../domain/document'
-import { RemoteDocumentConflictError, synchronizeDocument } from '../services/webdav'
-import type { TeamDocument } from '../domain/types'
+import { createTeamDocument } from '../../packages/attendance/src/domain/defaults'
+import { saveSession, serializeTeamDocument } from '../../packages/attendance/src/domain/document'
+import { RemoteDocumentConflictError, synchronizeDocument } from '../adapters/nextcloud'
+import type { TeamDocument } from '../../packages/attendance/src/domain/types'
 
 const config = { baseUrl: 'https://cloud.example.it', username: 'coach', appPassword: 'password', remoteFolder: 'attendance-tracker' }
 const base = createTeamDocument({ teamName: 'U14', organizationName: 'Volley', coachName: 'Coach', startYear: 2026, athleteNames: ['Anna'] })

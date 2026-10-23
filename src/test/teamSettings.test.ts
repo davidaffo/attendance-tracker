@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
-import { createTeamDocument } from '../domain/defaults'
-import { prepareRosterDocument, refreshTeamSettingsDraft } from '../domain/teamSettings'
+import { createTeamDocument } from '../../packages/attendance/src/domain/defaults'
+import { prepareRosterDocument, refreshTeamSettingsDraft } from '../../packages/attendance/src/domain/teamSettings'
 
 const createDocument = () => createTeamDocument({
   teamName: 'U14',

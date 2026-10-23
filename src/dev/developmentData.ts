@@ -3,8 +3,8 @@ import under12 from '../../resources/nextcloud-demo-2026-2027/under-12-blu__2026
 import under14 from '../../resources/nextcloud-demo-2026-2027/under-14-rossa__2026-2027.attendance.json'
 import under16 from '../../resources/nextcloud-demo-2026-2027/under-16-verde__2026-2027.attendance.json'
 import under18 from '../../resources/nextcloud-demo-2026-2027/under-18-gialla__2026-2027.attendance.json'
-import { isTeamDocument } from '../domain/document'
-import type { TeamDocument, TeamSummary } from '../domain/types'
+import { isTeamDocument } from '../../packages/attendance/src/domain/document'
+import type { TeamDocument, TeamSummary } from '../../packages/attendance/src/domain/types'
 
 const rawDocuments: unknown[] = [serieD, under12, under14, under16, under18]
 const developmentTeamIds = new Set([

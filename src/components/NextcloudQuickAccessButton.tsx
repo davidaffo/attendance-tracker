@@ -1,5 +1,5 @@
 import { Copy } from 'lucide-react'
-import type { AppMode } from '../domain/types'
+import type { AppMode } from '../../packages/attendance/src/domain/types'
 
 interface NextcloudQuickAccessButtonsProps {
   links: Partial<Record<AppMode, string>>

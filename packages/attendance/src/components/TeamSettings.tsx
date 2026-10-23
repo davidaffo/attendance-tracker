@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { Archive, Plus, RotateCcw, Save } from 'lucide-react'
-import type { TeamDocument } from '../domain/types'
+import type { Athlete, TeamDocument } from '../domain/types'
 import { compareAthletesByName } from '../domain/document'
 import { formatAthleteName } from '../domain/athleteList'
 import { AthleteListPaste } from './AthleteListPaste'
@@ -15,6 +15,8 @@ interface TeamSettingsProps {
   managedByCoordinator?: boolean
   onDraftChange?: (document: TeamDocument, dirty: boolean) => void
   comparisonDocument?: TeamDocument
+  catalog?: { athletes: Athlete[]; coaches: { id: string; name: string; selected: boolean }[]; onAssignCoach: (id: string, assigned: boolean) => Promise<void> }
+  readOnly?: boolean
 }
 
 function withScheduleDefaults(value: TeamDocument, enabled: boolean): TeamDocument {
@@ -76,6 +78,8 @@ export function TeamSettings({
   onUpdate,
   managedByCoordinator = false,
   onDraftChange,
+  catalog,
+  readOnly = false,
   comparisonDocument = document
 }: TeamSettingsProps) {
   const [draft, setDraft] = useState(() =>
@@ -146,6 +150,11 @@ export function TeamSettings({
   }
 
   const addAthlete = async () => {
+    if (catalog) {
+      const athlete = catalog.athletes.find(athlete => athlete.id === newAthlete)
+      if (athlete && await saveRoster([...draft.athletes.filter(a => a.id !== athlete.id), { ...athlete, active: true }])) setNewAthlete('')
+      return
+    }
     const name = formatAthleteName(newAthlete)
     if (!name) return
     const saved = await saveRoster([
@@ -215,6 +224,7 @@ export function TeamSettings({
         </div>
       </div>
 
+      <fieldset className="register-settings-fields" disabled={readOnly}>
       <section className="panel settings-panel">
         <div className="panel-heading">
           <div>
@@ -243,6 +253,7 @@ export function TeamSettings({
             <span>Società</span>
             <input
               value={draft.organizationName}
+              readOnly={Boolean(catalog)}
               onChange={(event) => update('organizationName', event.target.value)}
             />
           </label>
@@ -257,6 +268,7 @@ export function TeamSettings({
             <span>Allenatore</span>
             <input
               value={draft.coachName}
+              readOnly={Boolean(catalog)}
               onChange={(event) => update('coachName', event.target.value)}
             />
           </label>
@@ -269,6 +281,7 @@ export function TeamSettings({
                 max="2100"
                 inputMode="numeric"
                 value={draft.season.startYear}
+                readOnly={Boolean(catalog)}
                 onChange={(event) => {
                   const startYear = Number(event.target.value)
                   const period = defaultTrainingPeriod(startYear)
@@ -289,6 +302,14 @@ export function TeamSettings({
 
       </section>
 
+      {catalog && !managedByCoordinator && <section className="panel settings-panel">
+        <h2>Allenatori della squadra</h2>
+        <div className="host-roster-picker">{catalog.coaches.map(coach => <label key={coach.id}>
+          <input type="checkbox" checked={coach.selected} onChange={event => {
+            setMessage(''); void catalog.onAssignCoach(coach.id, event.target.checked).catch(error => setMessage(error instanceof Error ? error.message : 'Assegnazione non riuscita.'))
+          }} /> {coach.name}
+        </label>)}</div>
+      </section>}
       <section className="panel settings-panel">
         <div className="panel-heading">
           <div>
@@ -353,6 +374,7 @@ export function TeamSettings({
                 <span className="row-number">{index + 1}</span>
                 <input
                   value={athlete.name}
+                  readOnly={Boolean(catalog)}
                   aria-label={`Nome atleta ${index + 1}`}
                   onBlur={() => void saveRoster(draft.athletes)}
                   onKeyDown={(event) => {
@@ -381,7 +403,10 @@ export function TeamSettings({
             ))}
             <div className="roster-row add-row">
               <span className="row-number">+</span>
-              <input
+              {catalog ? <select aria-label="Atleta da aggiungere alla rosa" value={newAthlete} onChange={event => setNewAthlete(event.target.value)}>
+                <option value="">Seleziona un’atleta dalle anagrafiche</option>
+                {catalog.athletes.filter(athlete => !activeAthletes.some(active => active.id === athlete.id)).map(athlete => <option key={athlete.id} value={athlete.id}>{athlete.name}</option>)}
+              </select> : <input
                 value={newAthlete}
                 placeholder="Nuova atleta"
                 onChange={(event) => setNewAthlete(event.target.value)}
@@ -392,16 +417,17 @@ export function TeamSettings({
                   }
                 }}
               />
+              }
               <button className="icon-button accent" onClick={addAthlete} aria-label="Aggiungi atleta">
                 <Plus size={18} />
               </button>
             </div>
           </div>
 
-          <AthleteListPaste
+          {!catalog && <AthleteListPaste
             existingNames={draft.athletes.map((athlete) => athlete.name)}
             onAdd={addAthletes}
-          />
+          />}
 
           {archivedAthletes.length > 0 && (
             <details className="archived">
@@ -483,6 +509,7 @@ export function TeamSettings({
           ))}
         </div>
       </section>}
+      </fieldset>
     </div>
   )
 }

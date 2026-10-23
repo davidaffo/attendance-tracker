@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
-import type { Athlete } from '../domain/types'
-import { matchAthleteByName, parseTeamAssignments } from '../domain/scoreImport'
+import type { Athlete } from '../../packages/attendance/src/domain/types'
+import { matchAthleteByName, parseTeamAssignments } from '../../packages/attendance/src/domain/scoreImport'
 
 const athletes = ['Anna Rossi', 'Bianca Verdi', 'Carla Rossi'].map((name, order): Athlete => ({
   id: String(order), name, order, active: true, createdAt: '2026-08-01T00:00:00.000Z'

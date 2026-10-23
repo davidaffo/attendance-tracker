@@ -204,7 +204,7 @@ export function Scores({ document, initialSessionId, readOnly = false, onSave, o
                 key={session.id}
                 onClick={() => setSelectedSessionId(session.id)}
               >
-                <span>{formatDate(session.date)}</span>
+                <span>{formatDate(session.date)}{session.label ? ` · ${session.label}` : ''}</span>
                 <small>{session.score ? 'Punteggio inserito' : 'Da compilare'}</small>
                 <ChevronRight size={18} />
               </button>
@@ -236,7 +236,7 @@ function ScoreSessionViewer({
         <button className="button ghost" type="button" onClick={onBack}>
           <ArrowLeft size={17} /> Punteggi
         </button>
-        <div><h1>{formatDate(session.date)}</h1></div>
+        <div><h1>{formatDate(session.date)}{session.label ? ` · ${session.label}` : ''}</h1></div>
       </div>
 
       {!session.score ? (
@@ -570,7 +570,7 @@ function ScoreEditor({
         <button className="button ghost" type="button" onClick={onBack}>
           <ArrowLeft size={17} /> Punteggi
         </button>
-        <div><h1>{formatDate(session.date)}</h1></div>
+        <div><h1>{formatDate(session.date)}{session.label ? ` · ${session.label}` : ''}</h1></div>
         <button className="button primary" type="button" disabled={saving} onClick={() => void save()}>
           <Save size={17} /> {saving ? 'Salvo…' : 'Salva punteggi'}
         </button>

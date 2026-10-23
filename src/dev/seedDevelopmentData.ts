@@ -1,4 +1,4 @@
-import { COACH_ONBOARDING_VERSION } from '../domain/defaults'
+import { COACH_ONBOARDING_VERSION } from '../../packages/attendance/src/domain/defaults'
 import {
   loadCoordinatorTeamCache,
   loadCoachDocumentOrigin,

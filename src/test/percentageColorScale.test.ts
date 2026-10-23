@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { percentageScaleColor } from '../domain/percentageColorScale'
+import { percentageScaleColor } from '../../packages/attendance/src/domain/percentageColorScale'
 
 describe('scale colore percentuali Excel', () => {
   const absent = { id: 'absent', code: 'A' }

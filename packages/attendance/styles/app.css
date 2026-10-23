@@ -5213,3 +5213,29 @@ html[data-theme='dark'] .sharing-cors-help code {
   white-space: pre-wrap;
   overflow-wrap: anywhere;
 }
+
+.attendance-outcome { display: block; color: var(--muted); font-size: .75rem; }
+.participation-mark { display: inline-block; margin-left: .3rem; color: var(--green-2); font-weight: 700; }
+.participation-legend { color: var(--muted); font-size: .85rem; margin-top: .75rem; }
+
+.athlete-identity { min-width: 0; }
+.athlete-identity > strong { display: block; }
+
+/* Embedded host layout keeps the original register panels inside the host navigation. */
+.register-coach-layout { display: grid; grid-template-columns: 210px minmax(0, 1fr); gap: 1.5rem; padding-top: 1.5rem; }
+.register-coach-sidebar { display: flex; flex-direction: column; align-self: start; gap: .8rem; position: sticky; top: 1rem; }
+.register-coach-sidebar .sidebar-team { margin: 0; padding: 1rem; background: var(--green); color: white; border-radius: 14px; }
+.register-coach-sidebar .sidebar-team span, .register-coach-sidebar .sidebar-team small { color: #d3e1d9; }
+.register-coach-sidebar nav { display: grid; gap: .35rem; }
+.register-coach-sidebar nav button { text-align: left; border: 0; border-radius: 10px; padding: .85rem 1rem; background: transparent; color: var(--ink); font-weight: 700; }
+.register-coach-sidebar nav button.active { background: var(--green); color: white; }
+.register-coach-content { min-width: 0; }
+.register-settings-fields { border: 0; padding: 0; margin: 0; min-width: 0; }
+.host-roster-picker { display: grid; gap: .6rem; max-height: 320px; overflow: auto; padding: .75rem 0; }
+.host-roster-picker label { display: flex; align-items: center; gap: .6rem; }
+@media (max-width: 900px) {
+  .register-coach-layout { grid-template-columns: minmax(0, 1fr); }
+  .register-coach-sidebar { position: static; }
+  .register-coach-sidebar nav { display: flex; overflow: auto; }
+  .register-coach-sidebar nav button { flex: 0 0 auto; }
+}

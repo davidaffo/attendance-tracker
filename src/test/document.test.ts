@@ -4,7 +4,7 @@ import {
   createTeamDocument,
   defaultTrainingPeriod,
   isFirstCoachUse
-} from '../domain/defaults'
+} from '../../packages/attendance/src/domain/defaults'
 import {
   athleteScoreForSession,
   athleteTotals,
@@ -23,7 +23,7 @@ import {
   scoreTeamTotal,
   serializeTeamDocument,
   totalsForDocument
-} from '../domain/document'
+} from '../../packages/attendance/src/domain/document'
 
 describe('documento squadra', () => {
   it('salva, esporta e rimuove l’annotazione senza perdere i punteggi', () => {

@@ -10,9 +10,9 @@ import { PlannedSessionsPanel } from './PlannedSessionsPanel'
 
 interface DashboardProps {
   document: TeamDocument
-  onNewSession: (date?: string) => void
+  onNewSession?: (date?: string) => void
   onEditSession: (session: TrainingSession) => void
-  onIgnorePlannedSession: (date: string) => Promise<void>
+  onIgnorePlannedSession?: (date: string) => Promise<void>
 }
 
 const monthFormatter = new Intl.DateTimeFormat('it-IT', { month: 'long', year: 'numeric' })
@@ -48,10 +48,10 @@ export function Dashboard({
         <div>
           <h1>Panoramica</h1>
         </div>
-        <button className="button light" onClick={() => onNewSession()}>
+        {onNewSession && <button className="button light" onClick={() => onNewSession()}>
           <Plus size={19} />
           Nuova sessione
-        </button>
+        </button>}
       </section>
 
       <PlannedSessionsPanel

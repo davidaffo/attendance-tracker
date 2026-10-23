@@ -4,7 +4,7 @@ import App from './App'
 import { AppErrorBoundary } from './components/AppErrorBoundary'
 import { AppUpdatePrompt, AppUpdateProvider } from './components/AppUpdatePrompt'
 import { initializeTheme } from './domain/theme'
-import './styles/app.css'
+import '../packages/attendance/styles/app.css'
 
 initializeTheme()
 

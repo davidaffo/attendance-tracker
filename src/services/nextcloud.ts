@@ -1,4 +1,4 @@
-import type { SyncConfig } from '../domain/types'
+import type { SyncConfig } from '../../packages/attendance/src/domain/types'
 
 export function normalizeNextcloudBaseUrl(value: string): string {
   const trimmed = value.trim().replace(/\/+$/, '')

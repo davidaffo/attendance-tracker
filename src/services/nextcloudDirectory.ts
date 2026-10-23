@@ -1,4 +1,4 @@
-import type { SyncConfig } from '../domain/types'
+import type { SyncConfig } from '../../packages/attendance/src/domain/types'
 import { nextcloudAuthorization, normalizeNextcloudBaseUrl } from './nextcloud'
 
 export interface NextcloudDirectoryUser {

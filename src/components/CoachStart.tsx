@@ -1,5 +1,5 @@
 import { ArrowLeft, Cloud, Settings2 } from 'lucide-react'
-import type { TeamDocument } from '../domain/types'
+import type { TeamDocument } from '../../packages/attendance/src/domain/types'
 import { RestoreBackupButton } from './RestoreBackupButton'
 
 interface CoachStartProps {

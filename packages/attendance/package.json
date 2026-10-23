@@ -1,0 +1,32 @@
+{
+  "name": "@clubiva/attendance",
+  "version": "0.2.1",
+  "type": "module",
+  "files": [
+    "dist"
+  ],
+  "main": "./dist/attendance.js",
+  "types": "./dist/types/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/types/index.d.ts",
+      "import": "./dist/attendance.js"
+    },
+    "./styles.css": "./dist/styles.css",
+    "./domain": {
+      "types": "./dist/types/domain/index.d.ts",
+      "import": "./dist/domain.js"
+    }
+  },
+  "sideEffects": [
+    "**/*.css"
+  ],
+  "peerDependencies": {
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
+  },
+  "scripts": {
+    "build": "node build.mjs"
+  },
+  "license": "UNLICENSED"
+}

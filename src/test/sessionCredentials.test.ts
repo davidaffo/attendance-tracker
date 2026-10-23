@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import type { SyncConfig } from '../domain/types'
+import type { SyncConfig } from '../../packages/attendance/src/domain/types'
 import {
   clearSessionPasswords,
   forgetSessionPassword,

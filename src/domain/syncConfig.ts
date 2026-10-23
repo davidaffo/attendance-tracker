@@ -1,4 +1,4 @@
-import type { AppMode, LocalSyncMeta, SyncConfig } from './types'
+import type { AppMode, LocalSyncMeta, SyncConfig } from '../../packages/attendance/src/domain/types'
 
 export interface NextcloudResourceDetails {
   baseUrl: string

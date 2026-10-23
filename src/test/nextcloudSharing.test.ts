@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
-import { createTeamDocument } from '../domain/defaults'
+import { createTeamDocument } from '../../packages/attendance/src/domain/defaults'
 import {
   createNextcloudShare,
   deleteNextcloudShare,

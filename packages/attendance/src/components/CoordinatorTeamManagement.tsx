@@ -12,9 +12,8 @@ import {
   Users
 } from 'lucide-react'
 import { useState, type ReactNode } from 'react'
-import type { AppMode, TeamDocument, TeamSummary } from '../domain/types'
+import type { TeamDocument, TeamSummary } from '../domain/types'
 import { CoordinatorTeamCreator } from './CoordinatorTeamCreator'
-import { NextcloudQuickAccessButtons } from './NextcloudQuickAccessButton'
 
 interface CoordinatorTeamManagementProps {
   teams: TeamSummary[]
@@ -24,10 +23,13 @@ interface CoordinatorTeamManagementProps {
   onCreate: (document: TeamDocument) => Promise<void>
   onDelete: (team: TeamSummary) => Promise<void>
   onRefresh: () => void
-  onBackup: () => Promise<void>
+  onBackup?: () => Promise<void>
   canBackup: boolean
-  quickAccessLinks: Partial<Record<AppMode, string>>
-  onQuickAccessCopied: (mode: AppMode) => void
+  headerActions?: ReactNode
+  description?: string
+  deletionHint?: string
+  renderCreator?: (onCreated: (document: TeamDocument) => Promise<void>, onCancel: () => void) => ReactNode
+  canDeleteTeam?: (team: TeamSummary) => boolean
   onOpenAsCoach: (team: TeamSummary) => Promise<void>
   canOpenAsCoach: (team: TeamSummary) => boolean
   renderTeamControls: (team: TeamSummary) => ReactNode
@@ -45,8 +47,11 @@ export function CoordinatorTeamManagement({
   onRefresh,
   onBackup,
   canBackup,
-  quickAccessLinks,
-  onQuickAccessCopied,
+  headerActions,
+  description = 'Crea, espandi e amministra qui tutti i registri gestiti su Nextcloud.',
+  deletionHint = 'I file eliminati possono essere recuperati dal cestino Nextcloud, se attivo.',
+  renderCreator,
+  canDeleteTeam,
   onOpenAsCoach,
   canOpenAsCoach,
   renderTeamControls,
@@ -67,13 +72,10 @@ export function CoordinatorTeamManagement({
         <div>
           <span className="eyebrow">Coordinatore</span>
           <h1>Pannello di controllo</h1>
-          <p>Crea, espandi e amministra qui tutti i registri gestiti su Nextcloud.</p>
+          <p>{description}</p>
         </div>
         <div className="team-management-actions">
-          <NextcloudQuickAccessButtons
-            links={quickAccessLinks}
-            onCopied={onQuickAccessCopied}
-          />
+          {headerActions}
           <button
             className="button primary"
             type="button"
@@ -88,7 +90,7 @@ export function CoordinatorTeamManagement({
             <RefreshCw className={loading ? 'spin' : undefined} size={17} />
             Aggiorna
           </button>
-          <button
+          {onBackup && <button
             className="button secondary"
             type="button"
             onClick={() => void onBackup()}
@@ -97,14 +99,15 @@ export function CoordinatorTeamManagement({
           >
             <Archive size={17} />
             Backup registri
-          </button>
+          </button>}
         </div>
       </section>
 
       {message && <div className="team-management-message">{message}</div>}
 
-      {creating && (
-        <CoordinatorTeamCreator
+      {creating && (renderCreator ? renderCreator(async document => {
+        await onCreate(document); setCreating(false); setExpandedTeam(document.teamId)
+      }, () => setCreating(false)) : <CoordinatorTeamCreator
           embedded
           onCreate={async (document) => {
             await onCreate(document)
@@ -118,7 +121,7 @@ export function CoordinatorTeamManagement({
       <section className="team-management-list" aria-label="Squadre gestite">
         <div className="team-management-list-heading">
           <h2>Squadre ({teams.length})</h2>
-          <span>I file eliminati possono essere recuperati dal cestino Nextcloud, se attivo.</span>
+          <span>{deletionHint}</span>
         </div>
 
         {teams.length === 0 ? (
@@ -131,7 +134,7 @@ export function CoordinatorTeamManagement({
           <div className="team-management-rows">
             {teams.map((team) => {
               const { document } = team
-              const remoteTeam = team.remoteFolder !== undefined
+              const remoteTeam = canDeleteTeam ? canDeleteTeam(team) : team.remoteFolder !== undefined
               const teamKey = `${team.source}-${document.teamId}`
               const expanded = expandedTeam === teamKey || expandedTeam === document.teamId
               return (

@@ -413,3 +413,7 @@ dopo una doppia conferma:
 Dopo il reset la PWA viene ricaricata sulla scelta iniziale allenatore,
 coordinatore o giocatrice. Non vengono cancellati i file già sincronizzati su
 Nextcloud né le password conservate dal password manager del browser.
+
+## Registro React condiviso
+
+Architettura, sviluppo, versionamento e aggiornamento del pacchetto sono descritti nella [guida del registro condiviso](SHARED_ATTENDANCE.md).

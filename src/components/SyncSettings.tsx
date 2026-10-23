@@ -8,10 +8,10 @@ import {
   ListChecks,
   Save
 } from 'lucide-react'
-import type { LocalSyncMeta, SyncConfig, SyncIndicator, TeamDocument } from '../domain/types'
-import { serializeTeamDocument } from '../domain/document'
-import { remoteFileName } from '../domain/defaults'
-import { testWebDavConnection } from '../services/webdav'
+import type { LocalSyncMeta, SyncConfig, SyncIndicator, TeamDocument } from '../../packages/attendance/src/domain/types'
+import { serializeTeamDocument } from '../../packages/attendance/src/domain/document'
+import { remoteFileName } from '../../packages/attendance/src/domain/defaults'
+import { testWebDavConnection } from '../adapters/nextcloud'
 import { ResetAppDataButton } from './ResetAppDataButton'
 import { RestoreBackupButton } from './RestoreBackupButton'
 import { AppUpdateSettings } from './AppUpdatePrompt'

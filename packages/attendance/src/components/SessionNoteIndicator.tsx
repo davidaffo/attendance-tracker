@@ -69,7 +69,7 @@ export function SessionNoteIndicator({ note, date, weekday, onEdit }: {
         <span id={tooltipId} role="tooltip" className="session-note-tooltip" style={position}>
           {note}
         </span>,
-        document.body
+        container.current?.closest('.attendance-module') ?? document.body
       )}
     </span>
   )

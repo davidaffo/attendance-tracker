@@ -18,6 +18,8 @@ interface MonthlyRegisterProps {
   onEditSession?: (session: TrainingSession) => void
   onNewSession?: () => void
   compactHeader?: boolean
+  searchable?: boolean
+  onExport?: (sessions: TrainingSession[]) => void
 }
 
 interface SeasonMonth {
@@ -56,8 +58,11 @@ export function MonthlyRegister({
   document,
   onEditSession,
   onNewSession,
-  compactHeader = false
+  compactHeader = false,
+  searchable = false,
+  onExport
 }: MonthlyRegisterProps) {
+  const [athleteSearch, setAthleteSearch] = useState('')
   const months = useMemo(() => getSeasonMonths(document.season.startYear), [document.season.startYear])
   const [selectedPeriod, setSelectedPeriod] = useState(() => {
     const today = new Date()
@@ -71,7 +76,9 @@ export function MonthlyRegister({
         a.date.localeCompare(b.date)
       )
     : [...document.sessions].sort((a, b) => a.date.localeCompare(b.date))
-  const athletes = athletesForReport(document)
+  const athletes = athletesForReport(document).filter(athlete =>
+    !searchable || athlete.name.toLocaleLowerCase('it-IT').includes(athleteSearch.toLocaleLowerCase('it-IT'))
+  )
   const completedAttendances = sessions.reduce(
     (sum, session) => sum + completedAttendancesForAthletes(session, athletes),
     0
@@ -92,6 +99,7 @@ export function MonthlyRegister({
             {document.teamName} · Stagione {document.season.startYear}–{document.season.endYear}
           </h1>
         </div>
+        {onExport && <button type="button" className="button secondary" onClick={() => onExport(sessions)}>Esporta CSV</button>}
         {onNewSession && (
           <button className="button primary" onClick={onNewSession}>
             <Plus size={17} />
@@ -143,7 +151,12 @@ export function MonthlyRegister({
         </div>
       </section>
 
+      {searchable && <label className="field">Cerca atleta
+        <input type="search" value={athleteSearch} onChange={event => setAthleteSearch(event.target.value)} />
+      </label>}
       <AttendanceLegend statuses={document.statuses} />
+      {document.sessions.some(session => session.confirmedAthleteIds !== undefined) &&
+        <p className="participation-legend">✓ Partecipazione confermata · P/A/R/E/I indicano la presenza rilevata.</p>}
 
       {selectedMonth ? (
         <MonthMatrix
@@ -195,7 +208,7 @@ function MonthMatrix({ document, sessions, athletes, onEditSession }: MatrixProp
             <tr>
               <th className="sticky-name">Atleta</th>
               {sessions.map((session) => (
-                <th key={session.id} className={session.note ? 'session-has-note' : undefined}>
+                <th key={session.id} title={session.label} className={session.note ? 'session-has-note' : undefined}>
                   <div className="session-heading-content">
                     {session.note ? (
                       <SessionNoteIndicator
@@ -215,6 +228,8 @@ function MonthMatrix({ document, sessions, athletes, onEditSession }: MatrixProp
                         <strong>{session.date.slice(-2)}</strong>
                       </span>
                     )}
+                    {session.label && <small>{session.label}</small>}
+                    {session.confirmedAthleteIds && <small>{session.confirmedAthleteIds.length} conferme</small>}
                   </div>
                 </th>
               ))}
@@ -259,6 +274,9 @@ function MonthMatrix({ document, sessions, athletes, onEditSession }: MatrixProp
                           </span>
                         ) : (
                           <span className="matrix-empty">—</span>
+                        )}
+                        {session.confirmedAthleteIds?.includes(athlete.id) && (
+                          <span className="participation-mark" title="Partecipazione confermata" aria-label={`${athlete.name}: partecipazione confermata il ${session.date}`}>✓</span>
                         )}
                         {session.earlyDepartures?.includes(athlete.id) && (
                           <span className="matrix-early-departure" title="Uscita anticipata">U</span>

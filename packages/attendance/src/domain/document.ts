@@ -45,10 +45,13 @@ function isSession(value: unknown): value is TrainingSession {
   return (
     isRecord(value) &&
     isString(value.id) &&
+    (value.label === undefined || isString(value.label)) &&
     /^\d{4}-\d{2}-\d{2}$/.test(String(value.date)) &&
     isRecord(value.attendances) &&
     Object.values(value.attendances).every(isString) &&
     (value.note === undefined || isString(value.note)) &&
+    (value.confirmedAthleteIds === undefined ||
+      (Array.isArray(value.confirmedAthleteIds) && value.confirmedAthleteIds.every(isString))) &&
     (value.earlyDepartures === undefined ||
       (Array.isArray(value.earlyDepartures) && value.earlyDepartures.every(isString))) &&
     (value.score === undefined || isSessionScore(value.score)) &&
@@ -86,6 +89,7 @@ export function isTeamDocument(value: unknown): value is TeamDocument {
   if (!isRecord(value.season)) return false
 
   const hasValidShape =
+    (value.sessionIdentity === undefined || value.sessionIdentity === 'id') &&
     isString(value.teamId) &&
     isString(value.teamName) &&
     isString(value.organizationName) &&
@@ -143,7 +147,7 @@ export function isTeamDocument(value: unknown): value is TeamDocument {
     statusCodes.size !== document.statuses.length ||
     athleteIds.size !== document.athletes.length ||
     sessionIds.size !== document.sessions.length ||
-    sessionDates.size !== document.sessions.length
+    (document.sessionIdentity !== 'id' && sessionDates.size !== document.sessions.length)
   ) return false
 
   if (
@@ -164,6 +168,8 @@ export function isTeamDocument(value: unknown): value is TeamDocument {
   ) return false
 
   return document.sessions.every((session) =>
+    (session.confirmedAthleteIds ?? []).every(id => athleteIds.has(id)) &&
+    new Set(session.confirmedAthleteIds ?? []).size === (session.confirmedAthleteIds ?? []).length &&
     Object.entries(session.attendances).every(
       ([athleteId, statusId]) => athleteIds.has(athleteId) && statusIds.has(statusId)
     ) &&
@@ -373,6 +379,7 @@ export function mergeDocuments(local: TeamDocument, remote: TeamDocument): TeamD
 
   const sessionsByDate = new Map<string, TrainingSession>()
   for (const session of sessions.values()) {
+    if (local.sessionIdentity === 'id') { sessionsByDate.set(session.id, session); continue }
     const sameDate = sessionsByDate.get(session.date)
     if (!sameDate || session.updatedAt > sameDate.updatedAt) {
       sessionsByDate.set(session.date, session)
@@ -390,7 +397,7 @@ export function mergeDocuments(local: TeamDocument, remote: TeamDocument): TeamD
       ...newerDocument.monthlyScoreAdjustments?.[month]
     }])
   )
-  const mergedSessionDates = new Set(sessionsByDate.keys())
+  const mergedSessionDates = new Set([...sessionsByDate.values()].map(session => session.date))
   const ignoredTrainingDates = [
     ...new Set([
       ...(local.ignoredTrainingDates ?? []),

@@ -10,7 +10,7 @@ import {
   UserPlus,
   UsersRound
 } from 'lucide-react'
-import type { SyncConfig, TeamDocument } from '../domain/types'
+import type { SyncConfig, TeamDocument } from '../../packages/attendance/src/domain/types'
 import {
   listNextcloudDirectoryUsers,
   type NextcloudDirectoryUser

@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState, type ChangeEvent } from 'react'
 import { FileUp, RotateCcw, X } from 'lucide-react'
-import { parseTeamDocument } from '../domain/document'
-import type { TeamDocument } from '../domain/types'
+import { parseTeamDocument } from '../../packages/attendance/src/domain/document'
+import type { TeamDocument } from '../../packages/attendance/src/domain/types'
 
 interface RestoreBackupButtonProps {
   currentDocument?: TeamDocument

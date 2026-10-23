@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
 import {
   ArrowLeft,
   Check,
@@ -14,8 +14,12 @@ import {
 import type { TeamDocument, TrainingSession } from '../domain/types'
 import { compareAthletesByName } from '../domain/document'
 import { AttendanceLegend } from './AttendanceLegend'
+import { AttendanceOutcome } from './AttendanceOutcome'
 
 interface AttendanceEditorProps {
+  sessionFields?: ReactNode
+  dateLocked?: boolean
+  confirmedAthleteIds?: string[]
   document: TeamDocument
   initialSession?: TrainingSession
   initialDate?: string
@@ -32,6 +36,9 @@ function localDate(): string {
 }
 
 export function AttendanceEditor({
+  sessionFields,
+  dateLocked = false,
+  confirmedAthleteIds,
   document,
   initialSession,
   initialDate,
@@ -151,9 +158,10 @@ export function AttendanceEditor({
 
       <section className="editor-toolbar">
         <div className="editor-session-fields">
+          {sessionFields}
           <label className="field date-field">
             <span>Data</span>
-            <input type="date" value={date} onChange={(event) => setDate(event.target.value)} />
+            <input type="date" disabled={dateLocked} value={date} onChange={(event) => setDate(event.target.value)} />
           </label>
           <label className="field">
             <span>Annotazione</span>
@@ -190,6 +198,16 @@ export function AttendanceEditor({
             <UserX size={17} />
             Tutte assenti
           </button>
+          {confirmedAthleteIds && presentStatus && (
+            <button className="button secondary" type="button" onClick={() => {
+              setAttendances(current => ({
+                ...Object.fromEntries(athletes.filter(athlete => confirmedAthleteIds.includes(athlete.id)).map(athlete => [athlete.id, presentStatus.id])),
+                ...current
+              }))
+            }}>
+              <UserCheck size={17} /> Usa conferme per le presenze da compilare
+            </button>
+          )}
           <button className="button secondary" type="button" onClick={clearAll}>
             <Eraser size={17} />
             Azzera stati
@@ -212,7 +230,13 @@ export function AttendanceEditor({
             <div className="attendance-row" key={athlete.id}>
               <div className="athlete-name">
                 <span>{String(index + 1).padStart(2, '0')}</span>
-                <strong>{athlete.name}</strong>
+                <div className="athlete-identity">
+                  <strong>{athlete.name}</strong>
+                  {confirmedAthleteIds && <AttendanceOutcome
+                    confirmed={confirmedAthleteIds.includes(athlete.id)}
+                    status={document.statuses.find(status => status.id === attendances[athlete.id])}
+                    earlyDeparture={earlyDepartures.includes(athlete.id)} /> }
+                </div>
               </div>
               <div className="status-options">
                 {document.statuses.map((status) => {

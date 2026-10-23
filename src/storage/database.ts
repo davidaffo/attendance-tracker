@@ -7,7 +7,7 @@ import type {
   LocalSyncMeta,
   SyncConfig,
   TeamDocument
-} from '../domain/types'
+} from '../../packages/attendance/src/domain/types'
 
 interface AttendanceDatabase extends DBSchema {
   state: {

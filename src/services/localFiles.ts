@@ -2,9 +2,9 @@ import {
   mergeDocuments,
   parseTeamDocument,
   serializeTeamDocument
-} from '../domain/document'
+} from '../../packages/attendance/src/domain/document'
 import { isBackupPath } from '../domain/backup'
-import type { TeamSummary } from '../domain/types'
+import type { TeamSummary } from '../../packages/attendance/src/domain/types'
 
 async function scanHandle(
   handle: FileSystemDirectoryHandle,

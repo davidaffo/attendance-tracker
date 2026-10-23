@@ -4,8 +4,8 @@ import under12 from '../../resources/nextcloud-demo-2026-2027/under-12-blu__2026
 import under14 from '../../resources/nextcloud-demo-2026-2027/under-14-rossa__2026-2027.attendance.json'
 import under16 from '../../resources/nextcloud-demo-2026-2027/under-16-verde__2026-2027.attendance.json'
 import under18 from '../../resources/nextcloud-demo-2026-2027/under-18-gialla__2026-2027.attendance.json'
-import { isTeamDocument, parseTeamDocument, sessionsInMonth } from '../domain/document'
-import type { TeamDocument } from '../domain/types'
+import { isTeamDocument, parseTeamDocument, sessionsInMonth } from '../../packages/attendance/src/domain/document'
+import type { TeamDocument } from '../../packages/attendance/src/domain/types'
 import { parseSelectedFiles, writeTeamDocumentToFile } from '../services/localFiles'
 
 const fixtures: unknown[] = [serieD, under12, under14, under16, under18]

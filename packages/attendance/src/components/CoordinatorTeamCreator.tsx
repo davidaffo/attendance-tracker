@@ -12,7 +12,7 @@ import {
   getCurrentSeason
 } from '../domain/defaults'
 import { formatAthleteName } from '../domain/athleteList'
-import type { TeamDocument } from '../domain/types'
+import type { Athlete, TeamDocument } from '../domain/types'
 import { AthleteListPaste } from './AthleteListPaste'
 import { WeekdayPicker } from './WeekdayPicker'
 import { TrainingPeriodFields } from './TrainingPeriodFields'
@@ -21,26 +21,30 @@ interface CoordinatorTeamCreatorProps {
   onCreate: (document: TeamDocument) => Promise<void>
   onCancel: () => void
   embedded?: boolean
+  catalog?: { organizationName: string; startYear: number; athletes: Athlete[]; teams: { id: string; name: string; athleteIds: string[]; coachName: string }[] }
 }
 
 export function CoordinatorTeamCreator({
   onCreate,
   onCancel,
+  catalog,
   embedded = false
 }: CoordinatorTeamCreatorProps) {
   const currentSeason = useMemo(() => getCurrentSeason(), [])
-  const [organizationName, setOrganizationName] = useState('')
+  const [organizationName, setOrganizationName] = useState(catalog?.organizationName ?? '')
   const [teamName, setTeamName] = useState('')
   const [coachName, setCoachName] = useState('')
-  const [startYear, setStartYear] = useState(currentSeason.startYear)
+  const [startYear, setStartYear] = useState(catalog?.startYear ?? currentSeason.startYear)
   const [weekdays, setWeekdays] = useState<number[]>([])
   const initialTrainingPeriod = useMemo(
-    () => defaultTrainingPeriod(currentSeason.startYear),
+    () => defaultTrainingPeriod(catalog?.startYear ?? currentSeason.startYear),
     [currentSeason.startYear]
   )
   const [trainingStartDate, setTrainingStartDate] = useState(initialTrainingPeriod.startDate)
   const [trainingEndDate, setTrainingEndDate] = useState(initialTrainingPeriod.endDate)
   const [athletes, setAthletes] = useState<string[]>([''])
+  const [existingTeamId, setExistingTeamId] = useState('')
+  const [selectedAthletes, setSelectedAthletes] = useState<string[]>([])
   const [submitting, setSubmitting] = useState(false)
   const [message, setMessage] = useState('')
   const athleteInputs = useRef<Array<HTMLInputElement | null>>([])
@@ -79,8 +83,7 @@ export function CoordinatorTeamCreator({
     setSubmitting(true)
     setMessage('')
     try {
-      await onCreate(
-        createTeamDocument({
+      const created = createTeamDocument({
           organizationName,
           teamName,
           coachName,
@@ -88,9 +91,13 @@ export function CoordinatorTeamCreator({
           weekdays,
           trainingStartDate,
           trainingEndDate,
-          athleteNames: athletes
+          athleteNames: catalog ? [] : athletes
         })
-      )
+      if (catalog) {
+        created.teamId = existingTeamId || crypto.randomUUID()
+        created.athletes = catalog.athletes.filter(athlete => selectedAthletes.includes(athlete.id))
+      }
+      await onCreate(created)
     } catch (error) {
       setMessage(error instanceof Error ? error.message : 'Creazione non riuscita.')
     } finally {
@@ -110,9 +117,7 @@ export function CoordinatorTeamCreator({
           <span className="eyebrow">Nuovo registro</span>
           <h1>Crea una squadra</h1>
           <p className="section-copy">
-            Il registro verrà caricato nella cartella Nextcloud configurata. Subito dopo potrai
-            assegnare dall’app l’accesso in modifica agli allenatori e quello in lettura alle
-            giocatrici.
+            {catalog ? 'Scegli una squadra esistente oppure creane una nuova, definisci il calendario e seleziona la rosa dalle anagrafiche della società.' : 'Il registro verrà caricato nella cartella Nextcloud configurata. Subito dopo potrai assegnare gli accessi agli allenatori e alle giocatrici.'}
           </p>
         </div>
 
@@ -121,10 +126,19 @@ export function CoordinatorTeamCreator({
             <span>Società</span>
             <input
               value={organizationName}
+              readOnly={Boolean(catalog)}
               onChange={(event) => setOrganizationName(event.target.value)}
               required
             />
           </label>
+          {catalog && <label className="field"><span>Squadra esistente</span>
+            <select value={existingTeamId} onChange={event => {
+              const team = catalog.teams.find(team => team.id === event.target.value)
+              setExistingTeamId(event.target.value); setTeamName(team?.name ?? ''); setCoachName(team?.coachName ?? '')
+              setSelectedAthletes(team?.athleteIds ?? [])
+            }}><option value="">Crea una nuova squadra</option>
+              {catalog.teams.map(team => <option key={team.id} value={team.id}>{team.name}</option>)}
+            </select></label>}
           <label className="field">
             <span>Squadra</span>
             <input
@@ -137,8 +151,9 @@ export function CoordinatorTeamCreator({
             <span>Allenatore</span>
             <input
               value={coachName}
+              readOnly={Boolean(catalog)}
               onChange={(event) => setCoachName(event.target.value)}
-              required
+              required={!catalog}
             />
           </label>
           <label className="field">
@@ -150,6 +165,7 @@ export function CoordinatorTeamCreator({
                 max="2100"
                 inputMode="numeric"
                 value={startYear}
+                readOnly={Boolean(catalog)}
                 onChange={(event) => {
                   const nextStartYear = Number(event.target.value)
                   const period = defaultTrainingPeriod(nextStartYear)
@@ -180,6 +196,12 @@ export function CoordinatorTeamCreator({
 
         <fieldset className="fieldset">
           <legend>Rosa iniziale</legend>
+          {catalog ? <div className="host-roster-picker">
+            {catalog.athletes.map(athlete => <label key={athlete.id}>
+              <input type="checkbox" checked={selectedAthletes.includes(athlete.id)} onChange={event => setSelectedAthletes(current => event.target.checked ? [...current, athlete.id] : current.filter(id => id !== athlete.id))} /> {athlete.name}
+            </label>)}
+            {!catalog.athletes.length && <p>Aggiungi le atlete alle anagrafiche della società per comporre la rosa.</p>}
+          </div> : <>
           <div className="athlete-inputs">
             {athletes.map((athlete, index) => (
               <div className="athlete-input-row" key={index}>
@@ -237,6 +259,7 @@ export function CoordinatorTeamCreator({
               setAthletes((current) => [...current.filter((name) => name.trim()), ...names])
             }
           />
+          </>}
         </fieldset>
 
         {message && <p className="form-message">{message}</p>}

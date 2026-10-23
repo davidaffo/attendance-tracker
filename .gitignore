@@ -13,3 +13,6 @@ vite.config.d.ts
 .env
 .env.*
 !.env.example
+
+# Generated release artifacts (Clubiva vendors only the selected release).
+packages/attendance/*.tgz

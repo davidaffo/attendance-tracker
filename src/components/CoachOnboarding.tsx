@@ -18,14 +18,14 @@ import {
   createTeamDocument,
   defaultTrainingPeriod,
   getCurrentSeason
-} from '../domain/defaults'
-import type { SyncConfig, TeamDocument } from '../domain/types'
-import { formatAthleteName } from '../domain/athleteList'
-import { testWebDavConnection } from '../services/webdav'
+} from '../../packages/attendance/src/domain/defaults'
+import type { SyncConfig, TeamDocument } from '../../packages/attendance/src/domain/types'
+import { formatAthleteName } from '../../packages/attendance/src/domain/athleteList'
+import { testWebDavConnection } from '../adapters/nextcloud'
 import { RestoreBackupButton } from './RestoreBackupButton'
-import { AthleteListPaste } from './AthleteListPaste'
-import { WeekdayPicker } from './WeekdayPicker'
-import { TrainingPeriodFields } from './TrainingPeriodFields'
+import { AthleteListPaste } from '../../packages/attendance/src/components/AthleteListPaste'
+import { WeekdayPicker } from '../../packages/attendance/src/components/WeekdayPicker'
+import { TrainingPeriodFields } from '../../packages/attendance/src/components/TrainingPeriodFields'
 
 interface AthleteDraft {
   key: string

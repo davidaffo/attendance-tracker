@@ -1,3 +1,4 @@
+import { TeamDirectory } from '../../packages/attendance/src/components/TeamDirectory'
 import {
   useEffect,
   useRef,
@@ -18,14 +19,14 @@ import {
   UserRound,
   Users
 } from 'lucide-react'
-import { ignorePlannedTrainingDate, totalsForDocument } from '../domain/document'
+import { ignorePlannedTrainingDate, totalsForDocument } from '../../packages/attendance/src/domain/document'
 import type {
   AppMode,
   CoordinatorTeamCache,
   SyncConfig,
   TeamDocument,
   TeamSummary
-} from '../domain/types'
+} from '../../packages/attendance/src/domain/types'
 import {
   parseSelectedFiles,
   pickAndScanDirectory,
@@ -43,30 +44,30 @@ import {
   type ConflictResolution,
   updateRemoteTeamDocument,
   verifyRemoteFolderWritable
-} from '../services/webdav'
+} from '../adapters/nextcloud'
 import {
   loadCoordinatorDirectoryHandle,
   loadCoordinatorTeamCache,
   storeCoordinatorTeamCache,
   storeCoordinatorDirectoryHandle
 } from '../storage/database'
-import { percentageScaleColor } from '../domain/percentageColorScale'
+import { percentageScaleColor } from '../../packages/attendance/src/domain/percentageColorScale'
 import {
   coordinatorDetailsFromNextcloudLink,
   detailsFromNextcloudLink,
   nextcloudQuickAccessUrl
 } from '../domain/syncConfig'
-import { MonthlyRegister } from './MonthlyRegister'
+import { MonthlyRegister } from '../../packages/attendance/src/components/MonthlyRegister'
 import { AppBrand } from './AppBrand'
 import { AppModeControls } from './AppModeControls'
-import { CoordinatorTeamCreator } from './CoordinatorTeamCreator'
+import { CoordinatorTeamCreator } from '../../packages/attendance/src/components/CoordinatorTeamCreator'
 import { NextcloudSharingPanel } from './NextcloudSharingPanel'
-import { CoordinatorTeamManagement } from './CoordinatorTeamManagement'
+import { CoordinatorTeamManagement } from '../../packages/attendance/src/components/CoordinatorTeamManagement'
 import { NextcloudQuickAccessButtons } from './NextcloudQuickAccessButton'
-import { prepareTeamSettingsDocument, TeamSettings } from './TeamSettings'
-import { PlannedSessionsPanel } from './PlannedSessionsPanel'
+import { prepareTeamSettingsDocument, TeamSettings } from '../../packages/attendance/src/components/TeamSettings'
+import { PlannedSessionsPanel } from '../../packages/attendance/src/components/PlannedSessionsPanel'
 import { ConflictResolutionDialog } from './ConflictResolutionDialog'
-import { Scores } from './Scores'
+import { Scores } from '../../packages/attendance/src/components/Scores'
 
 interface CoordinatorDashboardProps {
   startupOnline: boolean
@@ -853,8 +854,7 @@ export function CoordinatorDashboard({
           onRefresh={() => void loadCloud(draft, false)}
           onBackup={backupTeams}
           canBackup={teams.length > 0 && teams.every((team) => team.remoteFolder !== undefined)}
-          quickAccessLinks={quickAccessLinks}
-          onQuickAccessCopied={quickAccessCopied}
+          headerActions={<NextcloudQuickAccessButtons links={quickAccessLinks} onCopied={quickAccessCopied} />}
           onOpenAsCoach={(team) => openTeamAsCoach(team)}
           canOpenAsCoach={canWriteTeam}
           dirtyTeams={teams.filter(
@@ -1175,97 +1175,12 @@ export function CoordinatorDashboard({
                 </p>
               </div>
             ) : (
-              <div className="team-summary-grid">
-                {teams.map((team) => {
-                  const { source, document } = team
-                  const totals = totalsForDocument(document)
-                  const athletes = document.athletes.filter((athlete) => athlete.active).length
-                  const possibleAttendances = totals.sessions * athletes
-                  return (
-                    <article className="team-summary-card" key={source}>
-                        <div className="team-card-heading">
-                          <div>
-                            <span>{document.organizationName}</span>
-                            <h3>{document.teamName}</h3>
-                          </div>
-                          <span className="season-pill">
-                            {document.season.startYear}–{String(document.season.endYear).slice(-2)}
-                          </span>
-                        </div>
-                        <div className="team-card-metrics">
-                          <span>
-                            <UserRound size={16} /> {document.coachName}
-                          </span>
-                          <span>
-                            <Users size={16} /> {athletes} atlete
-                          </span>
-                          <span>{totals.sessions} allenamenti</span>
-                        </div>
-                        <div className="team-status-totals">
-                          {document.statuses.map((status) => {
-                            const count = totals.byStatus[status.id] ?? 0
-                            const percentage = possibleAttendances
-                              ? (count / possibleAttendances) * 100
-                              : 0
-                            const scaleColor = percentageScaleColor(status, percentage)
-                            return (
-                              <span
-                                className={scaleColor ? 'color-scale-cell' : undefined}
-                                key={status.id}
-                                title={`${status.label}: ${Math.round(percentage)}%`}
-                                style={
-                                  scaleColor
-                                    ? ({ '--percentage-scale-color': scaleColor } as CSSProperties)
-                                    : undefined
-                                }
-                              >
-                                <i style={{ background: status.color }}>{status.code}</i>
-                                <b>{Math.round(percentage)}%</b>
-                              </span>
-                            )
-                          })}
-                        </div>
-                        <PlannedSessionsPanel
-                          document={document}
-                          compact
-                          onIgnore={
-                            !isViewer && canWriteTeam(team)
-                              ? (date) => ignoreTeamTrainingDate(team, date)
-                              : undefined
-                          }
-                          onAdd={
-                            !isViewer && canWriteTeam(team)
-                              ? (date) => void openTeamAsCoach(team, date)
-                              : undefined
-                          }
-                        />
-                        <div className="team-card-actions">
-                          <button
-                            className="button team-report-button"
-                            onClick={() =>
-                              onNavigate(
-                                `${basePath}/squadra/${encodeURIComponent(document.teamId)}`
-                              )
-                            }
-                          >
-                            Apri squadra
-                            <ChevronRight size={17} />
-                          </button>
-                          {!isViewer && canWriteTeam(team) && (
-                            <button
-                              className="button secondary"
-                              type="button"
-                              onClick={() => void openTeamAsCoach(team)}
-                            >
-                              <ClipboardCheck size={17} />
-                              Entra come allenatore
-                            </button>
-                          )}
-                        </div>
-                    </article>
-                  )
-                })}
-              </div>
+              <TeamDirectory teams={teams} canEditTeam={team => !isViewer && canWriteTeam(team)}
+                onOpen={team => onNavigate(`${basePath}/squadra/${encodeURIComponent(team.document.teamId)}`)}
+                onOpenAsCoach={!isViewer ? team => { if (canWriteTeam(team)) void openTeamAsCoach(team) } : undefined}
+                onNewSession={!isViewer ? (team, date) => { if (canWriteTeam(team)) void openTeamAsCoach(team, date) } : undefined}
+                onIgnore={!isViewer ? (team, date) => canWriteTeam(team) ? ignoreTeamTrainingDate(team, date) : Promise.resolve() : undefined}
+              />
             )}
           </section>
         </main>

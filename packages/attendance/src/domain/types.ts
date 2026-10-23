@@ -33,6 +33,9 @@ export interface Athlete {
 }
 
 export interface TrainingSession {
+  /** Optional participation declarations supplied by the hosting app. */
+  confirmedAthleteIds?: string[]
+  label?: string
   id: string
   date: string
   attendances: Record<string, string>
@@ -61,6 +64,8 @@ export interface Season {
 }
 
 export interface TeamDocument {
+  /** API-backed calendars may contain several events on the same date. */
+  sessionIdentity?: 'id'
   schemaVersion: typeof ATTENDANCE_SCHEMA_VERSION
   teamId: string
   teamName: string

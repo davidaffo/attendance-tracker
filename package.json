@@ -14,7 +14,9 @@
     "verify:pages": "node scripts/verify-pages-build.mjs",
     "preview": "vite preview",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "build:attendance": "npm run build --workspace @clubiva/attendance",
+    "pack:attendance": "npm run build:attendance && npm pack --workspace @clubiva/attendance --pack-destination packages/attendance"
   },
   "dependencies": {
     "idb": "^8.0.3",
@@ -29,9 +31,13 @@
     "typescript": "^7.0.2",
     "vite": "^7.3.6",
     "vite-plugin-pwa": "^1.2.0",
-    "vitest": "^4.1.10"
+    "vitest": "^4.1.10",
+    "postcss": "^8.5.24"
   },
   "overrides": {
     "brace-expansion": "5.0.8"
-  }
+  },
+  "workspaces": [
+    "packages/*"
+  ]
 }

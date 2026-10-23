@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
-import { createTeamDocument } from '../domain/defaults'
-import { saveSession, deleteSession, saveSessionScore, saveMonthlyScoreAdjustments } from '../domain/document'
+import { createTeamDocument } from '../../packages/attendance/src/domain/defaults'
+import { saveSession, deleteSession, saveSessionScore, saveMonthlyScoreAdjustments } from '../../packages/attendance/src/domain/document'
 import { mergeDocumentsFromBase } from '../domain/syncMerge'
 
 function fixture() {

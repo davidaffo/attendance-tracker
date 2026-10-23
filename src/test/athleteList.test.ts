@@ -3,7 +3,7 @@ import {
   formatAthleteName,
   normalizeAthleteName,
   parseAthleteList
-} from '../domain/athleteList'
+} from '../../packages/attendance/src/domain/athleteList'
 
 describe('elenco giocatrici', () => {
   it('legge una giocatrice per riga e ignora le righe vuote', () => {

@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Check, ChevronDown, LoaderCircle } from 'lucide-react'
-import type { TeamDocument, TeamSummary } from '../domain/types'
+import type { TeamDocument, TeamSummary } from '../../packages/attendance/src/domain/types'
 
 interface CoachTeamSwitcherProps {
   currentDocument: TeamDocument

@@ -1,5 +1,5 @@
 import { AlertTriangle, CloudDownload, GitMerge, Upload } from 'lucide-react'
-import type { ConflictResolution } from '../services/webdav'
+import type { ConflictResolution } from '../adapters/nextcloud'
 
 interface ConflictResolutionDialogProps {
   syncConflicts?: string[]

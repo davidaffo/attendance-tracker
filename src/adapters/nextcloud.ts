@@ -1,14 +1,14 @@
 import { mergeDocumentsFromBase, type SyncConflictChoice } from '../domain/syncMerge'
-import { mergeDocuments, parseTeamDocument, serializeTeamDocument } from '../domain/document'
+import { mergeDocuments, parseTeamDocument, serializeTeamDocument } from '../../packages/attendance/src/domain/document'
 import { isBackupPath } from '../domain/backup'
-import { remoteFileName } from '../domain/defaults'
+import { remoteFileName } from '../../packages/attendance/src/domain/defaults'
 import type {
   LocalSyncMeta,
   SyncConfig,
   TeamDocument,
   TeamSummary
-} from '../domain/types'
-import { nextcloudAuthorization, normalizeNextcloudBaseUrl } from './nextcloud'
+} from '../../packages/attendance/src/domain/types'
+import { nextcloudAuthorization, normalizeNextcloudBaseUrl } from '../services/nextcloud'
 
 interface RemoteFile {
   document?: TeamDocument

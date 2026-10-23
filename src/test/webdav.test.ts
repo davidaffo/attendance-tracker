@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
-import { createTeamDocument } from '../domain/defaults'
-import { serializeTeamDocument } from '../domain/document'
+import { createTeamDocument } from '../../packages/attendance/src/domain/defaults'
+import { serializeTeamDocument } from '../../packages/attendance/src/domain/document'
 import { detailsFromNextcloudFolderLink } from '../domain/syncConfig'
 import {
   createRemoteTeamDocument,
@@ -17,7 +17,7 @@ import {
   testNextcloudCredentials,
   updateRemoteTeamDocument,
   verifyRemoteFolderWritable
-} from '../services/webdav'
+} from '../adapters/nextcloud'
 
 afterEach(() => {
   vi.unstubAllGlobals()

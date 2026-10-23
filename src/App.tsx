@@ -15,25 +15,25 @@ import {
 } from 'lucide-react'
 import { ConflictResolutionDialog } from './components/ConflictResolutionDialog'
 import { mergeDocumentsFromBase, type SyncConflictChoice } from './domain/syncMerge'
-import { AttendanceEditor } from './components/AttendanceEditor'
+import { AttendanceEditor } from '../packages/attendance/src/components/AttendanceEditor'
 import { AppBrand } from './components/AppBrand'
 import { AppModeControls } from './components/AppModeControls'
 import { CoachOnboarding } from './components/CoachOnboarding'
 import { CoachStart } from './components/CoachStart'
 import { CoachTeamSwitcher } from './components/CoachTeamSwitcher'
 import { CoordinatorDashboard } from './components/CoordinatorDashboard'
-import { Dashboard } from './components/Dashboard'
-import { MonthlyRegister } from './components/MonthlyRegister'
+import { Dashboard } from '../packages/attendance/src/components/Dashboard'
+import { MonthlyRegister } from '../packages/attendance/src/components/MonthlyRegister'
 import { PasswordPrompt } from './components/PasswordPrompt'
 import { ResetAppDataButton } from './components/ResetAppDataButton'
 import { SharedTeamSetup } from './components/SharedTeamSetup'
 import { SyncSettings } from './components/SyncSettings'
-import { TeamSettings } from './components/TeamSettings'
-import { Scores } from './components/Scores'
+import { TeamSettings } from '../packages/attendance/src/components/TeamSettings'
+import { Scores } from '../packages/attendance/src/components/Scores'
 import { ThemeSelector } from './components/ThemeSelector'
 import {
   COACH_ONBOARDING_VERSION
-} from './domain/defaults'
+} from '../packages/attendance/src/domain/defaults'
 import {
   allowsCoachBackgroundSync,
   hasStoredSetupForMode
@@ -44,7 +44,7 @@ import {
   saveSession,
   saveSessionScore,
   saveMonthlyScoreAdjustments
-} from './domain/document'
+} from '../packages/attendance/src/domain/document'
 import {
   metaForManualSync,
   metaForRestoredBackup,
@@ -62,13 +62,13 @@ import type {
   TeamDocument,
   TeamSummary,
   TrainingSession
-} from './domain/types'
+} from '../packages/attendance/src/domain/types'
 import {
   RemoteDocumentConflictError,
   discoverRemoteTeamDocuments,
   synchronizeDocument,
   testNextcloudCredentials
-} from './services/webdav'
+} from './adapters/nextcloud'
 import { writeTeamDocumentToFile } from './services/localFiles'
 import { prepareStartupConnection, type StartupSyncOutcome as SyncOutcome } from './services/connection'
 import {

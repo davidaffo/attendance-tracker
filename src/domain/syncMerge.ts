@@ -1,4 +1,4 @@
-import type { TeamDocument, TrainingSession } from './types'
+import type { TeamDocument, TrainingSession } from '../../packages/attendance/src/domain/types'
 
 export type SyncConflictChoice = 'local' | 'remote'
 export interface DocumentMerge {

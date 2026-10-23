@@ -1,5 +1,5 @@
-import { remoteFileName } from '../domain/defaults'
-import type { SyncConfig, TeamDocument } from '../domain/types'
+import { remoteFileName } from '../../packages/attendance/src/domain/defaults'
+import type { SyncConfig, TeamDocument } from '../../packages/attendance/src/domain/types'
 import { nextcloudAuthorization, normalizeNextcloudBaseUrl } from './nextcloud'
 
 export const NEXTCLOUD_SHARE_TYPE_USER = 0
