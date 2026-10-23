@@ -1,6 +1,6 @@
 {
-  "name": "@clubiva/attendance",
-  "version": "0.2.1",
+  "name": "@clubalive/attendance",
+  "version": "0.3.0",
   "type": "module",
   "files": [
     "dist"

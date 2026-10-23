@@ -15,8 +15,8 @@
     "preview": "vite preview",
     "test": "vitest run",
     "test:watch": "vitest",
-    "build:attendance": "npm run build --workspace @clubiva/attendance",
-    "pack:attendance": "npm run build:attendance && npm pack --workspace @clubiva/attendance --pack-destination packages/attendance"
+    "build:attendance": "npm run build --workspace @clubalive/attendance",
+    "pack:attendance": "npm run build:attendance && npm pack --workspace @clubalive/attendance --pack-destination packages/attendance"
   },
   "dependencies": {
     "idb": "^8.0.3",
