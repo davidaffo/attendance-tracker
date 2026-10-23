@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import {
   ArrowLeft,
   ChevronLeft,
@@ -398,6 +398,7 @@ function ScoreEditor({
   const [pasteText, setPasteText] = useState('')
   const [assignmentMessage, setAssignmentMessage] = useState('')
   const [draggedAthleteId, setDraggedAthleteId] = useState<string>()
+  const individualScoreInputs = useRef<Array<HTMLInputElement | null>>([])
   useEffect(() => setDraft(session.score ?? emptyScore()), [session.id, session.score])
   const athletes = useMemo(
     () => athletesForReport(document),
@@ -761,7 +762,7 @@ function ScoreEditor({
       <section className="panel score-athletes-panel">
         <div className="panel-heading"><div><h2>Punteggi individuali</h2></div></div>
         <div className="score-athlete-list">
-          {athletes.map((athlete) => {
+          {athletes.map((athlete, index) => {
             const absent = session.attendances[athlete.id] === absentStatusId
             const previewSession: TrainingSession = { ...session, score: draft as SessionScore }
             const points = absent ? 0 : athleteScoreForSession(document, previewSession, athlete.id)
@@ -786,8 +787,19 @@ function ScoreEditor({
                   <input
                     type="number"
                     step="1"
+                    ref={(element) => { individualScoreInputs.current[index] = element }}
                     disabled={absent}
                     value={draft.adjustments[athlete.id] ?? 0}
+                    onFocus={(event) => event.currentTarget.select()}
+                    onClick={(event) => event.currentTarget.select()}
+                    onKeyDown={(event) => {
+                      if (event.key !== 'Enter' || event.nativeEvent.isComposing) return
+                      event.preventDefault()
+                      individualScoreInputs.current
+                        .slice(index + 1, athletes.length)
+                        .find((input) => input && !input.disabled)
+                        ?.focus()
+                    }}
                     onChange={(event) => setDraft((current) => ({
                       ...current,
                       adjustments: {
